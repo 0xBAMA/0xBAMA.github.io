@@ -17,7 +17,7 @@ body {
             var paletteG = [];
             var paletteB = [];
 
-			function start()
+			function startfire()
 			{
 				//get your context stuff
 				canvas = document.getElementById('fire');
@@ -167,96 +167,100 @@ body {
 		</script>
 
 	<script type="application/javascript">
-            var oldImageData;
-            var newImageData;
+            var gololdImageData;
+            var golnewImageData;
 
+            var golwidth;
+            var golheight
 
+            var golctx;
+            var golcanvas;
 
-			function start2()
+			function startgol()
 			{
 				//get your context stuff
-				canvas = document.getElementById('GoL');
-				ctx = canvas.getContext('2d');
+				golcanvas = document.getElementById('GoL');
+				golctx = golcanvas.getContext('2d');
 				
 				//establish width, with wide border (100px all edges)
-				width = ctx.canvas.width  = 500;
-				height = ctx.canvas.height = 150;
+				golwidth = golctx.canvas.width  = 500;
+				golheight = golctx.canvas.height = 150;
 
-                newImageData = ctx.createImageData(width, height);
+                golnewImageData = golctx.createImageData(golwidth, golheight);
 
-                for(var	x = 0; x < width; x++)
+                for(var	x = 0; x < golwidth; x++)
                 {
-                    for(var y = 0; y < height; y++)
+                    for(var y = 0; y < golheight; y++)
                     {
                         //write your initial image data
                         var val = Math.random() > 0.5 ? 255 : 0;
-                        newImageData.data[y*width*4+x*4+0] = val; 
-                        newImageData.data[y*width*4+x*4+1] = val;
-                        newImageData.data[y*width*4+x*4+2] = val;
-                        newImageData.data[y*width*4+x*4+3] = 255;
+                        golnewImageData.data[y*golwidth*4+x*4+0] = val; 
+                        golnewImageData.data[y*golwidth*4+x*4+1] = val;
+                        golnewImageData.data[y*golwidth*4+x*4+2] = val;
+                        golnewImageData.data[y*golwidth*4+x*4+3] = 255;
 					}
 				}
                 
 				//call draw every __ ms
-				var id = setInterval(draw, 50);
+				var idgol = setInterval(drawgol, 50);
 			}
 
-			function draw() 
+			function drawgol() 
 			{
 				//get your context stuff
-				canvas = document.getElementById('GoL');
-				ctx = canvas.getContext('2d');
+				golcanvas = document.getElementById('GoL');
+				golctx = golcanvas.getContext('2d');
 				
 				//establish width, with wide border (100px all edges)
-				width = ctx.canvas.width  = 500;
-				height = ctx.canvas.height = 150;
+				golwidth = golctx.canvas.width  = 500;
+				golheight = golctx.canvas.height = 150;
 
 				//get old data - that's the same as last frame's new data
-				oldImageData = newImageData; 
+				gololdImageData = golnewImageData; 
 
 				//new image data, with same dimensions
-				newImageData = ctx.createImageData(oldImageData);
+				golnewImageData = golctx.createImageData(gololdImageData);
 
 				//manipulate the data
-                for(var	x = 0; x < width; x++)
+                for(var	x = 0; x < golwidth; x++)
                 {
-                    for(var y = 0; y < height; y++)
+                    for(var y = 0; y < golheight; y++)
                     {
                         //read from oldImageData.data
                         var sum = 0;
-                        var was_live = (oldImageData.data[(y+0)*width*4+(x+0)*4] == 255) ? 1 : 0;
+                        var was_live = (gololdImageData.data[(y+0)*golwidth*4+(x+0)*4] == 255) ? 1 : 0;
 
-                        sum += (oldImageData.data[(y+1)*width*4+(x+1)*4] == 255) ? 1 : 0;
-                        sum += (oldImageData.data[(y+1)*width*4+(x+0)*4] == 255) ? 1 : 0;
-                        sum += (oldImageData.data[(y+1)*width*4+(x-1)*4] == 255) ? 1 : 0;
+                        sum += (gololdImageData.data[(y+1)*golwidth*4+(x+1)*4] == 255) ? 1 : 0;
+                        sum += (gololdImageData.data[(y+1)*golwidth*4+(x+0)*4] == 255) ? 1 : 0;
+                        sum += (gololdImageData.data[(y+1)*golwidth*4+(x-1)*4] == 255) ? 1 : 0;
                         
-                        sum += (oldImageData.data[(y+0)*width*4+(x+1)*4] == 255) ? 1 : 0;
-                        sum += (oldImageData.data[(y+0)*width*4+(x-1)*4] == 255) ? 1 : 0;
+                        sum += (gololdImageData.data[(y+0)*golwidth*4+(x+1)*4] == 255) ? 1 : 0;
+                        sum += (gololdImageData.data[(y+0)*golwidth*4+(x-1)*4] == 255) ? 1 : 0;
                         
-                        sum += (oldImageData.data[(y-1)*width*4+(x+1)*4] == 255) ? 1 : 0;
-                        sum += (oldImageData.data[(y-1)*width*4+(x+0)*4] == 255) ? 1 : 0;
-                        sum += (oldImageData.data[(y-1)*width*4+(x-1)*4] == 255) ? 1 : 0;
+                        sum += (gololdImageData.data[(y-1)*golwidth*4+(x+1)*4] == 255) ? 1 : 0;
+                        sum += (gololdImageData.data[(y-1)*golwidth*4+(x+0)*4] == 255) ? 1 : 0;
+                        sum += (gololdImageData.data[(y-1)*golwidth*4+(x-1)*4] == 255) ? 1 : 0;
 
                         //do your computation
                         var is_live = (was_live && (sum == 2 || sum == 3)) || (!was_live && sum == 3);
 
                         //cell lives when it has either 2 or three neighbors
-                        newImageData.data[y*width*4+x*4+0] = is_live ? 255 : 0;
-                        newImageData.data[y*width*4+x*4+1] = is_live ? 255 : 0;
-                        newImageData.data[y*width*4+x*4+2] = is_live ? 255 : 0;
-                        newImageData.data[y*width*4+x*4+3] = 255;
+                        golnewImageData.data[y*golwidth*4+x*4+0] = is_live ? 255 : 0;
+                        golnewImageData.data[y*golwidth*4+x*4+1] = is_live ? 255 : 0;
+                        golnewImageData.data[y*golwidth*4+x*4+2] = is_live ? 255 : 0;
+                        golnewImageData.data[y*golwidth*4+x*4+3] = 255;
                         
 					}
 				}
 
                 //display the current data
-				ctx.putImageData(newImageData, 0, 0);
+				golctx.putImageData(golnewImageData, 0, 0);
 			}
 		</script>
 
 
 </head>
-<body onload="start(); start2();">
+<body onload="startfire(); startgol();">
 
 <h1>Jon Baker, Graphics Programming</h1>
 
