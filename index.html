@@ -266,9 +266,152 @@ body {
 			}
 		</script>
 
+<script type="application/javascript">
+            var wireoldImageData;
+            var wirenewImageData;
+            
+            var wirecanvas;
+            var wirectx;
 
+			function startwireworld()
+			{
+				//get your context stuff
+				wirecanvas = document.getElementById('wireworldbg');
+				wirectx = wirecanvas.getContext('2d');
+
+				wirewidth = wirectx.canvas.width  = 768;
+				wireheight = wirectx.canvas.height = 100;
+
+				//initially fill with all black
+				wirectx.fillStyle = 'rgb(64,64,64,255)';
+				wirectx.fillRect(0,0,wirewidth,wireheight);
+                
+				wirecanvas = document.getElementById('wireworld');
+				wirectx = wirecanvas.getContext('2d');
+				wirectx.imageSmoothingEnabled = false;
+
+				//establish width, with wide border (100px all edges)
+				wirewidth = wirectx.canvas.width  = 768;
+				wireheight = wirectx.canvas.height = 100;
+
+                wirenewImageData = wirectx.createImageData(wirewidth, wireheight);
+
+                for(var	x = 0; x < wirewidth; x++)
+                {
+                    for(var y = 0; y < wireheight; y++)
+                    {
+                        var sample = Math.random();
+                        if(x%12==0 || y%8==0)
+                        {
+                            if(sample > 0.999)
+                            {
+                                wirenewImageData.data[y*wirewidth*4+x*4+0] = 255; 
+                                wirenewImageData.data[y*wirewidth*4+x*4+1] = 255;
+                                wirenewImageData.data[y*wirewidth*4+x*4+2] = 0;
+                                wirenewImageData.data[y*wirewidth*4+x*4+3] = 255;
+                            }
+                            else
+                            {
+                                wirenewImageData.data[y*wirewidth*4+x*4+0] = 0; 
+                                wirenewImageData.data[y*wirewidth*4+x*4+1] = 0;
+                                wirenewImageData.data[y*wirewidth*4+x*4+2] = 0;
+                                wirenewImageData.data[y*wirewidth*4+x*4+3] = 255;
+                            }
+                        }
+                        else
+                        {
+                            wirenewImageData.data[y*wirewidth*4+x*4+0] = 0; 
+                            wirenewImageData.data[y*wirewidth*4+x*4+1] = 0;
+                            wirenewImageData.data[y*wirewidth*4+x*4+2] = 0;
+                            wirenewImageData.data[y*wirewidth*4+x*4+3] = 0;
+                        }
+                    }
+				}
+
+				wirectx.putImageData(wirenewImageData, 0, 0);
+
+				//call draw every __ ms
+				var idwire = setInterval(drawwire, 50);
+			}
+
+			function drawwire() 
+			{
+				//get old data - that's the same as last frame's new data
+				wireoldImageData = wirenewImageData; 
+
+				//new image data, with same dimensions
+				wirenewImageData = wirectx.createImageData(wireoldImageData);
+
+				//manipulate the data
+                for(var	x = 0; x < wirewidth; x++)
+                {
+                    for(var y = 0; y < wireheight; y++)
+                    {
+                        //read from oldImageData.data
+                        //red channel set, means electron head
+                        var was_head = (wireoldImageData.data[(y+0)*wirewidth*4+(x+0)*4] == 255) ? 1 : 0;
+                        //blue channel set, meads electron tail
+                        var was_tail = (wireoldImageData.data[(y+0)*wirewidth*4+(x+0)*4+2] == 255) ? 1 : 0;
+                        var has_alpha = (wireoldImageData.data[(y+0)*wirewidth*4+(x+0)*4+3] == 255) ? 1 : 0;
+ 
+
+
+                        //do your computation
+
+                        if(has_alpha)
+                        {//part of the simulation
+                            if(was_head)
+                            {//this was a head, and will become a tail
+                                wirenewImageData.data[y*wirewidth*4+x*4+0] = 0;
+                                wirenewImageData.data[y*wirewidth*4+x*4+1] = 255;
+                                wirenewImageData.data[y*wirewidth*4+x*4+2] = 255;
+                                wirenewImageData.data[y*wirewidth*4+x*4+3] = 255;
+                            }
+                            else if(was_tail)
+                            {//this was a tail, and will become conductor
+                                wirenewImageData.data[y*wirewidth*4+x*4+0] = 0;
+                                wirenewImageData.data[y*wirewidth*4+x*4+1] = 0;
+                                wirenewImageData.data[y*wirewidth*4+x*4+2] = 0;
+                                wirenewImageData.data[y*wirewidth*4+x*4+3] = 255;
+                            }
+                            else
+                            {//conductor, needs to check neighborhood
+                                var sum = 0;
+                                sum += (wireoldImageData.data[(y+1)*wirewidth*4+(x+1)*4] == 255) ? 1 : 0;
+                                sum += (wireoldImageData.data[(y+1)*wirewidth*4+(x+0)*4] == 255) ? 1 : 0;
+                                sum += (wireoldImageData.data[(y+1)*wirewidth*4+(x-1)*4] == 255) ? 1 : 0;
+                        
+                                sum += (wireoldImageData.data[(y+0)*wirewidth*4+(x+1)*4] == 255) ? 1 : 0;
+                                sum += (wireoldImageData.data[(y+0)*wirewidth*4+(x-1)*4] == 255) ? 1 : 0;
+                        
+                                sum += (wireoldImageData.data[(y-1)*wirewidth*4+(x+1)*4] == 255) ? 1 : 0;
+                                sum += (wireoldImageData.data[(y-1)*wirewidth*4+(x+0)*4] == 255) ? 1 : 0;
+                                sum += (wireoldImageData.data[(y-1)*wirewidth*4+(x-1)*4] == 255) ? 1 : 0;
+                                if(sum==1||sum==2)
+                                {//this cell will become an electron head
+                                    wirenewImageData.data[y*wirewidth*4+x*4+0] = 255;
+                                    wirenewImageData.data[y*wirewidth*4+x*4+1] = 255;
+                                    wirenewImageData.data[y*wirewidth*4+x*4+2] = 0;
+                                    wirenewImageData.data[y*wirewidth*4+x*4+3] = 255;
+                                }
+                                else
+                                {//int stays a conductor
+                                    wirenewImageData.data[y*wirewidth*4+x*4+0] = 0;
+                                    wirenewImageData.data[y*wirewidth*4+x*4+1] = 0;
+                                    wirenewImageData.data[y*wirewidth*4+x*4+2] = 0;
+                                    wirenewImageData.data[y*wirewidth*4+x*4+3] = 255;
+                                }
+                            }
+                        }
+					}
+				}
+
+                //display the current data
+				wirectx.putImageData(wirenewImageData, 0, 0);
+			}
+		</script>
 </head>
-<body onload="startfire(); startgol();">
+<body onload="startfire(); startgol(); startwireworld();">
 
 <h1>Jon Baker, Graphics Programming</h1>
 
@@ -287,7 +430,17 @@ body {
 <h2>&nbsp&nbsp Conway's Game of Life</h2>
 <p style="display: inline-block;"> &nbsp&nbsp &nbsp&nbsp &nbsp </p>
 <canvas id="GoL" style="border: 2px solid #ba550b;">Could not load Game of Life.</canvas>
+<br>
 
+
+<h2>&nbsp&nbsp WireWorld</h2>
+<div style="position: relative; left: 150;">
+<p style="display: inline-block;"> &nbsp&nbsp &nbsp&nbsp &nbsp </p>
+ <canvas id="wireworldbg" 
+    style="position: absolute; left: 50; top: 0; z-index: 0; border: 2px solid #ba550b; "></canvas>
+ <canvas id="wireworld"
+    style="position: absolute; left: 50; top: 0; z-index: 1; border: 2px solid #ba550b;  ">Wireworld loading failed.</canvas>
+</div>
 
 </body>
 </html>
