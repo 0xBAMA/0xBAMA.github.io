@@ -6,12 +6,173 @@ body {
   background-color: lightblue;
 }
 </style>
+
+
+<script type="application/javascript">
+            var oldImageData;
+            var newImageData;
+            var outputImageData;
+
+            var paletteR = [];
+            var paletteG = [];
+            var paletteB = [];
+
+			function start()
+			{
+				//get your context stuff
+				canvas = document.getElementById('fire');
+				ctx = canvas.getContext('2d');
+				
+				//establish width, with wide border (100px all edges)
+				width = ctx.canvas.width  = 500;
+				height = ctx.canvas.height = 100;
+
+                gen_palette();
+
+				//initially fill with all black
+				ctx.fillStyle = 'rgb(0,0,0,255)';
+				ctx.fillRect(0,0,width,height);
+
+                oldImageData = newImageData = outputImageData = ctx.getImageData(0, 0, width, height);
+
+				//call draw every __ ms
+				var id = setInterval(draw, 50);
+			}
+
+            function gen_palette()
+            {
+                for(var i = 0; i < 256; i++)
+                {
+                    HSLToRGB(i/3, 255, Math.min(255, i*2));
+                }
+            }
+
+            function HSLToRGB(h,s,l) 
+            {
+                // Must be fractions of 1
+                s /= 255;
+                l /= 255;
+
+                let c = (1 - Math.abs(2 * l - 1)) * s,
+                    x = c * (1 - Math.abs((h / 60) % 2 - 1)),
+                    m = l - c/2,
+                    r = 0,
+                    g = 0,
+                    b = 0;
+
+
+                if (0 <= h && h < 60) {
+                    r = c; g = x; b = 0;
+                } else if (60 <= h && h < 120) {
+                    r = x; g = c; b = 0;
+                } else if (120 <= h && h < 180) {
+                    r = 0; g = c; b = x;
+                } else if (180 <= h && h < 240) {
+                    r = 0; g = x; b = c;
+                } else if (240 <= h && h < 300) {
+                    r = x; g = 0; b = c;
+                } else if (300 <= h && h < 360) {
+                    r = c; g = 0; b = x;
+                }
+
+                r = Math.round((r + m) * 255);
+                g = Math.round((g + m) * 255);
+                b = Math.round((b + m) * 255);
+
+                console.log("rgb(" + r + "," + g + "," + b + ")");
+                paletteR.push(r);
+                paletteG.push(g);
+                paletteB.push(b);
+            }
+
+			function draw() 
+			{
+				//get old data
+				oldImageData = newImageData; 
+
+				//new image data, with same dimensions
+				newImageData = ctx.createImageData(oldImageData);
+
+                //update the bottom row
+                for(var x = 0; x < width; x++)
+                {
+                    oldImageData.data[(height-1)*width*4+x*4] = Math.random()*255; 
+                    //oldImageData.data[(height-1)*width*4+x*4] = Math.sin(0.3*x)*255; 
+                }
+
+				//manipulate the data
+                for(var	x = 0; x < width; x++)
+                {
+                    for(var y = 0; y < height; y++)
+                    {
+                        var avg = 0;
+
+                        if(x == 0)
+                        {
+                            avg += oldImageData.data[(y+1)*width*4 + (width-1)*4];
+                            avg += oldImageData.data[(y+1)*width*4 + (x)*4];
+                            avg += oldImageData.data[(y+1)*width*4 + (x+1)*4];
+                            avg += oldImageData.data[(y+2)*width*4 + (x)*4];
+                        }
+                        else if(x == width-1)
+                        {
+                            avg += oldImageData.data[(y+1)*width*4 + (x-1)*4];
+                            avg += oldImageData.data[(y+1)*width*4 + (x)*4];
+                            avg += oldImageData.data[(y+1)*width*4 + (0)*4];
+                            avg += oldImageData.data[(y+2)*width*4 + (x)*4];
+                        }
+                        else
+                        {
+                            avg += oldImageData.data[(y+1)*width*4 + (x-1)*4];
+                            avg += oldImageData.data[(y+1)*width*4 + (x)*4];
+                            avg += oldImageData.data[(y+1)*width*4 + (x+1)*4];
+                            avg += oldImageData.data[(y+2)*width*4 + (x)*4];
+                        }
+
+                        //avg /= 4.0625;
+                        //avg /= (129/32);
+                        avg /= 3.9;
+
+                        newImageData.data[y*width*4+x*4] = avg - 1; 
+					}
+				}
+
+                var outputImageData = ctx.createImageData(newImageData);
+
+                for(var i = 0; i < 4 * width * height; i += 4)
+                {
+                    outputImageData.data[i]   = paletteR[newImageData.data[i]];
+                    outputImageData.data[i+1] = paletteG[newImageData.data[i]];
+                    outputImageData.data[i+2] = paletteB[newImageData.data[i]];
+                    outputImageData.data[i+3] = 255;
+                    //outputImageData.data[i+3] = paletteR[newImageData.data[i]];
+                }
+
+				//put the manipulated data back
+				ctx.putImageData(outputImageData, 0, 0);
+			}
+		</script>
+
+
+
 </head>
-<body>
+<body onload="start();">
 
 <h1>Jon Baker, Graphics Programming</h1>
 
-<p> This site is a work in progress.</p>
+<p> This site is a work in progress. See some html5 canvas demos below (refresh to reset).</p>
+
+<br>
+<h1 style="display: inline-block;">Fire</h1>
+<p style="display: inline-block;">based on <a href = "https://lodev.org/cgtutor/fire.html">this tutorial</a>.</p>
+<br>
+<canvas id="fire">Could not load fire effect.</canvas>
+<br>
+
+
+<h2>Conway's Game of Life</h2>
+<canvas id="GoL">Could not load Game of Life.</canvas>
+
 
 </body>
 </html>
