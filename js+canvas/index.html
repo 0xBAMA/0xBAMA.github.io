@@ -31,9 +31,9 @@ body {
 				canvas = document.getElementById('fire');
 				ctx = canvas.getContext('2d');
 				
-				//establish width, with wide border (100px all edges)
+				//establish width
 				width = ctx.canvas.width  = 768;
-				height = ctx.canvas.height = 100;
+				height = ctx.canvas.height = 75;
 
                 gen_palette();
 
@@ -101,7 +101,7 @@ body {
 				
 				//establish width, with wide border (100px all edges)
 				width = ctx.canvas.width  = 768;
-				height = ctx.canvas.height = 100;
+				height = ctx.canvas.height = 75;
 
 				//get old data
 				oldImageData = newImageData; 
@@ -192,7 +192,7 @@ body {
 				
 				//establish width, with wide border 
 				golwidth = golctx.canvas.width  = 768;
-				golheight = golctx.canvas.height = 200;
+				golheight = golctx.canvas.height = 75;
 
                 golnewImageData = golctx.createImageData(golwidth, golheight);
 
@@ -221,7 +221,7 @@ body {
 				
 				//establish width, with wide border (100px all edges)
 				golwidth = golctx.canvas.width  = 768;
-				golheight = golctx.canvas.height = 200;
+				golheight = golctx.canvas.height = 75;
 
 				//get old data - that's the same as last frame's new data
 				gololdImageData = golnewImageData; 
@@ -280,7 +280,7 @@ body {
 				wirectx = wirecanvas.getContext('2d');
 
 				wirewidth = wirectx.canvas.width  = 768;
-				wireheight = wirectx.canvas.height = 100;
+				wireheight = wirectx.canvas.height = 75;
 
 				//initially fill with all black
 				wirectx.fillStyle = 'rgb(64,64,64,255)';
@@ -292,7 +292,7 @@ body {
 
 				//establish width, with wide border (100px all edges)
 				wirewidth = wirectx.canvas.width  = 768;
-				wireheight = wirectx.canvas.height = 100;
+				wireheight = wirectx.canvas.height = 75;
 
                 wirenewImageData = wirectx.createImageData(wirewidth, wireheight);
 
@@ -443,7 +443,7 @@ body {
 
 <h1>Jon Baker, Graphics Programming</h1>
 
-<p>  &nbsp&nbsp&nbsp&nbsp        This site is a work in progress. See some live html5 canvas demos below (refresh to reset).</p>
+<p>  &nbsp&nbsp&nbsp&nbsp        Refresh to reset. Click titles to go to a page with a larger canvas and explanation.</p>
 
 <br>
 <h2 style="display: inline-block;">&nbsp&nbsp Fire</h2>
