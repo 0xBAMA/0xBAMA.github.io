@@ -32,7 +32,7 @@ body {
 				ctx = canvas.getContext('2d');
 				
 				//establish width, with wide border (100px all edges)
-				width = ctx.canvas.width  = 162;
+				width = ctx.canvas.width  = 768;
 				height = ctx.canvas.height = 100;
 
                 gen_palette();
@@ -101,7 +101,7 @@ body {
 				
 				//establish width, with wide border (100px all edges)
 				width = ctx.canvas.width  = 768;
-				height = ctx.canvas.height = 162;
+				height = ctx.canvas.height = 100;
 
 				//get old data
 				oldImageData = newImageData; 
@@ -191,8 +191,8 @@ body {
 				golctx = golcanvas.getContext('2d');
 				
 				//establish width, with wide border 
-				golwidth = golctx.canvas.width  =  262;
-				golheight = golctx.canvas.height = 162;
+				golwidth = golctx.canvas.width  = 768;
+				golheight = golctx.canvas.height = 200;
 
                 golnewImageData = golctx.createImageData(golwidth, golheight);
 
@@ -220,8 +220,8 @@ body {
 				golctx = golcanvas.getContext('2d');
 				
 				//establish width, with wide border (100px all edges)
-				golwidth = golctx.canvas.width  = 262;
-				golheight = golctx.canvas.height = 162;
+				golwidth = golctx.canvas.width  = 768;
+				golheight = golctx.canvas.height = 200;
 
 				//get old data - that's the same as last frame's new data
 				gololdImageData = golnewImageData; 
