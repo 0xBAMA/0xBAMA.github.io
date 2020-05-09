@@ -4,8 +4,10 @@
 <style>
 body {
     background-color: #C2A46C;
+    margin: 30px 50px 75px 100px;
     line-height: 5px;
 }
+
 </style>
 
 
@@ -25,7 +27,7 @@ body {
 				ctx = canvas.getContext('2d');
 				
 				//establish width, with wide border (100px all edges)
-				width = ctx.canvas.width  = 500;
+				width = ctx.canvas.width  = 768;
 				height = ctx.canvas.height = 100;
 
                 gen_palette();
@@ -93,7 +95,7 @@ body {
 				ctx = canvas.getContext('2d');
 				
 				//establish width, with wide border (100px all edges)
-				width = ctx.canvas.width  = 500;
+				width = ctx.canvas.width  = 768;
 				height = ctx.canvas.height = 100;
 
 				//get old data
@@ -183,9 +185,9 @@ body {
 				golcanvas = document.getElementById('GoL');
 				golctx = golcanvas.getContext('2d');
 				
-				//establish width, with wide border (100px all edges)
-				golwidth = golctx.canvas.width  = 500;
-				golheight = golctx.canvas.height = 150;
+				//establish width, with wide border 
+				golwidth = golctx.canvas.width  = 768;
+				golheight = golctx.canvas.height = 256;
 
                 golnewImageData = golctx.createImageData(golwidth, golheight);
 
@@ -213,8 +215,8 @@ body {
 				golctx = golcanvas.getContext('2d');
 				
 				//establish width, with wide border (100px all edges)
-				golwidth = golctx.canvas.width  = 500;
-				golheight = golctx.canvas.height = 150;
+				golwidth = golctx.canvas.width  = 768;
+				golheight = golctx.canvas.height = 256;
 
 				//get old data - that's the same as last frame's new data
 				gololdImageData = golnewImageData; 
@@ -265,17 +267,20 @@ body {
 
 <h1>Jon Baker, Graphics Programming</h1>
 
-<p> This site is a work in progress. See some live html5 canvas demos below (refresh to reset).</p>
+<p>  &nbsp&nbsp       This site is a work in progress. See some live html5 canvas demos below (refresh to reset).</p>
 
 <br>
 <h2 style="display: inline-block;">Fire</h2>
 <p style="display: inline-block;">based on <a href = "https://lodev.org/cgtutor/fire.html">this tutorial</a>.</p>
+
 <br>
+<p style="display: inline-block;"> &nbsp </p>
 <canvas id="fire" style="border: 2px solid #866131;" >Could not load fire effect.</canvas>
 <br>
 
 
 <h2>Conway's Game of Life</h2>
+<p style="display: inline-block;"> &nbsp </p>
 <canvas id="GoL" style="border: 2px solid #866131;">Could not load Game of Life.</canvas>
 
 
