@@ -87,6 +87,14 @@ body {
 
 			function draw() 
 			{
+				//get your context stuff
+				canvas = document.getElementById('fire');
+				ctx = canvas.getContext('2d');
+				
+				//establish width, with wide border (100px all edges)
+				width = ctx.canvas.width  = 500;
+				height = ctx.canvas.height = 100;
+
 				//get old data
 				oldImageData = newImageData; 
 
@@ -151,16 +159,108 @@ body {
 				//put the manipulated data back
 				ctx.putImageData(outputImageData, 0, 0);
 			}
+
+        function report()
+        {
+            console.log("this has been reached");
+        }
+		</script>
+
+	<script type="application/javascript">
+            var oldImageData;
+            var newImageData;
+
+
+
+			function start2()
+			{
+				//get your context stuff
+				canvas = document.getElementById('GoL');
+				ctx = canvas.getContext('2d');
+				
+				//establish width, with wide border (100px all edges)
+				width = ctx.canvas.width  = 500;
+				height = ctx.canvas.height = 150;
+
+                newImageData = ctx.createImageData(width, height);
+
+                for(var	x = 0; x < width; x++)
+                {
+                    for(var y = 0; y < height; y++)
+                    {
+                        //write your initial image data
+                        var val = Math.random() > 0.5 ? 255 : 0;
+                        newImageData.data[y*width*4+x*4+0] = val; 
+                        newImageData.data[y*width*4+x*4+1] = val;
+                        newImageData.data[y*width*4+x*4+2] = val;
+                        newImageData.data[y*width*4+x*4+3] = 255;
+					}
+				}
+                
+				//call draw every __ ms
+				var id = setInterval(draw, 50);
+			}
+
+			function draw() 
+			{
+				//get your context stuff
+				canvas = document.getElementById('GoL');
+				ctx = canvas.getContext('2d');
+				
+				//establish width, with wide border (100px all edges)
+				width = ctx.canvas.width  = 500;
+				height = ctx.canvas.height = 150;
+
+				//get old data - that's the same as last frame's new data
+				oldImageData = newImageData; 
+
+				//new image data, with same dimensions
+				newImageData = ctx.createImageData(oldImageData);
+
+				//manipulate the data
+                for(var	x = 0; x < width; x++)
+                {
+                    for(var y = 0; y < height; y++)
+                    {
+                        //read from oldImageData.data
+                        var sum = 0;
+                        var was_live = (oldImageData.data[(y+0)*width*4+(x+0)*4] == 255) ? 1 : 0;
+
+                        sum += (oldImageData.data[(y+1)*width*4+(x+1)*4] == 255) ? 1 : 0;
+                        sum += (oldImageData.data[(y+1)*width*4+(x+0)*4] == 255) ? 1 : 0;
+                        sum += (oldImageData.data[(y+1)*width*4+(x-1)*4] == 255) ? 1 : 0;
+                        
+                        sum += (oldImageData.data[(y+0)*width*4+(x+1)*4] == 255) ? 1 : 0;
+                        sum += (oldImageData.data[(y+0)*width*4+(x-1)*4] == 255) ? 1 : 0;
+                        
+                        sum += (oldImageData.data[(y-1)*width*4+(x+1)*4] == 255) ? 1 : 0;
+                        sum += (oldImageData.data[(y-1)*width*4+(x+0)*4] == 255) ? 1 : 0;
+                        sum += (oldImageData.data[(y-1)*width*4+(x-1)*4] == 255) ? 1 : 0;
+
+                        //do your computation
+                        var is_live = (was_live && (sum == 2 || sum == 3)) || (!was_live && sum == 3);
+
+                        //cell lives when it has either 2 or three neighbors
+                        newImageData.data[y*width*4+x*4+0] = is_live ? 255 : 0;
+                        newImageData.data[y*width*4+x*4+1] = is_live ? 255 : 0;
+                        newImageData.data[y*width*4+x*4+2] = is_live ? 255 : 0;
+                        newImageData.data[y*width*4+x*4+3] = 255;
+                        
+					}
+				}
+
+                //display the current data
+				ctx.putImageData(newImageData, 0, 0);
+			}
 		</script>
 
 
-
 </head>
-<body onload="start();">
+<body onload="start(); start2();">
 
 <h1>Jon Baker, Graphics Programming</h1>
 
-<p> This site is a work in progress. See some html5 canvas demos below (refresh to reset).</p>
+<p> This site is a work in progress. See some live html5 canvas demos below (refresh to reset).</p>
 
 <br>
 <h1 style="display: inline-block;">Fire</h1>
