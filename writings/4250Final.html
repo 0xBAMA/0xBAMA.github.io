@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+	font-family: 'Rokkitt', serif;
+	color:#481203;
+    background-color: #ff9123;
+    margin: 50px 50px 50px 100px;
+    line-height: 12px;
+}
+
+</style>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Rokkitt:wght@600&display=swap');
+</style>
+
+</head>
+<body>
+
+<h1>Jon Baker, Graphics Programming</h1>
+<p> &nbsp &nbsp <a href='http://jbaker.graphics/index.html'>home</a></p>
+
+
+
+<pre>
+	This project got into some things that I had really wanted to explore - where a 3D 
+texture is read only in the shader, I found out about Image3D objects which provide a 
+load/store interface and allows for arbitrary reads and writes from shader programs. The 
+value in this, to me, was the ability to use these large chunks of texture memory to 
+compute cellular automata on large 3d grids, additionally using the parallel nature of 
+the GPU to assist in making this a realtime venture.
+
+
+    There are synchronization issues to be considered as well - you might have issues 
+if your neighbors are changing state while you’re trying to read what that state is - 
+I prevented any confusion by using two buffers - each frame they change roles as to who 
+is reading and who is writing. 
+
+
+    The ideal candidate for doing this computation is a compute shader - but at the 
+time I hadn’t figured out how simple it was to set up a compute shader yet, so I had to 
+do a bit of a workaround and used a vertex shader. I used a method called attributeless 
+rendering to create a large number of invocations of the vertex shader that each had a 
+distinct gl_VertexID, which I used some simple mod logic to compute x, y and z addresses 
+along the lines of what you would have when you do a compute shader in 
+gl_globalinvocationID as a vec3. Attributeless rendering here just means you call 
+glDrawArrays with your ‘fake compute’ shader active, your two textures bound, and a 
+big number passed as the count (x*y*z, one for every volume element). This was a little 
+bit of an abstract step, but it worked for the purposes of this demonstration. If you 
+read the writeup on Voraldo 1.0, I’ll go into more details on a more refined version 
+of this operation.
+
+
+    The cellular automata I picked to model was WireWorld - it is a classic 2d CA and 
+generalizes well to 3d. There are 4 states - conductor, electron head, electron tail, 
+and empty (this contains anything that’s not the exact colors associated with the other 
+three states).
+
+
+    The rules are simple - two unconditional ones - electron head becomes electron 
+tail, electron tail becomes conductor. Another, sort of trivial, empty is unaffected 
+and just gets written with it’s previous value. Slightly more complicated is the 
+behavior that’s core to what makes wireworld’s behavior so interesting (check out my 
+2d example on the javascript/canvas demos page) - basically you’re looking at the 
+neighborhood of any cell that’s in the conductor state - if either one or two of the 
+cells in the neighborhood are in the electron head state, you will become the electron 
+head state. If there is greater or less than that amount, you remain a conductor. 
+
+
+    This simple set of rules establishes a system in which you can create diodes, 
+logic gates, building up to complex digital circuits if you want. I find this as an 
+example of a cellular automaton incredibly fascinating. Game of Life is neat, but the 
+behavior of WireWorld is something that can be much more easily engineered into 
+functional units - I’ve seen this extended in 2d into small scale digital computers 
+with ROMs containing instructions that it’s able to read and use. I like the idea of 
+this modeling the electrical system on a vehicle, combined with a voxel based damage 
+model you would have the basis of a very interesting little structure.
+</pre>
+
+</body>
+</html>
