@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+	font-family: 'Rokkitt', serif;
+	color:#481203;
+    background-color: #ff9123;
+    margin: 50px 50px 50px 100px;
+    line-height: 12px;
+}
+
+</style>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Rokkitt:wght@600&display=swap');
+</style>
+
+</head>
+<body>
+
+<h1>Jon Baker, Graphics Programming</h1>
+<p> &nbsp &nbsp <a href='http://jbaker.graphics/index.html'>home</a></p>
+
+
+
+<pre>
+	This was an assignment for the senior elective CS Intro to Interactive Computer Graphics 
+class I took my last semester at Ohio University. The assignment was something along the 
+lines of trying to get food to good guys, with the chance of having it be intercepted by 
+bad guys. There was some notion of a game, with conflict between the two entities. Beyond 
+this very basic description, we were given largely free reign to define the rest of the 
+project.
+
+
+	Around the same time, I was looking at some code about textures and I saw how the sampler 
+object is declared with a uniform type specifier. This struck me as interesting - uniforms 
+existed in a global scope - my thought then became to see if I could use it at a different 
+point in the pipeline, rather than using it to color fragments - using in the vertex shader 
+to displace verticies. This worked, and allowed me to displace some geometry by a heightmap, 
+and draw skirts that matched up with the land’s surface around the edge to make it look solid.
+
+
+	In addition to this, there’s a couple other things going on - there are little characters 
+represented by textured points whose vertical displacements are set similarly to how the 
+surface geometry was moved. The texture is applied with gl_pointcoord, which lets you see 
+basically where on the point the fragment is, which you can use to apply a texture. I used 
+a heightmap of a sphere - I found a normal map too, this could be used to do phong shading 
+with, but we hadn’t covered that in the class yet and I didn’t get to it. There are two 
+types of these characters, red ones and blue ones representing bad guys and good guys 
+respectively.
+
+
+	The general structure of the game is as follows: you pass in command line arguments, or 
+accept some defaults - there’s four values to set, number of good guys, number of bad 
+guys, number of supply boxes, and number of trees. The game starts and spawns the good 
+guys, bad guys, and trees are spawned around the map randomly. A loop begins which has 
+the good guys and bad guys jiggle around randomly - a constant offset is applied to the 
+position if it is trying to move too close to a tree - this behavior can be seen when 
+groups go around trees. Their movement changes when a box is placed - their movement 
+then becomes a step towards the closest box plus a random offset, and again a small 
+step if too close to a tree. When one of the guys gets to the supply box, they score 
+a point for their team and capture that box. 
+
+
+	There are a few other aspects to the game - the selection process is done using a color 
+based method which allowed for very precise selection of a location to drop the crate. 
+If the selected point was too close to a tree, it would be ‘caught in the tree’ and be 
+deactivated with no points given. As another aspect of the selection scheme, I knew if 
+the box was dropped in water, and it could similarly be discarded. If boxes were dropped 
+too close to either good guys or bad guys, a message would be given ‘aw jeez man, you hit 
+a good/bad guy’ as the case was. As a hidden feature, if you hit the ‘g’ key while playing, 
+the radius that would be considered ‘hitting’ was increased by a factor of 10 and you 
+could take out small groups. There was some interesting behavior that came out of there 
+different pieces of this project interacting. Winning/losing was determined when you were 
+out of supply drops, by which team had scored more points.
+
+
+	The selection used the values in the red and green channels to represent x and y, in a 
+buffer that was rendered offscreen when a click event was registered. Water’s presence was 
+indicated by any activity on the blue channel. This was not displayed to the user, just 
+used to find where the click was, with relation to the model of the world.
+
+
+	This exercise, to make a game, with a win condition and some interesting emergent 
+behavior, was exciting and I really enjoyed it. Not quite simulation, but I really 
+liked the way that you could get the mass of little guys to start grouping up and 
+appearing to flow over the surface geometry and around the models of trees. In the 
+near future I want to port it to SDL to make it more practical to get running on 
+other systems - currently it uses GLUT. I’ve done two different programs now, 
+converting from GLUT to SDL2 as a windowing/event handling utility, and it’s 
+relatively straightforward - I do very much like SDL’s system of events.
+</pre>
+
+</body>
+</html>
