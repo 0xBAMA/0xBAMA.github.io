@@ -23,7 +23,6 @@ body {
 <p> &nbsp &nbsp <a href='http://jbaker.graphics/index.html'>home</a></p>
 
 
-
 <pre>
 	The Voraldo project has taken multiple forms over the two odd years I’ve been working
 on it - some of the ideas go back to some projects in 2014 where I had rendered some
@@ -40,6 +39,11 @@ using compute shaders (for details on the most recent iteration, see the writeup
 Voraldo 1.0). Another related endeavor is the 3D CA simulation I did for my graphics
 class final project, which really served as the basis for how 1.0 used compute shaders.
 
+</pre>
+
+<img src="voraldo_history1.png" style="border: 2px solid #ba550b;" alt="old versions" height="100" width="768">
+
+<pre>
 
 	In the earliest iterations, I used an image processing library called CImg, and
 simple pixel offsets mapped to x, y and z in a 3 dimensional array - I have a few
@@ -47,6 +51,11 @@ images here, showing what we’re talking about. The first few versions were rel
 similar, changing only really a little bit and experimenting with different ways to
 represent the colors.
 
+</pre>
+
+<img src="voraldo_history2.png" style="border: 2px solid #ba550b;" alt="drawing with circles" height="100" width="768">
+
+<pre>
 
 	Eventually moving forward, I used some of the drawing primitives offered by CImg,
 and used their transparency to implement transparency of my own. There are a few
@@ -57,6 +66,11 @@ pixel. I was still quite limited in the way that I was drawing, because I used s
 integer offsets for x, y and z, because I hadn’t really gotten sufficiently acquainted
 with the vector math to do anything more advanced.
 
+</pre>
+
+<img src="voraldo_history3.png" style="border: 2px solid #ba550b;" alt="showing off raycast aabb" height="100" width="768">
+
+<pre>
 
 	The next step took significantly longer, which ended up being probably towards
 the end of 2018 or early 2019. I started to experiment with methods of looking at a
@@ -76,6 +90,12 @@ every frame, as lighting calculations directly effected the RGBA values in the v
  array. It was bad, at times well over a minute or two for a frame for simple images.
  Animations like these took a good chunk of a day - that being said, you can see the
  shafts in the light, and the shadows cast by the rotating objects.
+
+</pre>
+
+<img src="voraldo_history4.png" style="border: 2px solid #ba550b;" alt="version v0.7" height="100" width="768">
+
+<pre>
 
 
 	That brings us to v0.7 - the first hardware accelerated version of the project. By
@@ -103,6 +123,12 @@ you have backface culling that you can control very easily with uniform variable
 into the shader, for example. In this approach though, I still had artifacts when the
 slices were viewed side on, as the geometry has zero thickness.
 
+</pre>
+
+<img src="voraldo_history5.png" style="border: 2px solid #ba550b;" alt="slice interaction" height="100" width="768">
+
+<pre>
+
 
 	I had controls to vary a value between -1 and 1, while your slice width was zero,
 mapped that to the offset of the slices, to pass through a sort of a highlighted slice.
@@ -122,6 +148,11 @@ represent the voxels. I wanted to better understand the use of different types o
 textures. The VIVS project was an interesting stab at something closer to what this
 project has turned into.
 
+</pre>
+
+<img src="voraldo_history6.png" style="border: 2px solid #ba550b;" alt="animated engine" height="100" width="768">
+
+<pre>
 
 	Voxelization in the Vertex Shader was the idea, and basically the way this
 manifested was using uniform arrays of parameters and doing the checking for each point
@@ -136,6 +167,12 @@ your vertex data, ordered in all possible ways, and then checked to see which se
 data should be used for the display. I had limited success, there are a lot of cases
 and I was confusing myself so I kind of moved away from that idea - the display in v1.0
 is handled very differently.
+
+</pre>
+
+<img src="voraldo_history7.png" style="border: 2px solid #ba550b;" alt="v08 diagram" height="100" width="768">
+
+<pre>
 
 
 	The last version to discuss here is v0.8, which implemented a client-server model using
