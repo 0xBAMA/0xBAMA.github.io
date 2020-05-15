@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
+
+<meta charset="UTF-8">
+
 <style>
 body {
-	font-family: 'Rokkitt', serif;
-	color:#481203;
+		font-family: 'Rokkitt', serif;
+		color:#481203;
     background-color: #ff9123;
     margin: 50px 50px 50px 100px;
     line-height: 5px;
@@ -87,7 +90,7 @@ body {
                 g = Math.round((g + m) * 255);
                 b = Math.round((b + m) * 255);
 
-                console.log("rgb(" + r + "," + g + "," + b + ")");
+                //console.log("rgb(" + r + "," + g + "," + b + ")");
                 paletteR.push(r);
                 paletteG.push(g);
                 paletteB.push(b);
@@ -276,16 +279,6 @@ body {
 			function startwireworld()
 			{
 				// //get your context stuff
-				// wirecanvas = document.getElementById('wireworldbg');
-				// wirectx = wirecanvas.getContext('2d');
-				//
-				// wirewidth = wirectx.canvas.width  = 768;
-				// wireheight = wirectx.canvas.height = 75;
-				//
-				// //initially fill with all black
-				// wirectx.fillStyle = 'rgb(64,64,64,255)';
-				// wirectx.fillRect(0,0,wirewidth,wireheight);
-
 				wirecanvas = document.getElementById('wireworld');
 				wirectx = wirecanvas.getContext('2d');
 				wirectx.imageSmoothingEnabled = false;
@@ -372,73 +365,77 @@ body {
 				wirenewImageData = wirectx.createImageData(wireoldImageData);
 
 				//manipulate the data
-                for(var	x = 0; x < wirewidth; x++)
-                {
-                    for(var y = 0; y < wireheight; y++)
-                    {
-                        //read from oldImageData.data
-												var was_conductor = true;
-                        //red channel set, means electron head
-                        var was_head = (wireoldImageData.data[(y+0)*wirewidth*4+(x+0)*4] == 255) ? 1 : 0;
-                        //blue channel set, meads electron tail
-                        var was_tail = (wireoldImageData.data[(y+0)*wirewidth*4+(x+0)*4+2] == 255) ? 1 : 0;
+        for(var	x = 0; x < wirewidth; x++)
+        {
+            for(var y = 0; y < wireheight; y++)
+            {
+                //read from oldImageData.data
+								var was_conductor = (wireoldImageData.data[(y+0)*wirewidth*4+(x+0)*4] == 0)
+									&& (wireoldImageData.data[(y+0)*wirewidth*4+(x+0)*4+1] == 0)
+									&& (wireoldImageData.data[(y+0)*wirewidth*4+(x+0)*4+2] == 0)
+									&& (wireoldImageData.data[(y+0)*wirewidth*4+(x+0)*4+3] == 255);
+
+								//red channel set, means electron head
+                var was_head = (wireoldImageData.data[(y+0)*wirewidth*4+(x+0)*4] == 255) ? 1 : 0;
+                //blue channel set, meads electron tail
+                var was_tail = (wireoldImageData.data[(y+0)*wirewidth*4+(x+0)*4+2] == 255) ? 1 : 0;
 
 
-												//var has_alpha = (wireoldImageData.data[(y+0)*wirewidth*4+(x+0)*4+3] == 255) ? 1 : 0;
-												// var has_alpha = 
 
+                //do your computation
 
+                if(was_head|was_tail|was_conductor)
+                {//part of the simulation
+                    if(was_head)
+                    {//this was a head, and will become a tail
+                        wirenewImageData.data[y*wirewidth*4+x*4+0] = 0;
+                        wirenewImageData.data[y*wirewidth*4+x*4+1] = 255;
+                        wirenewImageData.data[y*wirewidth*4+x*4+2] = 255;
+                        wirenewImageData.data[y*wirewidth*4+x*4+3] = 255;
+                    }
+                    else if(was_tail)
+                    {//this was a tail, and will become conductor
+                        wirenewImageData.data[y*wirewidth*4+x*4+0] = 0;
+                        wirenewImageData.data[y*wirewidth*4+x*4+1] = 0;
+                        wirenewImageData.data[y*wirewidth*4+x*4+2] = 0;
+                        wirenewImageData.data[y*wirewidth*4+x*4+3] = 255;
+                    }
+                    else
+                    {//conductor, needs to check neighborhood
+                        var sum = 0;
+                        sum += (wireoldImageData.data[(y+1)*wirewidth*4+(x+1)*4] == 255) ? 1 : 0;
+                        sum += (wireoldImageData.data[(y+1)*wirewidth*4+(x+0)*4] == 255) ? 1 : 0;
+                        sum += (wireoldImageData.data[(y+1)*wirewidth*4+(x-1)*4] == 255) ? 1 : 0;
 
-                        //do your computation
+                        sum += (wireoldImageData.data[(y+0)*wirewidth*4+(x+1)*4] == 255) ? 1 : 0;
+                        sum += (wireoldImageData.data[(y+0)*wirewidth*4+(x-1)*4] == 255) ? 1 : 0;
 
-                        if(was_head|was_tail|was_conductor)
-                        {//part of the simulation
-                            if(was_head)
-                            {//this was a head, and will become a tail
-                                wirenewImageData.data[y*wirewidth*4+x*4+0] = 0;
-                                wirenewImageData.data[y*wirewidth*4+x*4+1] = 255;
-                                wirenewImageData.data[y*wirewidth*4+x*4+2] = 255;
-                                wirenewImageData.data[y*wirewidth*4+x*4+3] = 255;
-                            }
-                            else if(was_tail)
-                            {//this was a tail, and will become conductor
-                                wirenewImageData.data[y*wirewidth*4+x*4+0] = 0;
-                                wirenewImageData.data[y*wirewidth*4+x*4+1] = 0;
-                                wirenewImageData.data[y*wirewidth*4+x*4+2] = 0;
-                                wirenewImageData.data[y*wirewidth*4+x*4+3] = 255;
-                            }
-                            else
-                            {//conductor, needs to check neighborhood
-                                var sum = 0;
-                                sum += (wireoldImageData.data[(y+1)*wirewidth*4+(x+1)*4] == 255) ? 1 : 0;
-                                sum += (wireoldImageData.data[(y+1)*wirewidth*4+(x+0)*4] == 255) ? 1 : 0;
-                                sum += (wireoldImageData.data[(y+1)*wirewidth*4+(x-1)*4] == 255) ? 1 : 0;
-
-                                sum += (wireoldImageData.data[(y+0)*wirewidth*4+(x+1)*4] == 255) ? 1 : 0;
-                                sum += (wireoldImageData.data[(y+0)*wirewidth*4+(x-1)*4] == 255) ? 1 : 0;
-
-                                sum += (wireoldImageData.data[(y-1)*wirewidth*4+(x+1)*4] == 255) ? 1 : 0;
-                                sum += (wireoldImageData.data[(y-1)*wirewidth*4+(x+0)*4] == 255) ? 1 : 0;
-                                sum += (wireoldImageData.data[(y-1)*wirewidth*4+(x-1)*4] == 255) ? 1 : 0;
-                                if(sum==1||sum==2)
-                                {//this cell will become an electron head
-                                    wirenewImageData.data[y*wirewidth*4+x*4+0] = 255;
-                                    wirenewImageData.data[y*wirewidth*4+x*4+1] = 255;
-                                    wirenewImageData.data[y*wirewidth*4+x*4+2] = 0;
-                                    wirenewImageData.data[y*wirewidth*4+x*4+3] = 255;
-                                }
-                                else
-                                {//int stays a conductor
-                                    wirenewImageData.data[y*wirewidth*4+x*4+0] = 0;
-                                    wirenewImageData.data[y*wirewidth*4+x*4+1] = 0;
-                                    wirenewImageData.data[y*wirewidth*4+x*4+2] = 0;
-                                    wirenewImageData.data[y*wirewidth*4+x*4+3] = 255;
-                                }
-                            }
+                        sum += (wireoldImageData.data[(y-1)*wirewidth*4+(x+1)*4] == 255) ? 1 : 0;
+                        sum += (wireoldImageData.data[(y-1)*wirewidth*4+(x+0)*4] == 255) ? 1 : 0;
+                        sum += (wireoldImageData.data[(y-1)*wirewidth*4+(x-1)*4] == 255) ? 1 : 0;
+                        if(sum==1||sum==2)
+                        {//this cell will become an electron head
+                            wirenewImageData.data[y*wirewidth*4+x*4+0] = 255;
+                            wirenewImageData.data[y*wirewidth*4+x*4+1] = 255;
+                            wirenewImageData.data[y*wirewidth*4+x*4+2] = 0;
+                            wirenewImageData.data[y*wirewidth*4+x*4+3] = 255;
                         }
+                        else
+                        {//int stays a conductor
+                            wirenewImageData.data[y*wirewidth*4+x*4+0] = 0;
+                            wirenewImageData.data[y*wirewidth*4+x*4+1] = 0;
+                            wirenewImageData.data[y*wirewidth*4+x*4+2] = 0;
+                            wirenewImageData.data[y*wirewidth*4+x*4+3] = 255;
+                        }
+                    }
+                }else{
+									wirenewImageData.data[y*wirewidth*4+x*4+0] = 64;
+									wirenewImageData.data[y*wirewidth*4+x*4+1] = 64;
+									wirenewImageData.data[y*wirewidth*4+x*4+2] = 64;
+									wirenewImageData.data[y*wirewidth*4+x*4+3] = 255;
+						}
 					}
 				}
-
 				wirectx.putImageData(wirenewImageData, 0, 0);
 			}
 		</script>
@@ -453,6 +450,19 @@ body {
 	var dlactx;
 	var dlacanvas;
 
+	//the points that have been aggregated
+	var treex 	= [];
+	var treey 	= [];
+
+	//the points which are still floating around
+	var walkerx = [];
+	var walkery = [];
+
+	var numWalkersInitial = 2000;
+	var numIterations = 25;
+
+
+
 	function startDLA()
 	{
 		dlacanvas = document.getElementById('DLA');
@@ -463,13 +473,106 @@ body {
 
 		dlaImageData = dlactx.createImageData(dlawidth, dlaheight);
 
+		//populate tree
+		for(var i = 0; i < dlaheight; i++)
+		{
+			treex.push(dlawidth - 1);
+			treey.push(i);
+
+			treex.push(0);
+			treey.push(i);
+		}
+
+		for(var i = 100; i < dlawidth-100; i+=33)
+		{
+			treex.push(i);
+			treey.push(40);
+		}
+
+		// populate walkers
+		for(var i = 0; i < numWalkersInitial; i++)
+		{
+			walkerx.push(Math.floor(Math.random() * dlawidth));
+			walkery.push(Math.floor(Math.random() * dlaheight));
+		}
+
 		//call every 50 ms - function runs till a walker becomes stuck
 		var iddla = setInterval(drawDLA, 50);
 	}
 
 	function drawDLA()
 	{
+		//update the positions of the walkers
+		for(var i = 0; i < walkerx.length; i++)
+		{
+			for(var iterations = 0; iterations < numIterations; iterations++)
+			{
+				walkerx[i] += (Math.random() < 0.5) ? -1 : 1;
+				walkery[i] += (Math.random() < 0.5) ? -1 : 1;
 
+				if(walkerx[i] >= width)
+					walkerx[i] = width - 1;
+
+				if(walkerx[i] < 0)
+					walkerx[i] = 0;
+
+				if(walkery[i] >= height)
+					walkery[i] = height - 1;
+
+				if(walkery[i] < 0)
+					walkery[i] = 0;
+
+				for(var j = 0; j < treex.length; j++)
+				{
+					var xterm = (treex[j] - walkerx[i]);
+					var yterm = (treey[j] - walkery[i]);
+
+					var distsq = xterm*xterm + yterm*yterm;
+
+					if(distsq < 4)
+					{
+						//move them to the tree if they're close enough
+						treex.push(walkerx[i]);
+						treey.push(walkery[i]);
+
+						//remove them from the walker list
+						walkerx.splice(i, 1);
+						walkery.splice(i, 1);
+
+						//don't want to do any more with this walker, as it's anchored
+						break;
+					}
+				}
+			}
+
+
+
+		}
+
+		dlactx.fillStyle = 'rgb(64,32,16,255)';
+		dlactx.fillRect(0,0,wirewidth,wireheight);
+
+		dlaImageData = dlactx.getImageData(0, 0, width, height);
+
+		//draw all the aggregated points
+		for(var i = 0; i < treex.length; i++)
+		{
+			dlaImageData.data[treey[i]*dlawidth*4+treex[i]*4+0] = 200*(i/treex.length)+55;
+			dlaImageData.data[treey[i]*dlawidth*4+treex[i]*4+1] = 200*(i/treex.length)+15;
+			dlaImageData.data[treey[i]*dlawidth*4+treex[i]*4+2] = 200*(i/treex.length);
+			dlaImageData.data[treey[i]*dlawidth*4+treex[i]*4+3] = 255;
+		}
+
+		//draw all the free floating points
+		for(var i = 0; i < walkerx.length; i++)
+		{
+			dlaImageData.data[walkery[i]*dlawidth*4+walkerx[i]*4+0] = 200;
+			dlaImageData.data[walkery[i]*dlawidth*4+walkerx[i]*4+1] = 200;
+			dlaImageData.data[walkery[i]*dlawidth*4+walkerx[i]*4+2] = 0;
+			dlaImageData.data[walkery[i]*dlawidth*4+walkerx[i]*4+3] = 255;
+		}
+
+		dlactx.putImageData(dlaImageData, 0, 0);
 	}
 
 </script>
