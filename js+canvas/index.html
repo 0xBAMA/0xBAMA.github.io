@@ -459,7 +459,7 @@ body {
 	var walkery = [];
 
 	var numWalkersInitial = 2000;
-	var numIterations = 25;
+	var numIterations = 15;
 
 
 
@@ -474,20 +474,36 @@ body {
 		dlaImageData = dlactx.createImageData(dlawidth, dlaheight);
 
 		//populate tree
-		for(var i = 0; i < dlaheight; i++)
-		{
-			treex.push(dlawidth - 1);
-			treey.push(i);
+		// for(var i = 0; i < dlaheight; i++)
+		// {
+		// 	treex.push(dlawidth - 1);
+		// 	treey.push(i);
+		//
+		// 	treex.push(0);
+		// 	treey.push(i);
+		// }
+		//
+		// for(var i = 0; i < dlawidth; i+=33)
+		// {
+		// 	treex.push(i);
+		// 	treey.push(10+Math.random()*55);
+		// }
 
-			treex.push(0);
-			treey.push(i);
+		// treex.push(dlawidth/2);
+		// treey.push(dlaheight/2);
+		//
+		// treex.push(dlawidth/2 + 200);
+		// treey.push(dlaheight/2);
+		//
+		// treex.push(dlawidth/2 - 200);
+		// treey.push(dlaheight/2);
+
+		for(var i = 0; i < 15; i+=1)
+		{
+			treex.push(20+Math.random()*(dlawidth-40));
+			treey.push(10+Math.random()*55);
 		}
 
-		for(var i = 100; i < dlawidth-100; i+=33)
-		{
-			treex.push(i);
-			treey.push(40);
-		}
 
 		// populate walkers
 		for(var i = 0; i < numWalkersInitial; i++)
