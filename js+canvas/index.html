@@ -14,8 +14,8 @@ body {
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Rokkitt:wght@600&display=swap');
-</style> 
-	
+</style>
+
 <script type="application/javascript">
             var oldImageData;
             var newImageData;
@@ -30,7 +30,7 @@ body {
 				//get your context stuff
 				canvas = document.getElementById('fire');
 				ctx = canvas.getContext('2d');
-				
+
 				//establish width
 				width = ctx.canvas.width  = 768;
 				height = ctx.canvas.height = 75;
@@ -55,7 +55,7 @@ body {
                 }
             }
 
-            function HSLToRGB(h,s,l) 
+            function HSLToRGB(h,s,l)
             {
                 // Must be fractions of 1
                 s /= 255;
@@ -93,18 +93,18 @@ body {
                 paletteB.push(b);
             }
 
-			function draw() 
+			function draw()
 			{
 				//get your context stuff
 				canvas = document.getElementById('fire');
 				ctx = canvas.getContext('2d');
-				
+
 				//establish width, with wide border (100px all edges)
 				width = ctx.canvas.width  = 768;
 				height = ctx.canvas.height = 75;
 
 				//get old data
-				oldImageData = newImageData; 
+				oldImageData = newImageData;
 
 				//new image data, with same dimensions
 				newImageData = ctx.createImageData(oldImageData);
@@ -112,8 +112,8 @@ body {
                 //update the bottom row
                 for(var x = 0; x < width; x++)
                 {
-                    oldImageData.data[(height-1)*width*4+x*4] = Math.random()*255; 
-                    //oldImageData.data[(height-1)*width*4+x*4] = Math.sin(0.3*x)*255; 
+                    oldImageData.data[(height-1)*width*4+x*4] = Math.random()*255;
+                    //oldImageData.data[(height-1)*width*4+x*4] = Math.sin(0.3*x)*255;
                 }
 
 				//manipulate the data
@@ -149,7 +149,7 @@ body {
                         //avg /= (129/32);
                         avg /= 3.9;
 
-                        newImageData.data[y*width*4+x*4] = avg - 1; 
+                        newImageData.data[y*width*4+x*4] = avg - 1;
 					}
 				}
 
@@ -172,9 +172,9 @@ body {
         {
             console.log("this has been reached");
         }
-		</script>
+</script>
 
-	<script type="application/javascript">
+<script type="application/javascript">
             var gololdImageData;
             var golnewImageData;
 
@@ -189,8 +189,8 @@ body {
 				//get your context stuff
 				golcanvas = document.getElementById('GoL');
 				golctx = golcanvas.getContext('2d');
-				
-				//establish width, with wide border 
+
+				//establish width, with wide border
 				golwidth = golctx.canvas.width  = 768;
 				golheight = golctx.canvas.height = 75;
 
@@ -202,29 +202,29 @@ body {
                     {
                         //write your initial image data
                         var val = Math.random() > 0.5 ? 255 : 0;
-                        golnewImageData.data[y*golwidth*4+x*4+0] = val; 
+                        golnewImageData.data[y*golwidth*4+x*4+0] = val;
                         golnewImageData.data[y*golwidth*4+x*4+1] = val;
                         golnewImageData.data[y*golwidth*4+x*4+2] = val;
                         golnewImageData.data[y*golwidth*4+x*4+3] = 255;
 					}
 				}
-                
+
 				//call draw every __ ms
 				var idgol = setInterval(drawgol, 50);
 			}
 
-			function drawgol() 
+			function drawgol()
 			{
 				//get your context stuff
 				golcanvas = document.getElementById('GoL');
 				golctx = golcanvas.getContext('2d');
-				
+
 				//establish width, with wide border (100px all edges)
 				golwidth = golctx.canvas.width  = 768;
 				golheight = golctx.canvas.height = 75;
 
 				//get old data - that's the same as last frame's new data
-				gololdImageData = golnewImageData; 
+				gololdImageData = golnewImageData;
 
 				//new image data, with same dimensions
 				golnewImageData = golctx.createImageData(gololdImageData);
@@ -241,10 +241,10 @@ body {
                         sum += (gololdImageData.data[(y+1)*golwidth*4+(x+1)*4] == 255) ? 1 : 0;
                         sum += (gololdImageData.data[(y+1)*golwidth*4+(x+0)*4] == 255) ? 1 : 0;
                         sum += (gololdImageData.data[(y+1)*golwidth*4+(x-1)*4] == 255) ? 1 : 0;
-                        
+
                         sum += (gololdImageData.data[(y+0)*golwidth*4+(x+1)*4] == 255) ? 1 : 0;
                         sum += (gololdImageData.data[(y+0)*golwidth*4+(x-1)*4] == 255) ? 1 : 0;
-                        
+
                         sum += (gololdImageData.data[(y-1)*golwidth*4+(x+1)*4] == 255) ? 1 : 0;
                         sum += (gololdImageData.data[(y-1)*golwidth*4+(x+0)*4] == 255) ? 1 : 0;
                         sum += (gololdImageData.data[(y-1)*golwidth*4+(x-1)*4] == 255) ? 1 : 0;
@@ -257,7 +257,7 @@ body {
                         golnewImageData.data[y*golwidth*4+x*4+1] = is_live ? 255 : 0;
                         golnewImageData.data[y*golwidth*4+x*4+2] = is_live ? 255 : 0;
                         golnewImageData.data[y*golwidth*4+x*4+3] = 255;
-                        
+
 					}
 				}
 
@@ -269,23 +269,23 @@ body {
 <script type="application/javascript">
             var wireoldImageData;
             var wirenewImageData;
-            
+
             var wirecanvas;
             var wirectx;
 
 			function startwireworld()
 			{
-				//get your context stuff
-				wirecanvas = document.getElementById('wireworldbg');
-				wirectx = wirecanvas.getContext('2d');
+				// //get your context stuff
+				// wirecanvas = document.getElementById('wireworldbg');
+				// wirectx = wirecanvas.getContext('2d');
+				//
+				// wirewidth = wirectx.canvas.width  = 768;
+				// wireheight = wirectx.canvas.height = 75;
+				//
+				// //initially fill with all black
+				// wirectx.fillStyle = 'rgb(64,64,64,255)';
+				// wirectx.fillRect(0,0,wirewidth,wireheight);
 
-				wirewidth = wirectx.canvas.width  = 768;
-				wireheight = wirectx.canvas.height = 75;
-
-				//initially fill with all black
-				wirectx.fillStyle = 'rgb(64,64,64,255)';
-				wirectx.fillRect(0,0,wirewidth,wireheight);
-                
 				wirecanvas = document.getElementById('wireworld');
 				wirectx = wirecanvas.getContext('2d');
 				wirectx.imageSmoothingEnabled = false;
@@ -296,6 +296,7 @@ body {
 
                 wirenewImageData = wirectx.createImageData(wirewidth, wireheight);
 
+
                 for(var	x = 0; x < wirewidth; x++)
                 {
                     for(var y = 0; y < wireheight; y++)
@@ -305,14 +306,14 @@ body {
                         {
                             if(sample > 0.999)
                             {
-                                wirenewImageData.data[y*wirewidth*4+x*4+0] = 255; 
+                                wirenewImageData.data[y*wirewidth*4+x*4+0] = 255;
                                 wirenewImageData.data[y*wirewidth*4+x*4+1] = 255;
                                 wirenewImageData.data[y*wirewidth*4+x*4+2] = 0;
                                 wirenewImageData.data[y*wirewidth*4+x*4+3] = 255;
                             }
                             else
                             {
-                                wirenewImageData.data[y*wirewidth*4+x*4+0] = 0; 
+                                wirenewImageData.data[y*wirewidth*4+x*4+0] = 0;
                                 wirenewImageData.data[y*wirewidth*4+x*4+1] = 0;
                                 wirenewImageData.data[y*wirewidth*4+x*4+2] = 0;
                                 wirenewImageData.data[y*wirewidth*4+x*4+3] = 255;
@@ -320,35 +321,35 @@ body {
                         }
                         else
                         {
-                            wirenewImageData.data[y*wirewidth*4+x*4+0] = 0; 
+                            wirenewImageData.data[y*wirewidth*4+x*4+0] = 0;
                             wirenewImageData.data[y*wirewidth*4+x*4+1] = 0;
                             wirenewImageData.data[y*wirewidth*4+x*4+2] = 0;
                             wirenewImageData.data[y*wirewidth*4+x*4+3] = 0;
                         }
                         if(Math.random()< 0.2)
                         {
-                            wirenewImageData.data[y*wirewidth*4+x*4+0] = 0; 
+                            wirenewImageData.data[y*wirewidth*4+x*4+0] = 0;
                             wirenewImageData.data[y*wirewidth*4+x*4+1] = 0;
                             wirenewImageData.data[y*wirewidth*4+x*4+2] = 0;
                             wirenewImageData.data[y*wirewidth*4+x*4+3] = 0;
                         }
                         if(Math.random()< 0.4)
                         {
-                            wirenewImageData.data[y*wirewidth*4+x*4+0] = 0; 
+                            wirenewImageData.data[y*wirewidth*4+x*4+0] = 0;
                             wirenewImageData.data[y*wirewidth*4+x*4+1] = 0;
                             wirenewImageData.data[y*wirewidth*4+x*4+2] = 0;
                             wirenewImageData.data[y*wirewidth*4+x*4+3] = 255;
                         }
                         if((x > 63 && x < 634)&&(y > 25 && y < 75))
                         {
-                            wirenewImageData.data[y*wirewidth*4+x*4+0] = 0; 
+                            wirenewImageData.data[y*wirewidth*4+x*4+0] = 0;
                             wirenewImageData.data[y*wirewidth*4+x*4+1] = 0;
                             wirenewImageData.data[y*wirewidth*4+x*4+2] = 0;
                             wirenewImageData.data[y*wirewidth*4+x*4+3] = 0;
                         }
                         if((y%12)==0)
                         {
-                            wirenewImageData.data[y*wirewidth*4+x*4+0] = 0; 
+                            wirenewImageData.data[y*wirewidth*4+x*4+0] = 0;
                             wirenewImageData.data[y*wirewidth*4+x*4+1] = 0;
                             wirenewImageData.data[y*wirewidth*4+x*4+2] = 0;
                             wirenewImageData.data[y*wirewidth*4+x*4+3] = 255;
@@ -362,10 +363,10 @@ body {
 				var idwire = setInterval(drawwire, 50);
 			}
 
-			function drawwire() 
+			function drawwire()
 			{
 				//get old data - that's the same as last frame's new data
-				wireoldImageData = wirenewImageData; 
+				wireoldImageData = wirenewImageData;
 
 				//new image data, with same dimensions
 				wirenewImageData = wirectx.createImageData(wireoldImageData);
@@ -376,17 +377,21 @@ body {
                     for(var y = 0; y < wireheight; y++)
                     {
                         //read from oldImageData.data
+												var was_conductor = true;
                         //red channel set, means electron head
                         var was_head = (wireoldImageData.data[(y+0)*wirewidth*4+(x+0)*4] == 255) ? 1 : 0;
                         //blue channel set, meads electron tail
                         var was_tail = (wireoldImageData.data[(y+0)*wirewidth*4+(x+0)*4+2] == 255) ? 1 : 0;
-                        var has_alpha = (wireoldImageData.data[(y+0)*wirewidth*4+(x+0)*4+3] == 255) ? 1 : 0;
- 
+
+
+												//var has_alpha = (wireoldImageData.data[(y+0)*wirewidth*4+(x+0)*4+3] == 255) ? 1 : 0;
+												// var has_alpha = 
+
 
 
                         //do your computation
 
-                        if(has_alpha)
+                        if(was_head|was_tail|was_conductor)
                         {//part of the simulation
                             if(was_head)
                             {//this was a head, and will become a tail
@@ -408,10 +413,10 @@ body {
                                 sum += (wireoldImageData.data[(y+1)*wirewidth*4+(x+1)*4] == 255) ? 1 : 0;
                                 sum += (wireoldImageData.data[(y+1)*wirewidth*4+(x+0)*4] == 255) ? 1 : 0;
                                 sum += (wireoldImageData.data[(y+1)*wirewidth*4+(x-1)*4] == 255) ? 1 : 0;
-                        
+
                                 sum += (wireoldImageData.data[(y+0)*wirewidth*4+(x+1)*4] == 255) ? 1 : 0;
                                 sum += (wireoldImageData.data[(y+0)*wirewidth*4+(x-1)*4] == 255) ? 1 : 0;
-                        
+
                                 sum += (wireoldImageData.data[(y-1)*wirewidth*4+(x+1)*4] == 255) ? 1 : 0;
                                 sum += (wireoldImageData.data[(y-1)*wirewidth*4+(x+0)*4] == 255) ? 1 : 0;
                                 sum += (wireoldImageData.data[(y-1)*wirewidth*4+(x-1)*4] == 255) ? 1 : 0;
@@ -434,14 +439,44 @@ body {
 					}
 				}
 
-                //display the current data
 				wirectx.putImageData(wirenewImageData, 0, 0);
 			}
 		</script>
 </head>
-<body onload="startfire(); startgol(); startwireworld();">
 
-    <h1>Jon Baker, Graphics Programming</h1> 
+<script type="application/javascript">
+
+	var dlaImageData;
+	var dlawidth;
+	var dlaheight;
+
+	var dlactx;
+	var dlacanvas;
+
+	function startDLA()
+	{
+		dlacanvas = document.getElementById('DLA');
+		dlactx = dlacanvas.getContext('2d');
+
+		dlawidth = dlactx.canvas.width = 768;
+		dlaheight = dlactx.canvas.height = 75;
+
+		dlaImageData = dlactx.createImageData(dlawidth, dlaheight);
+
+		//call every 50 ms - function runs till a walker becomes stuck
+		var iddla = setInterval(drawDLA, 50);
+	}
+
+	function drawDLA()
+	{
+
+	}
+
+</script>
+
+<body onload="startfire(); startgol(); startwireworld(); startDLA();">
+
+    <h1>Jon Baker, Graphics Programming</h1>
 
 <p>  &nbsp&nbsp&nbsp&nbsp        Refresh to reset. Click titles to go to a page with a larger canvas and explanation. &nbsp <a href='http://jbaker.graphics/index.html'>home</a></p>
 
@@ -451,25 +486,31 @@ body {
 
 <br>
 <p style="display: inline-block;"> &nbsp&nbsp &nbsp&nbsp &nbsp </p>
-<canvas id="fire" style="border: 2px solid #ba550b;" >Could not load fire effect.</canvas>
+<canvas id="fire" style="border: 2px solid #ba550b;" >
+	Could not load fire effect.
+</canvas>
 <br>
 
 
 <h2>&nbsp&nbsp Conway's Game of Life</h2>
 <p style="display: inline-block;"> &nbsp&nbsp &nbsp&nbsp &nbsp </p>
-<canvas id="GoL" style="border: 2px solid #ba550b;">Could not load Game of Life.</canvas>
+<canvas id="GoL" style="border: 2px solid #ba550b;">
+	Could not load Game of Life.
+</canvas>
 <br>
 
 
 <h2>&nbsp&nbsp WireWorld</h2>
-<div style="position: relative; left: 150;">
 <p style="display: inline-block;"> &nbsp&nbsp &nbsp&nbsp &nbsp </p>
- <canvas id="wireworldbg" 
-    style="position: absolute; left: 50; top: 0; z-index: 0; border: 2px solid #ba550b; "></canvas>
- <canvas id="wireworld"
-    style="position: absolute; left: 50; top: 0; z-index: 1; border: 2px solid #ba550b;  ">Wireworld loading failed.</canvas>
-</div>
+<canvas id="wireworld" style="border: 2px solid #ba550b;">
+	Wireworld loading failed.
+</canvas>
+
+
+<h2>&nbsp&nbsp Diffusion Limited Aggregation</h2>
+<p style="display: inline-block;"> &nbsp&nbsp &nbsp&nbsp &nbsp </p>
+<canvas id="DLA" style="border: 2px solid #ba550b;">Could not load Diffusion Limited Aggregation.</canvas>
+<br>
 
 </body>
 </html>
-
