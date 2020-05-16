@@ -458,10 +458,10 @@ body {
 	var walkerx = [];
 	var walkery = [];
 
-	var numWalkersInitial = 2000;
-	var numIterations = 15;
+	var numWalkersInitial = 800;
+	var numIterations = 6;
 
-
+	var totalWalkersSpawned = 0;
 
 	function startDLA()
 	{
@@ -510,6 +510,7 @@ body {
 		{
 			walkerx.push(Math.floor(Math.random() * dlawidth));
 			walkery.push(Math.floor(Math.random() * dlaheight));
+			totalWalkersSpawned++;		
 		}
 
 		//call every 50 ms - function runs till a walker becomes stuck
@@ -560,10 +561,44 @@ body {
 					}
 				}
 			}
-
-
-
 		}
+
+		if(walkerx.length < 200 && totalWalkersSpawned < (dlawidth*dlaheight*0.5))
+		{
+			for(var i = 0; i < 250; i++)
+			{
+				var side = Math.floor(Math.random()*4);
+				
+				if(side===0)
+				{
+					walkerx.push(0);
+					walkery.push(Math.floor(Math.random()*dlaheight));
+				}
+				else if(side===1)
+				{
+					walkerx.push(dlawidth-1);
+					walkery.push(Math.floor(Math.random()*dlaheight));
+				
+				}
+				else if(side===2)
+				{
+					walkerx.push(Math.floor(Math.random()*dlawidth));
+					walkery.push(0);
+				
+				}
+				else
+				{
+					walkerx.push(Math.floor(Math.random()*dlawidth));
+					walkery.push(dlaheight-1);
+				
+				}
+
+
+				totalWalkersSpawned++;
+			}
+		}
+		
+		console.log(walkerx.length);
 
 		dlactx.fillStyle = 'rgb(64,32,16,255)';
 		dlactx.fillRect(0,0,wirewidth,wireheight);
@@ -633,3 +668,4 @@ body {
 
 </body>
 </html>
+
