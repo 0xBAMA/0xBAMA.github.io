@@ -567,7 +567,7 @@ body {
 		{
 			for(var i = 0; i < 250; i++)
 			{
-				var side = Math.floor(Math.random()*4);
+				var side = Math.floor(Math.random()*10);
 				
 				if(side===0)
 				{
@@ -580,7 +580,7 @@ body {
 					walkery.push(Math.floor(Math.random()*dlaheight));
 				
 				}
-				else if(side===2)
+				else if(side<7 && side>=2)
 				{
 					walkerx.push(Math.floor(Math.random()*dlawidth));
 					walkery.push(0);
