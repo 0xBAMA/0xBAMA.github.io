@@ -10,7 +10,7 @@ body {
 		color:#481203;
     background-color: #ff9123;
     margin: 50px 50px 50px 100px;
-    line-height: 5px;
+    line-height: 10px;
 }
 
 </style>
@@ -520,44 +520,47 @@ body {
 	function drawDLA()
 	{
 		//update the positions of the walkers
-		for(var i = 0; i < walkerx.length; i++)
-		{
-			for(var iterations = 0; iterations < numIterations; iterations++)
-			{
-				walkerx[i] += (Math.random() < 0.5) ? -1 : 1;
-				walkery[i] += (Math.random() < 0.5) ? -1 : 1;
+        if(totalWalkersSpawned < dlawidth*dlaheight*0.7)		
+        {
+            for(var i = 0; i < walkerx.length; i++)
+		    {
+			    for(var iterations = 0; iterations < numIterations; iterations++)
+			    {
+				    walkerx[i] += (Math.random() < 0.5) ? -1 : 1;
+				    walkery[i] += (Math.random() < 0.5) ? -1 : 1;
 
-				if(walkerx[i] >= width)
-					walkerx[i] = width - 1;
+				    if(walkerx[i] >= width)
+					    walkerx[i] = width - 1;
 
-				if(walkerx[i] < 0)
-					walkerx[i] = 0;
+				    if(walkerx[i] < 0)
+					    walkerx[i] = 0;
 
-				if(walkery[i] >= height)
-					walkery[i] = height - 1;
+				    if(walkery[i] >= height)
+					    walkery[i] = height - 1;
 
-				if(walkery[i] < 0)
-					walkery[i] = 0;
+				    if(walkery[i] < 0)
+					    walkery[i] = 0;
 
-				for(var j = 0; j < treex.length; j++)
-				{
-					var xterm = (treex[j] - walkerx[i]);
-					var yterm = (treey[j] - walkery[i]);
+				    for(var j = 0; j < treex.length; j++)
+				    {
+					    var xterm = (treex[j] - walkerx[i]);
+					    var yterm = (treey[j] - walkery[i]);
 
-					var distsq = xterm*xterm + yterm*yterm;
+					    var distsq = xterm*xterm + yterm*yterm;
 
-					if(distsq < 4)
-					{
-						//move them to the tree if they're close enough
-						treex.push(walkerx[i]);
-						treey.push(walkery[i]);
+					    if(distsq < 4)
+					    {
+						    //move them to the tree if they're close enough
+						    treex.push(walkerx[i]);
+						    treey.push(walkery[i]);
 
-						//remove them from the walker list
-						walkerx.splice(i, 1);
-						walkery.splice(i, 1);
+						    //remove them from the walker list
+						    walkerx.splice(i, 1);
+						    walkery.splice(i, 1);
 
-						//don't want to do any more with this walker, as it's anchored
-						break;
+						    //don't want to do any more with this walker, as it's anchored
+						    break;
+                        }
 					}
 				}
 			}
@@ -630,42 +633,49 @@ body {
 
 <body onload="startfire(); startgol(); startwireworld(); startDLA();">
 
-    <h1>Jon Baker, Graphics Programming</h1>
+     <h1 style='display:inline-block;'>Jon Baker, Graphics Programming</h1>
 
-<p>  &nbsp&nbsp&nbsp&nbsp        Refresh to reset. Click titles to go to a page with a larger canvas and explanation. &nbsp <a href='http://jbaker.graphics/index.html'>home</a></p>
+<p style='display:inline-block;'> &nbsp &nbsp <a href='http://jbaker.graphics/index.html'>home</a></p>
 
-<br>
-<h2 style="display: inline-block;">&nbsp&nbsp Fire</h2>
+    <pre style="font-family: 'Rokkitt', serif;">    Some realtime demos of interesting concepts I've found, implemented with javascript/html5 canvas. 
+
+        Refresh to reset. Click titles to go to a page with a larger canvas and explanation. </pre>
+
+<div style='margin: 5px 0px 25px 25px'>
+
+<h2 style="display: inline-block;">Fire</h2>
 <p style="display: inline-block;">based on <a href = "https://lodev.org/cgtutor/fire.html">this tutorial</a>.</p>
-
-<br>
-<p style="display: inline-block;"> &nbsp&nbsp &nbsp&nbsp &nbsp </p>
 <canvas id="fire" style="border: 2px solid #ba550b;" >
 	Could not load fire effect.
 </canvas>
 <br>
+<br>
 
 
-<h2>&nbsp&nbsp Conway's Game of Life</h2>
-<p style="display: inline-block;"> &nbsp&nbsp &nbsp&nbsp &nbsp </p>
+<h2>Conway's Game of Life</h2>
 <canvas id="GoL" style="border: 2px solid #ba550b;">
 	Could not load Game of Life.
 </canvas>
 <br>
+<br>
 
 
-<h2>&nbsp&nbsp WireWorld</h2>
-<p style="display: inline-block;"> &nbsp&nbsp &nbsp&nbsp &nbsp </p>
+<h2>WireWorld</h2>
 <canvas id="wireworld" style="border: 2px solid #ba550b;">
 	Wireworld loading failed.
 </canvas>
-
-
-<h2>&nbsp&nbsp Diffusion Limited Aggregation</h2>
-<p style="display: inline-block;"> &nbsp&nbsp &nbsp&nbsp &nbsp </p>
-<canvas id="DLA" style="border: 2px solid #ba550b;">Could not load Diffusion Limited Aggregation.</canvas>
+<br>
 <br>
 
+
+<h2>Diffusion Limited Aggregation</h2>
+<canvas id="DLA" style="border: 2px solid #ba550b;">
+    Could not load Diffusion Limited Aggregation.
+</canvas>
+<br>
+<br>
+
+</div>
 </body>
 </html>
 
