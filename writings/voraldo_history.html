@@ -105,15 +105,15 @@ every frame, as lighting calculations directly effected the color values in the 
 
 </p>
 
-<img src="voraldo_history5.png" style="border: 2px solid #ba550b;" alt="version v0.7" height="100" width="768">
+<img src="voraldo_history5.png" style="border: 2px solid #ba550b;" alt="version v0.7" height="435" width="768">
 
 <p>
 
 &nbsp That brings us to v0.7 - the first hardware accelerated version of the project. By
 using an OpenGL based representation, it went from something that was measured in
 seconds per frame, to frames per second. Although the rendering was much faster, there are certain limitations on what I was able to do with it. The project at this point split into two
-pieces, which ran separately: one which had all the commands to draw geometry into
-the block and one that would allow you to view it. The generation program required you
+pieces, which ran separately: gen, which had all the commands to draw geometry into
+the block and vu, that would allow you to view it. The generation program required you
 to write long lists of function calls that specified all of the parameters of the
 geometry you wanted to use. It was not really something someone could be reasonably
 expected to pick up and interact with without talking to me about how it worked - this
