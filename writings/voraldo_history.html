@@ -130,7 +130,7 @@ the composition of multiple transparent triangles must happen in a depth-sorted 
 set of triangles that faced the other way, and discarding the fragments on the slices
 that were not front facing. I like this technique and have used it in a couple of
 different places, because using the discard statement in GLSL, and gl_FrontFacing,
-you have backface culling that you can control very easily with uniform variables going
+you have the ability to do per-fragment backface culling that you can control very easily with uniform variables going
 into the shader, for example. In this approach though, I still had artifacts when the
 slices were viewed side on, as the geometry has zero thickness.
 
