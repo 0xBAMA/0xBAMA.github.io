@@ -45,7 +45,7 @@ class final project, which really served as the basis for how 1.0 used compute s
 
 </p>
 
-<img src="voraldo_history1.png" style="border: 2px solid #ba550b;" alt="old versions" height="100" width="768">
+<img src="voraldo_history1.png" style="border: 2px solid #ba550b;" alt="old versions" height="335" width="768">
 
 <p>
 
@@ -57,7 +57,7 @@ represent the colors.
 
 </p>
 
-<img src="voraldo_history2.png" style="border: 2px solid #ba550b;" alt="drawing with circles" height="100" width="768">
+<img src="voraldo_history2.png" style="border: 2px solid #ba550b;" alt="drawing with circles" height="450" width="768">
 
 <p>
 
@@ -67,12 +67,12 @@ worthwhile images produced with that - I liked the look of some of these. But on
 the main drawbacks here was the huge redundancy that’s inherent in drawing these
 primitives over each other, again and again to get the color value for the output
 pixel. I was still quite limited in the way that I was drawing, because I used simple
-integer offsets for x, y and z, because I hadn’t really gotten sufficiently acquainted
+integer offsets for x, y and z, and iterated through the entire 3 dimensional array to draw all these little circles. At this point, I hadn’t really gotten sufficiently acquainted
 with the vector math to do anything more advanced.
 
 </p>
 
-<img src="voraldo_history3.png" style="border: 2px solid #ba550b;" alt="showing off raycast aabb" height="100" width="768">
+<img src="voraldo_history3.png" style="border: 2px solid #ba550b;" alt="showing off raycast aabb" height="431" width="768">
 
 <p>
 
@@ -82,7 +82,7 @@ ray for each pixel, traced through the voxel space. My first naive implementatio
 took small steps through space, looking to see if there was contents in the space
 even if it was outside of the block. I came up with an optimization that was really
 quite significant, in which you first tested that ray against an AABB representing
-the voxels. In addition to knowing whether or not you would need to consider that
+the voxels. In the picture above, there's a couple things going on. Three distinct things can happen, in this context - first, you can have a ray that does not hit the block at all - the pixel associated with this ray will be colored with a background color. Second, the ray can hit the block, and progress through till it hits a colored cell, and the pixel is colored with the color of that cell - the third being the case where you hit all zero-containing cells and these pixels are colored pink. In addition to knowing whether or not you would need to consider that
 ray, you also had data expressing a near point and a far point along that ray which
 constituted the near and far intersection points with that bounding box. Once you know
 that much, you can greatly reduce the amount of sampling you need to do and things get
@@ -90,21 +90,28 @@ much quicker. Quicker, here, was relative because all of these projects were con
 with function calls and the image generation process was offline, so you would open the
 picture in something else once you finished. My early attempts at lighting were
 extremely messy and slow because they required recomputation of all of the voxels
-every frame, as lighting calculations directly effected the RGBA values in the voxel
+every frame, as lighting calculations directly effected the color values in the voxel
  array. It was bad, at times well over a minute or two for a frame for simple images.
  Animations like these took a good chunk of a day - that being said, you can see the
  shafts in the light, and the shadows cast by the rotating objects.
 
 </p>
 
-<img src="voraldo_history4.png" style="border: 2px solid #ba550b;" alt="version v0.7" height="100" width="768">
+<img src="voraldo_history4.png" style="border: 2px solid #ba550b;" alt="ambient occlusion and alpha blending" height="450" width="768">
 
 <p>
 
+    &nbsp Some of the implemented features at this time were a simplified model of ambient occlusion (on the right) and my own calculation of the alpha blending (bottom left). I did some simple volumetric lighting based on the way the ray-based display worked (top left). This was all rendered offline and some of the animations took all day as a single threaded CPU process <a href="https://www.youtube.com/watch?v=ABLM5HDZmJs">(video 1)</a> <a href="https://www.youtube.com/watch?v=uUwM5ZjEn5s">(video 2)</a>. The way the color was represented at this point had changed to RGBA values, so that these kinds of effects could be implemented.
+
+</p>
+
+<img src="voraldo_history5.png" style="border: 2px solid #ba550b;" alt="version v0.7" height="100" width="768">
+
+<p>
 
 &nbsp That brings us to v0.7 - the first hardware accelerated version of the project. By
 using an OpenGL based representation, it went from something that was measured in
-seconds per frame, to frames per second. The project at this point split into two
+seconds per frame, to frames per second. Although the rendering was much faster, there are certain limitations on what I was able to do with it. The project at this point split into two
 pieces, which ran separately: one which had all the commands to draw geometry into
 the block and one that would allow you to view it. The generation program required you
 to write long lists of function calls that specified all of the parameters of the
