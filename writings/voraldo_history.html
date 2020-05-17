@@ -34,14 +34,14 @@ heightmaps and figured out the BMP image specification to do some image output. 
 very much interested by this sort of grid based representation of space. I had also done
 some limited stuff with simple OpenGL python bindings to display 3D arrays of points to
 represent voxel geometry, and made a very low resolution model of the enterprise. I
-didn’t at that time get deep into what was possible with modern OpenGL. The general
+didn’t at that time get deep into what was possible with modern OpenGL. This project has really grown with me, as I've gotten deeper into math, computer science, and computer graphics theory. The general
 notion of the project is that you want to display voxels, so really at your most basic
 it’s just something that serves as a viewer, but the specifics on how this was achieved
 varied greatly, shifting from an offline process which would produce still images, to a
 realtime, interactive viewer that allows manipulation of the contents of the voxels
 using compute shaders (for details on the most recent iteration, see the writeup on
 Voraldo 1.0). Another related endeavor is the 3D CA simulation I did for my graphics
-class final project, which really served as the basis for how 1.0 used compute shaders.
+class final project, which really served as the basis for how v1.0 used compute shaders.
 
 </p>
 
@@ -168,17 +168,17 @@ project has turned into.
 
 &nbsp Voxelization in the Vertex Shader was the idea, and basically the way this
 manifested was using uniform arrays of parameters and doing the checking for each point
-in space against these parametric representations of the geometry. On the CPU, I
-generated the parameters of the shapes and got the data ready to send each frame. I did
-a couple of different little demos with this but I again ran into the issue with the
-alpha blending, because here I was still trying to do the alpha blending of a great
+in this dense space against these parametric representations of the geometry, in the vertex shader. Each frame update on the CPU, I
+generated and animated the parameters of the shapes over time and got the data ready to send each frame. I did
+a couple of different little demos with this but I again ran into the issue with OpenGL's
+alpha blending, because here I was still trying to blend of a great
 number of points in an array, and their depth ordering was violated when you rotated
 away away from the ideal direction. I experimented with some information in an Inigo
-Quilez article, called volumetric sort, which talked about keeping multiple copies of
+Quilez article, called <a href="https://www.iquilezles.org/www/articles/volumesort/volumesort.htm">volumetric sort</a>, which talked about keeping multiple copies of
 your vertex data, ordered in all possible ways, and then checked to see which set of
-data should be used for the display. I had limited success, there are a lot of cases
-and I was confusing myself so I kind of moved away from that idea - the display in v1.0
-is handled very differently.
+data should be used for the display. I had limited success, there are a large number of cases (48 distinct orderings kept as full copies of all the point data on the GPU)
+and I was confusing myself on the logic to compute which set of points to use, so I kind of moved away from that idea. The display in v1.0
+is handled very differently, pretty far divorced from OpenGL's handling of geometry which again necessitated doing my own alpha blending computation.
 
 </p>
 
