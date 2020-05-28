@@ -33,9 +33,9 @@ body {
 	<img src="softbody1_1.png" style="margin: 0px 0px 0px 134px; border: 2px solid #ba550b;" alt="bridge builder" height="379" width="500">
 
 <p>
-&nbsp Doing some research I found that Pixar has a series of courses hosted on Kahn Academy called Pixar in a Box – I went through the one on simulation, hosted by Haley Iben, and I was surprised to find just how simple it really was. The course is designed to be used for 5th grade and up but I didn’t find it at all tedious going into it with more experience.
+&nbsp Doing some research I found that Pixar has a series of courses hosted on Kahn Academy called Pixar in a Box – I went through the <a href="https://www.khanacademy.org/partner-content/pixar/simulation/">one on simulation</a>, hosted by Haley Iben, and I was surprised to find just how simple it really was. The course is designed to be used for 5th grade and up but I didn’t find it at all tedious going into it with more experience.
 </p>
-	<img src="softbody1_2.png" style="border: 2px solid #ba550b;" alt="free body diagram" height="262" width="768">
+	<img src="softbody1_2.png" style="border: 2px solid #ba550b;" alt="free body diagram" height="280" width="768">
 
 <p>
 &nbsp The logic draws from the physics concept of a free body diagram – you can figure out the net forces on an object by summing all forces acting upon it. Once you know the net force on the object, you can use Newton’s second law to find acceleration (f=ma becomes a=f/m). I’ve included here a screenshot of one of the interactive damped spring examples on the Kahn Academy course.
@@ -59,25 +59,28 @@ body {
 
 <h3>&nbsp Cloth Sim</h3>
 
-<img src="softbody1_4.png" style="margin: 0px 0px 0px 134px; border: 2px solid #ba550b;" alt="Kahn Academy example" height="262" width="500">
+<img src="softbody1_4.png" style="margin: 0px 0px 0px 134px; border: 2px solid #ba550b;" alt="Kahn Academy example" height="308" width="500">
 
 <h3>&nbsp Bridge Truss</h3>
 
-<img src="softbody1_5.png" style="margin: 0px 0px 0px 134px; border: 2px solid #ba550b;" alt="Kahn Academy example" height="262" width="500">
+<img src="softbody1_5.png" style="margin: 0px 0px 0px 134px; border: 2px solid #ba550b;" alt="Kahn Academy example" height="308" width="500">
 	
 <h3>&nbsp Vehicle Chassis</h3>
 
-<img src="softbody1_6.png" style="margin: 0px 0px 0px 134px; border: 2px solid #ba550b;" alt="Kahn Academy example" height="262" width="500">
+<img src="softbody1_6.png" style="margin: 0px 0px 0px 134px; border: 2px solid #ba550b;" alt="Kahn Academy example" height="308" width="500">
 
 <h2>PSEUDOCODE OF MY 2D SOLUTION</h2>
 
-<pre>CODE LISTING</pre>
+<pre>
+CODE LISTING
+</pre>
 
 <h2>FUTURE DIRECTIONS</h2>
 <p>
 &nbsp All the computation for this project was already done with vec3’s – everything’s just in the z=0 plane. This was a put together as a relatively quick prototype, and there’s certainly room for improvement. In the writeup on the 3D version, I detail some of the directions I explored – I want to explore this parallelizability further once I figure out std::thread and see if it’s as significant a speedup as I suspect it would be.
 </p>
 </div>
-
+<br>
+<p>Last updated 5/28/2020</p>
 </body>
 </html>
