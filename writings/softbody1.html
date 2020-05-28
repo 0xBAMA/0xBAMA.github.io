@@ -65,14 +65,105 @@ body {
 
 <img src="softbody1_5.png" style="margin: 0px 0px 0px 134px; border: 2px solid #ba550b;" alt="Kahn Academy example" height="308" width="500">
 	
-<h3>&nbsp Vehicle Chassis</h3>
+<h3>&nbsp Vehicle Chassis - wheel anchors displaced with perlin noise</h3>
 
 <img src="softbody1_6.png" style="margin: 0px 0px 0px 134px; border: 2px solid #ba550b;" alt="Kahn Academy example" height="308" width="500">
 
 <h2>PSEUDOCODE OF MY 2D SOLUTION</h2>
 
 <pre>
-CODE LISTING
+
+struct edge
+{
+   float k;		//spring constant
+   float damping_rate;	//damping rate
+   float base_length;	//base distance, for compressible springs 
+
+   int node1;		//index of the first node involved in this edge
+   int node2;		//index of the second node involved in this edge
+}
+
+
+struct node
+{
+   vec3 position;	//position of the node
+   vec3 old_position;	//previous value of the node's position
+
+   vec3 velocity;	//velocity of the node
+   vec3 old_velocity;	//previous value of the node's velocity
+
+   float mass;		//mass of this node
+   bool anchored;	//if anchored, this node does not move
+
+   std::vector<edge> edges;	//the list of edges this node is part of
+}
+
+
+//these are populated with your nodes and edges
+std::vector<node> nodes;
+std::vector<edge> edges;	//this is redundant, but kept for rendering purposes
+
+
+//only including the update function, not getting into support functions/init, etc.
+void update(int mouse_x, int mouse_y, bool mouse_clicked)
+{
+   //back up position and velocity
+   for(node in nodes)
+   {
+      node.old_position = node.position;
+      node.old_velocity = node.velocity;
+   }
+
+
+   if(mouse_clicked)
+   {
+      //determine the index of the node that lies closest to vec3(mouse_x, mouse_y, 0)
+   }
+
+
+   //this loop could be parallelized
+   for(node in nodes)
+   {
+      if(!node.anchored)
+      {
+
+         vec3 accumulated_force = vec3(0,0,0); 	//initially zero force
+
+         for(edge in node.edges)
+         {
+            //each edge can impart spring and damping forces
+            float k = edge.k;
+            float d = edge.damping_rate;
+
+            vec3 my_position = node.old_position;
+            vec3 ur_position = nodes[edge.node2];
+
+            float spring_ratio = distance(my_position, ur_position)/edge.base_length;
+            vec3 springforce = -k * (my_position-ur_position) * (spring_ratio-1);
+
+            vec3 my_velocity = node.old_velocity;
+            vec3 dampforce = d * my_velocity;
+
+            force += (springforce - dampforce); 
+         }
+
+
+         force += node.mass * vec3(0,-GRAVITY,0);
+
+
+         if(mouse_clicked && current node index == index of the closest node to the mouse)
+         {
+            //apply some force based on an edge between mouse and that node
+         }
+
+
+         vec3 acceleration = force/node.mass;	//Newton's second law
+         node.velocity = node.old_velocity + acceleration * TIMESTEP;	//update velocity
+         node.position = node.old_position + node.velocity * TIMESTEP;	//update position
+      }
+   }
+}
+
 </pre>
 
 <h2>FUTURE DIRECTIONS</h2>
