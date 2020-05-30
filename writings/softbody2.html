@@ -29,7 +29,25 @@ body {
 
 <p>
 
-    writings on 3d softbodies program
+If you read the writeup on the implementation of the 2 softbodies, you will have seen that it really served as a prototype for the ideas used in this project. I have not implemented as many different models, just the vehicle chassis, but the framework is in place to do 3d analogs of what I was doing in 2d (bridge truss, cloth). I won’t get as much into the theory, since it is almost entirely the same as the previous project, but now with OpenGL hardware accelerated 3D output.
+
+GENERATING THE MODEL
+
+In the previous project, I generated the models by drawing them out on paper or on a whiteboard, or opened them in GIMP and picked pixel offsets as the X and Y positions of some selected points on the model. I then added the edges between the relevant nodes and that was the model. I could set the spring constants and damping rates, but it was on a per-edge basis so the ability to orchestrate it at a higher level was difficult. It was not at all an efficient process and required a fair amount of time to go from working on paper to having a reasonable model in the program.
+
+The model I used was one that I generated in Blender – using the mirror modifier and modleing with individual verticies and manually creating edges between them, I was able to get what I think is a reasonable 3d analog to the 2d chassis I had laid out. The OBJ export feature of Blender is a big deal, in this context – it turns out, the way they represent points and edges in the Wavefront OBJ format is almost identical to the approach that I was using – very little conversion was required.
+
+The format has some header information, followed by a list of points – there are a lot more pieces of information that can be included on a per-vertex basis but for my purposes I only needed vertex positions. After the vertex info, there’s a listing of the edges – each edge is specified by two numbers, which are 1-indexed into the list of verticies. Subtracting 1 was the only conversion necessary to get 0-indexed values like I was using.
+
+I used this method to generate the points on the chassis – the suspension links were generated separately. I set up a quick tool to let me iterate through the individual verticies, highlighting them and report the index of the highlighted vertex to the command line – I used this to figure out which of the chassis points should be connected to the wheel anchors by the suspension edges.
+
+By treating these as two sets of edges, the chassis links and the suspension links separately, I was able to set up sliders to set the two sets of spring rates and damping constants.
+
+C++ IMPLEMENTATION
+
+Similar to Voraldo 1.0, I used Dear Imgui to do the graphical user interface. As a very flexible drop-in utility, I’ve had a lot of success using it to allow runtime interaction with my OpenGL applications at a higher level than just using SDL’s event system to handle input.
+
+
 
 </p>
 </div>
