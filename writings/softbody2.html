@@ -29,14 +29,14 @@
         <div style='width:768px;'>
 
             <p>
-                &nbsp If you read the writeup on the implementation of the 2 softbodies, you will have seen that it really served as a prototype for the ideas used in this project. I have not implemented as many different models, just the vehicle chassis, but the framework is in place to do 3d analogs of what I was doing in 2d (bridge truss, cloth). I won’t get as much into the theory, since it is almost entirely the same as the previous project, but now with OpenGL hardware accelerated 3D output.
+                &nbsp If you read the writeup on the implementation of the 2d softbodies, you will have seen that it really served as a prototype for the ideas used in this project. I have not implemented as many different models, just the vehicle chassis, but the framework is in place to do 3d analogs of what I was doing in 2d (bridge truss, cloth). I won’t get as much into the theory, since it is almost entirely the same as the previous project, but now with OpenGL hardware accelerated 3D output.
             </p>
             <h2>GENERATING THE MODEL</h2>
             <p>
-                &nbsp In the previous project, I generated the models by drawing them out on paper or on a whiteboard, or opened them in GIMP and picked pixel offsets as the X and Y positions of some selected points on the model. I then added the edges between the relevant nodes and that was the model. I could set the spring constants and damping rates, but it was on a per-edge basis so the ability to orchestrate it at a higher level was difficult. It was not at all an efficient process and required a fair amount of time to go from working on paper to having a reasonable model in the program.
+                &nbsp In the previous project, I generated the models by drawing them out on paper or on a whiteboard, or opened them in GIMP and picked pixel offsets as the X and Y positions of some selected points on the model. I then added the edges between the relevant nodes and that was the model. I could set the spring constants and damping rates, but it was on a per-edge basis so the ability to orchestrate it at a higher level was difficult. It was not at all an efficient process and required a fair amount of time to go from working on paper to having a reasonable model in the program. This does not scale well - designing 3d models this way quickly becomes impractical.
             </p>
             <p>
-                &nbsp The model I used was one that I generated in Blender – using the mirror modifier and modleing with individual verticies and manually creating edges between them, I was able to get what I think is a reasonable 3d analog to the 2d chassis I had laid out. The OBJ export feature of Blender is a big deal, in this context – it turns out, the way they represent points and edges in the Wavefront OBJ format is almost identical to the approach that I was using – very little conversion was required.
+                &nbsp As a result, I had to figure out different tools. I generated the model of the vehicle chassis in Blender – using the mirror modifier and modleing with individual verticies and manually creating edges between them, I was able to get what I think is a reasonable 3d analog to the 2d chassis I had laid out. The OBJ export feature of Blender is a big deal, in this context – it turns out, the way they represent points and edges in the Wavefront OBJ format is almost identical to the approach that I was using – very little conversion was required.
             </p>
             <p>
                 &nbsp The format has some header information, followed by a list of points – there are a lot more pieces of information that can be included on a per-vertex basis but for my purposes I only needed vertex positions. After the vertex info, there’s a listing of the edges – each edge is specified by two numbers, which are 1-indexed into the list of verticies. Subtracting 1 was the only conversion necessary to get 0-indexed values like I was using.
@@ -49,7 +49,13 @@
             </p>
             <h2>C++ IMPLEMENTATION</h2>
             <p>
-                 &nbsp Similar to Voraldo 1.0, I used Dear Imgui to do the graphical user interface. As a very flexible drop-in utility, I’ve had a lot of success using it to allow runtime interaction with my OpenGL applications at a higher level than just using SDL’s event system to handle input.
+                 &nbsp Similar to Voraldo 1.0, I used Dear Imgui to do the graphical user interface. As a very flexible drop-in utility, I’ve had a lot of success using it to allow runtime interaction with my OpenGL applications at a higher level than just using SDL’s event system to handle input. One important way this manifests is inputting numbers, strings and other values, because keeping them otherwise would have to be handled on a per-event basis and that becomes very labor intesive - much easier to get this functionality from something at a higher level like dear imgui handles it.
+            </p>
+            <p>
+                &nbsp My softbody update is very similar to the 2d version - however, each frame, after the update is computed, the current vertex positions are sent in a batch to the GPU to be used as position vertex attributes. I am rendering these lines twice, with different line widths, in order to achieve the thin black outline around all the segments. I find this helps delineate between lines that would otherwise be over top of lines exactly the same color (vs having no distinction between those neighboring fragments).        
+            </p>
+            <p>
+                &nbsp The wheel's positions, again, are displaced by perlin noise. By doing this, I can have smooth movement, and using the sliders in the interface I can scale the amplitude and change the frequency of how this noise function is evaluated. The offsets are only applied perpendicular to the XZ plane - I added some points rendered in a grid, using this same offset, to help visualize where this perlin noise 'ground' would be.
             </p>
         </div>
 
