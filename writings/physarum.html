@@ -34,7 +34,7 @@ body {
 <img src="physarum1.gif" style="margin: 0px 0px 0px 184px; border: 2px solid #ba550b;" alt="my implementation" height="265" width="400">
 
 <p>
-&nbsp This project was inspired by the work done by <a href="https://sagejenson.com/physarum">Sage Jenson</a> which attempts to model the behavior of the Physarum Polycephalum slime mold using an interesting simulation methodology. They very clearly communicated the concept in a visual form on that page, which I found to be incredibly useful in implementing my own simulation. I do everything after the initialization on the GPU - during the implementation of this project, I ended up learning a few new concepts about modern OpenGL (SSBOs and GLSL atomic operations).
+&nbsp This project was inspired by the work done by <a href="https://sagejenson.com/physarum">Sage Jenson</a> which attempts to model the behavior of the <a href="https://uwe-repository.worktribe.com/output/980579">Physarum Polycephalum</a> slime mold using an interesting simulation methodology. They very clearly communicated the concept in a visual form on that page, which I found to be incredibly useful in implementing my own simulation. I do everything after the initialization on the GPU - during the implementation of this project, I ended up learning a few new concepts about modern OpenGL (SSBOs and GLSL atomic operations).
 </p>
 
 <img src="physarum2.gif" style="margin: 0px 0px 0px 134px; border: 2px solid #ba550b;" alt="my implementation" height="319" width="500">
@@ -67,7 +67,7 @@ body {
 </p>
 
 <p>
-&nbsp And just as one last note here before I describe the simulation, the way in which I got random numbers for the rotation in simulation step 2 is with std::random - however, in order to avoid just using the same value across all simulation agents, I picked a number of random values, and passed them into the vertex shader as an array of uniform variables (glUniform2fv()) - when I needed a random value, simply index into this array by gl_VertexID modded by the number of values you passed in. I felt this was an elegant way to handle this, so that you don't see the exact same behavior across all the simulation agents. 
+&nbsp And just as one last note here before I describe the simulation, the way in which I got random numbers for the rotation in simulation step 2 is with std::random - however, in order to avoid just using the same value across all simulation agents, I picked a number of random values, and passed them into the vertex shader each frame as an array of uniform variables (glUniform2fv()) - when I needed a random value, simply index into this array by gl_VertexID modded by the number of values you passed in. I felt this was an elegant way to handle this, so that you don't see the exact same behavior across all the simulation agents. 
 </p>
 
 <h2>The 6 Steps of the Simulation Update</h2>
@@ -75,47 +75,51 @@ body {
 &nbsp First of all, I would again direct you to Sage Jenson's post on this topic - the hand-drawn graphic they have on their site encapsulates everything that's involved in a very concise way. I'll attempt to go into detail here on what goes on, and give some implementation notes where I can.
 </p>
 
-<img src="physarum3.png" style="margin: 0px 0px 0px 323px;" alt="my implementation" height="142" width="121">
+<img src="physarum3.png" style="margin: 0px 0px 0px 323px;" alt="agent" height="142" width="121">
 
 <h3>1 - Sense</h3>
 
-<p>
-&nbsp
+<p style="margin: 0px 32px 0px 32px;">
+&nbsp Read the current state of the pheremone buffer, at positions 1, 2 and 3 - sample 2 is taken along the current heading of the agent, while 1 is rotated by the sensor angle in the negative direction and 3 is rotated by the sensor angle in the positive direction. I noticed interesting patterns when this angle θ is obtuse - this meaning that samples 1 and 3 are actually being taken behind the agent's position. 
 </p>
 
 <h3>2 - Rotate</h3>
 
-<p>
-&nbsp
+<p style="margin: 0px 32px 0px 32px;">
+&nbsp Based on the samples taken, make a determination on how you want to turn. I implemented this with a few if statements that compared the relative magnitude of the samples, but there is room for refinement here. The general concept is that you are moving towards areas of higher concentration in the pheremone buffer - I just rotate the direction vector positively or negatively by the turn angle to realize this. In the case where samples 1 and 3 are both greater than sample 2, you use a random value for direction. I have seen mention of doing this as more of a vector sum or potentially keeping a velocity as part of the agent's state to have an acceleration applied during the next step.
 </p>
 
 <h3>3 - Move</h3>
 
-<p>
-&nbsp
+<p style="margin: 0px 32px 0px 32px;">
+&nbsp This step is simple - you increment the position by the step size times the unit-length direction vector, and store the result back in the SSBO.
 </p>
 
 <h3>4 - Deposit</h3>
 
-<p>
-&nbsp
+<p style="margin: 0px 32px 0px 32px;">
+&nbsp This is the last step that occurs in the vertex shader - using imageAtomicAdd, you increment the value of the texel in the current pheremone buffer in which the agent resides by the pheremone deposit amount.
 </p>
 
 <h3>5 - Diffuse</h3>
 
-<p>
-&nbsp
+<p style="margin: 0px 32px 0px 32px;">
+&nbsp Before this step occurs, the pheremeone buffers are swapped. The current pheremone buffer becomes the previous pheremone buffer, and the previous becomes the current. This diffusion is done by a compute shader with the same dimensions as the pheremone buffer that computes the result of a 3x3 gaussian kernel in every invocation.
 </p>
 
 <h3>6 - Decay</h3>
 
-<p>
-&nbsp
+<p style="margin: 0px 32px 0px 32px;">
+&nbsp As part of this same compute shader, scale the result of the gaussian kernel by the pheremone decay factor, and store the result back into the current image. This diffused and decayed result is the ready to serve as the current image for the next iteration of simulation step 1.
 </p>
 
 <h2>Future Directions</h2>
 <p>
 &nbsp As I mentioned earlier, the pheremone data is stored as a 1-channel uimage2D, in which texels are simply 32 bit unsigned integers. I want to put together an alternative visualization which uses this uimage2D as a heightmap and renders it in a way similar to how I did the rendering in <a href="https://jbaker.graphics/writings/vertexture.html">Vertexture</a>. Because the mesh used in that project was just a plane of small, flat triangles, displaced by texture reads in the vertex shader, this seems like a very good application for that type of logic.
+</p>
+
+<p>
+&nbsp As far as other projects go, the introduction of SSBOs to my toolbox has been a major breakthrough and I'm very excited to apply it other projects. Namely, I think that I could apply the logic to the update of softbodies, in the style of my <a href="softbody1.html">2D</a> and <a href="softbody2.html">3D</a> implementations, but with all the computation done on the GPU.
 </p>
 
 
