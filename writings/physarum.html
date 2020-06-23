@@ -28,10 +28,89 @@ body {
 
 <div style='width:768px;'>
 
-<h2>Physarum</h2>
+<h2>Physarum Simulation</h2>
+
+
+<img src="physarum1.gif" style="margin: 0px 0px 0px 184px; border: 2px solid #ba550b;" alt="my implementation" height="265" width="400">
+
 <p>
-&nbsp writings on physarum sims
+&nbsp This project was inspired by the work done by <a href="https://sagejenson.com/physarum">Sage Jenson</a> which attempts to model the behavior of the Physarum Polycephalum slime mold using an interesting simulation methodology. They very clearly communicated the concept in a visual form on that page, which I found to be incredibly useful in implementing my own simulation. I do everything after the initialization on the GPU - during the implementation of this project, I ended up learning a few new concepts about modern OpenGL (SSBOs and GLSL atomic operations).
 </p>
+
+<img src="physarum2.gif" style="margin: 0px 0px 0px 134px; border: 2px solid #ba550b;" alt="my implementation" height="319" width="500">
+
+<p>
+&nbsp Tweaking of simulation parameters leads to some very different behavior. The parameters are as follows, and are explained in detail below: sensor angle, sensor distance, turn angle, step size, pheremone deposit amount and pheremone decay factor.
+</p>
+
+<h2>Background</h2>
+
+<p>
+&nbsp "Can you have modifiable vertex attributes?" is a question that I've found myself asking since very soon after I learned about how you can set up vertex attributes such as colors, texture coordinates, positions in space, etc. You use these things to define your model as you pass them into OpenGL, but is there a way to make these more dynamic? You can do all this math in your vertex shader, but your vertex attributes are generally used with an 'in' qualifier which I take to mean they are read only - it didn't make sense to me that there would be no way to write this data.
+</p>
+
+<p>
+&nbsp Enter OpenGL 4.3 SSBOs. The specification guarantees you a huge amount of space to work with for an SSBO - 128MB as a minimum, and they can be freely read from or written to in your shaders. Where vertex attributes are associated with a particular shader invocation, these buffers appear to the shader as a chunk of memory that can be arbitrarily accessed. They use the same layout/binding syntax as textures or images, so you could concieveably use a number of them if you had an application for it.
+</p>
+
+<h2>Simulation Environment</h2>
+<p>
+&nbsp There are two major components to this simulation - the agents and the pheremone buffer. They are drawn as two separate units - many verticies (5 million+) for the agents, and then two triangles to cover the screen for the pheremone buffer. The agents make movement decisions based on the values pheremone buffer, and deposit pheremones along their path. Agents are rendered as points, and the movement logic is all handled in the vertex shader - their positions and directions are seeded with std::random during the initialization, and then all further updates are handled by manipulating an SSBO in the vertex shader. They are rendered as light blue soft-edged points, which is briefly shown in the first gif in this post, but I found the patterns that form in the pheremone buffer to be much more visually interesting. The yellow color comes from the fact that the pheremone buffer is a uimage2D, which has texels in the form of unsigned integers - I used this along with some multiplication logic to set the red and green channels of the output pixel.
+</p>
+
+<p>
+&nbsp I believe this is the best place to mention this - I will explain further in simulation step 4 - but when the pheremone is being deposited, there is a potential dependence on the order in which the accesses are made to the pheremone buffer. While in the past I have implemented things like this with a pair of textures that are swapped each update, this approach would not work this time, because each of the simulation agents will be incrementing the value in the image, and potentially multiple vertex shader invocations would be trying to manipulate the same data at the same time. This introduces an order dependence in something that should be completely parallel from a user perspective. To solve this, I applied the use of a GLSL function added in OpenGL 4.2 - imageAtomicAdd, which will increment the value at a particular location in the image in a way that prevents me from stepping on my own toes. If it was handled as a load, increment, then store, I wouldn't be able to know if the internal implementation of the pipeline will give me the correct result.
+</p>
+
+<h2>The 6 Steps of the Simulation Update</h2>
+<p>
+&nbsp First of all, I would again direct you to Sage Jenson's post on this topic - the hand-drawn graphic they have on their site encapsulates everything that's involved in a very concise way. I'll attempt to go into detail here on what goes on, and give some implementation notes where I can.
+</p>
+
+<img src="physarum3.png" style="margin: 0px 0px 0px 323px;" alt="my implementation" height="142" width="121">
+
+<h3>1 - Sense</h3>
+
+<p>
+&nbsp
+</p>
+
+<h3>2 - Rotate</h3>
+
+<p>
+&nbsp
+</p>
+
+<h3>3 - Move</h3>
+
+<p>
+&nbsp
+</p>
+
+<h3>4 - Deposit</h3>
+
+<p>
+&nbsp
+</p>
+
+<h3>5 - Diffuse</h3>
+
+<p>
+&nbsp
+</p>
+
+<h3>6 - Decay</h3>
+
+<p>
+&nbsp
+</p>
+
+<h2>Future Directions</h2>
+<p>
+&nbsp As I mentioned earlier, the pheremone data is stored as a 1-channel uimage2D, in which texels are simply 32 bit unsigned integers. I want to put together an alternative visualization which uses this uimage2D as a heightmap and renders it in a way similar to how I did the rendering in <a href="https://jbaker.graphics/writings/vertexture.html">Vertexture</a>. Because the mesh used in that project was just a plane of small, flat triangles, displaced by texture reads in the vertex shader, this seems like a very good application for that type of logic.
+</p>
+
+
 </div>
 <br>
 <p>Last updated 6/22/2020</p>
