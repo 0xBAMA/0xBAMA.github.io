@@ -36,6 +36,10 @@ body {
 
 <br>
 
+<img src="voraldo0.gif" style="margin: 0px 0px 0px 84px; border: 2px solid #ba550b;" alt="simple example" height="281" width="500">
+
+<br>
+
 <h2>Background</h2>
 
 <p>
@@ -103,7 +107,13 @@ body {
 
 <h3>&nbsp-Lighting Operations-</h3>
 <p>
-&nbsp The lighting buffer was added fairly late in the game in this version, and was not really initially designed for - this is something to think about for the next iteration. In essence, currently it is used as a scale factor for the RGB components of the color data in the display function - a value of 0.25 in the lighting buffer is 'neutral', because there is also a factor of 4.0 applied when doing this scaling (this extra headroom lets you get some cool highlights - the image above shows the same color data twice, with different lighting applied). There are currently 3 operations in the lighting menu - clearing, ambient occlusion, and directional lighting. Clearing will set a uniform level in the lighting buffer. Ambient occlusion will darken cells based on a neighborhood of a certain radius - it looks at the alpha values across this and computes an average weighted by transparency. More transparent neighborhoods will mean less darkening, more opaque neighborhoods will mean more darkening - the effect is subtle, but I think it adds quite a bit to the lighting system. Directional lighting is applied in a very similar way to the main display function, in that it has a grid of starting positions for rays that are then traced into the volumes. The difference here is that they are considered from nearest point to farthest point, with the intensity decremented by the alpha value and then applied to the lighting buffer at each step. This has the potential to create sunshafts through the volume that I find very visually appealing. The latest addition to this has been the ability to 'mash' the lighting value into the RGB data - this basically goes through and applies the scaling that would be applied in the display shader, so that this data is retained and can be saved with the voxel data.
+&nbsp The lighting buffer was added fairly late in the game in this version, and was not really initially designed for - this is something to think about for the next iteration. In essence, currently it is used as a scale factor for the RGB components of the color data in the display function - a value of 0.25 in the lighting buffer is 'neutral', because there is also a factor of 4.0 applied when doing this scaling (this extra headroom lets you get some cool highlights - the image above shows the same color data twice, with different lighting applied). There are currently 3 operations in the lighting menu - clearing, ambient occlusion, and directional lighting. 
+</p>
+
+<img src="voraldo5.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="simple example" height="498" width="768">
+
+<p>
+&nbsp Shown here is the lighting config menu. Clearing will set a uniform level in the lighting buffer. Ambient occlusion will darken cells based on a neighborhood of a certain radius - it looks at the alpha values across this and computes an average weighted by transparency. More transparent neighborhoods will mean less darkening, more opaque neighborhoods will mean more darkening - the effect is subtle, but I think it adds quite a bit to the lighting system. Directional lighting is applied in a very similar way to the main display function, in that it has a grid of starting positions for rays that are then traced into the volumes. The difference here is that they are considered from nearest point to farthest point, with the intensity decremented by the alpha value and then applied to the lighting buffer at each step. This has the potential to create sunshafts through the volume that I find very visually appealing. The latest addition to this has been the ability to 'mash' the lighting value into the RGB data - this basically goes through and applies the scaling that would be applied in the display shader, so that this data is retained and can be saved with the voxel data.
 </p>
 
 <h3>&nbsp-Utility Operations-</h3>
