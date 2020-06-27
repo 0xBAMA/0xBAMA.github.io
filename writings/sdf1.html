@@ -93,6 +93,12 @@ body {
 		 imageStore(current, ivec2(gl_GlobalInvocationID.xy), uvec4(l.rgb, h.a));
 	}
 </pre>
+<br>
+<p>
+&nbsp I've put together a very simple flowchart of what's going on in this program - the inputs are handed to the raymarch compute shader, which may eventually include an SSBO with geometry parameters, the output of which is then processed by the dithering shader, which is then passed along to the vertex/fragment shader pair represented here as the display shader. This display is doing the nearest sampling for all fragments on the screen - this involves covering the screen with two triangles, then doing a reference to the current image in the fragment shader.
+</p>
+
+<img src="sdf1_1.png" style="margin: 0px 0px 0px 231px;" alt="program structure" height="341" width="306">
 
 
 <h3>Future Directions</h3>
