@@ -66,10 +66,14 @@
             </p>
             
             <p>
-            &nbsp Since this was written, I have figured out OpenGL SSBOs for my physarum sim project, and given the parallelizability of this approach I want to return to this to do the computation directly on the GPU once I have some more experience with these and can get my mind around handling the data this way.
+            &nbsp Since this was written, I have figured out OpenGL SSBOs for my physarum sim project, and given the parallelizability of this approach I want to return to this to do the computation directly on the GPU once I have some more experience with these and can get my mind around handling the data this way.            
+            </p>
+            
+            <p>
+            &nbsp UPDATE (6/29/2020): I went through and figured out how to multithread the update function. However, I actually saw a slowdown when running the threaded update versus the unthreaded update. My working theory is that with the limited number of points (about 10, which is very small, and really not that much work is done for each point) that are involved in each thread's update, the overhead of creating and joining threads is actually greater than the speedup that you would see. I could be mistaken, but this is what I think is happening.
             </p>
         </div>
 		<br>
-		<p>Last updated 6/22/2020</p>
+		<p>Last updated 6/29/2020</p>
     </body>
 </html>
