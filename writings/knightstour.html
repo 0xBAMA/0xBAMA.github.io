@@ -30,19 +30,79 @@ body {
 
 <h2>Knights Tours via Recursive Backtracing</h2>
 
-<!-- <img src="sdf1_0.gif" alt="simple example" height="512" width="768"> -->
+
+
+
+
 
 <p>
-&nbsp This project came up when I found some of my old code from CS3610, Data Structures. I had written it very poorly, hardcoded the size of the board, and certain starting positions would create issues - I took this chance to fix these problems and make it work for an arbitrary sized board. A 'Knight's Tour' is a pattern in which a knight can visit all the squares on a chessboard - they exist for all square chessboards which have an edge length greater than 4 - I found a pretty good discussion of this fact <a href="http://gaebler.us/share/Knight_tour.html">here</a>.
+&nbsp In chess, a 'Knight's Tour' is a pattern in which a knight can visit all the squares on a chessboard. They exist for all square chessboards which have an edge length greater than 4 - I found a pretty good discussion of this fact <a href="http://gaebler.us/share/Knight_tour.html">here</a>. Of course standard chessboards are 8 squares on a side, and there is no point while playing the game that you would see this behavior unfold, so this is really more of a mathematical exersize when you go to arbitrary board sizes.
 </p>
+
+<h2>Background</h2>
 
 <p>
-&nbsp Writeup WIP
+&nbsp This project came up when I found some of my old code from CS3610, Data Structures - the goal was to enumerate all the knights tours from a given board square. I had written it a number of years ago, and as part of the problem that was given, I had hardcoded the size of the board as 5 squares - I took this chance to fix this and make it work for an arbitrary sized board. When I added the ability do a different size board, I quickly found out how incredibly it scales - I will explain the structure of the execution to illustrate it.
 </p>
 
+<h2>Implementation</h2>
+
+<p>
+&nbsp The program starts with a few parameters supplied via the command line:
+</p>
+
+<pre>	./knightstour < board size > < starting x position > < starting y position ></pre>
+
+<p>
+&nbsp The board is represented as a 2d array of integers, initialized with zero values except for the starting location, which is marked with 1 as it is the first square to be visited. When the recursive part of the program begins, you look at the moves that are available to the knight - this is the standard set of canonical moves from chess. Of the set of 8 possible moves, some are on the board, and potentially there are some that are not. The squares that are on the board and still contain zero values are added to a list of valid moves.
+</p>
+
+<img src="knightstour1.png" alt="movement" height="314" width="768">
+
+<p>
+&nbsp For each of the valid moves that have been generated, you mark the square with a running counter to tell which move this is along the tour, and then if the board square you are moving to still holds a zero value (unvisited), you recurse. A new set of moves is generated, you go to the first valid one (unvisited and on the board), mark it with the incremented counter, all the way down until this counter value equals the board size squared. When this occurs, the board's representation is printed at the command line, as a 2d array of integers representing the order in which the knight visits all the board squares.
+</p>
+
+<h2>Scaling</h2>
+
+<p>
+&nbsp It is here that we get a sense of the wild scaling of this problem - I like to think of it in terms of an upper bound, sort of a Big O type of notion, that there is a tree type of structure that branches 8 times at every node - add to this the fact that for board size n, it is n<sup>2</sup> levels deep, because all the board squares must be visited. This means you're looking at something along the lines of O(8<sup>n<sup>2</sup></sup>). You will note that a lot of these subtrees will be invalid, just by nature of how the piece moves, a lot will fall outside the range of valid board squares or try to move to squares that have already been visited higher up in the tree.
+</p>
+
+<h2>Example Tours</h2>
+
+<h3>5x5</h3>
+<pre>
+  19    6   11   16   25 
+  12    1   18    5   10 
+   7   20   15   24   17 
+   2   13   22    9    4 
+  21    8    3   14   23 
+</pre>
+
+<h3>6x6</h3>
+<pre>
+  27   16   33   14   25   22 
+  34    7   26   23    2   13 
+  17   28   15   32   21   24 
+   6   35    8    1   12    3 
+  29   18    5   10   31   20 
+  36    9   30   19    4   11 
+</pre>
+
+<h3>7x7</h3>
+<pre>
+  23   16   45   32   43   40    5 
+  46   33   22   39    6   31   42 
+  17   24   15   44   41    4    7 
+  34   47   38   21   30   11    2 
+  25   18   35   14    3    8   29 
+  48   37   20   27   10    1   12 
+  19   26   49   36   13   28    9 
+</pre>
 
 </div>
 <br>
-<p>Last updated 6/27/2020</p>
+<p>Last updated 7/10/2020</p>
 </body>
 </html>
