@@ -63,6 +63,10 @@ body {
 &nbsp For each of the valid moves that have been generated, you mark the square with a running counter to tell which move this is along the tour, and then if the board square you are moving to still holds a zero value (unvisited), you recurse. A new set of moves is generated, you go to the first valid one (unvisited and on the board), mark it with the incremented counter, all the way down until this counter value equals the board size squared. When this occurs, the board's representation is printed at the command line, as a 2d array of integers representing the order in which the knight visits all the board squares.
 </p>
 
+<p>
+&nbsp When you reach a state from which there are no valid moves, whether you have completed a tour, or all the moves you would consider are to invalid spaces, the backtracking occurs - here you could think of the moves as a stack, where you pop them off the stack (move back to previous location, reset squares you have visited in the popped moves to zero) until you get to one from which there are valid moves. If you pop all the way back to your first move, and have no more moves to check, you drop out of the recursive function and the program terminates.
+</p>
+
 <h2>Scaling</h2>
 
 <p>
