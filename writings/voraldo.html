@@ -31,7 +31,7 @@ body {
 <h2>Voraldo v1.0 - An Interactive Volume Editor</h2>
 
 <p>
-&nbsp Firstly, you'll note that it's relatively difficult to pick good pictures for what amounts to an image editor. This project has been my baby for quite some time now and I have a huge amount that I could say about it - in a big way, it represents a very concrete representation of how I visualize things in my own mind. For the purposes of this writeup, I will be sticking to the the important parts of the implementaion and leave the exhaustive detail of each operation for later. Since starting on this iteration of the project, I have gained a lot of experience and am already planning a number of pretty significant architectural changes for the next.
+&nbsp Firstly, you'll note that it's relatively difficult to pick good pictures for what amounts to an image editor. For the purposes of this writeup, I will be sticking to the the important parts of the implementaion and leave the exhaustive detail of each operation for later. Since starting on this iteration of the project, I have gained a lot of experience and am already planning a number of pretty significant architectural changes for the next.
 </p>
 
 <br>
@@ -126,52 +126,20 @@ body {
 
 
 
-
-
-
 <br>
 <br>
 
 <h2>Future Directions</h2>
 
+
+<img src="voraldo6.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="simple example" height="624" width="768">
+
 <p>
-&nbsp By no means an exhaustive list - keeping ideas for the next version here. This project is of a continually evolving nature and has seen over ten complete rewrites, we will see what the future holds.
+&nbsp Version 1.1 of this project is currently in the works - I have a number of improvements planned, including better organization of my GPU buffers and a complete overhaul of the user interface to simplify both the code and the user interaction. Within the next few weeks, I should have something more presentable. Shown here is a model made with some more recent developments, including better use of the alpha channel for transparency, some major lighting improvements, and the inclusion of ideas from Brent Werness's open source project called <a href="https://bitbucket.org/BWerness/voxel-automata-terrain/">Voxel Automata Terrain</a> (translated from Processing to C++ with some guidance by the author).
 </p>
-
-<dl>
-  <dt><h3>-Compute shader refinements-</h3></dt>
-  <dd>- implement #include syntax for things like utility functions, reduce code duplication across shaders</dd>
-  <dd>- standard environment presented to all shaders, rather than the current ad hoc arrangement</dd>
-  <dd>- in-program editing of shaders, using this standard environment? (documented for users)</dd>
-  <dd>- flesh out the GUI using some of the cooler dearImGui features (tabs, textures, text entry, etc)</dd>
-  <dd>- related to previous, how cool would embedded nvim be? potentially silly and difficult</dd>
-  
-  <dt><h3>-GPU-Side Data Handling-</h3></dt>
-  <dd>- plan out image buffers better (current ad hoc structure works, but is relatively ugly)</dd>
-  <dd>- doing the phyarum sim, I now know I would hugely prefer working with uimage3D over image3D (not big on handling them as a floating point value)</dd>
-  
-  <dt><h3>-CPU-Side Data Handling-</h3></dt>
-  <dd>- file format for variable size blocks? <a href="https://github.com/0xBAMA/curl_in_c-">see this</a> for handling png data directly</dd>
-  <dd>- .vox support? something other than huge pngs (currently using 65536*256 PNG for 256*256*256 block)?</dd>
-  <dd>- should you be able to save the mask?</dd>
-
-  <dt><h3>-Drawing-</h3></dt> 
-  <dd>- batching like VIVS, but probably using SSBOs (unify all drawing shaders into one? might do with #include) - fewer instances of glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT)?</dd>
-  <dd>- related to previous, animation - another buffer holding temporary voxel data, mixed in display shader?</dd>
-  <dd>- look into more SDFs, and <a href="https://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm">some of the operations people have done</a> to combine them (smooth min, etc)</dd>
-  <dd>- better blur, come up with a variable radius 3d gaussian kernel to replace current box blur</dd>
-  <dd>- fix the blur so that the contribution of each color is scaled by that color's alpha value</dd>
-  <dd>- 'stamp' operation, thinking about this as basically a load that respects the mask</dd>
-  <dd>- cellular automata?</dd>
-  
-  <dt><h3>-Lighting-</h3></dt> 
-  <dd>- do it better</dd>
-  <dd>- point lights - earlier approach got complicated, rethink</dd>
-  <dd>- realtime updates (move around per frame, clear and recalculate)</dd>
-</dl>
 
 </div>
 <br>
-<p>Last updated 6/24/2020</p>
+<p>Last updated 8/3/2020</p>
 </body>
 </html>
