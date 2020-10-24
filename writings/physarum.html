@@ -31,13 +31,13 @@ body {
 <h2>Physarum Simulation</h2>
 
 
-<img src="physarum1.gif" style="margin: 0px 0px 0px 184px; border: 2px solid #ba550b;" alt="my implementation" height="265" width="400">
+<img src="images/physarum1.gif" style="margin: 0px 0px 0px 184px; border: 2px solid #ba550b;" alt="my implementation" height="265" width="400">
 
 <p>
 &nbsp This project was inspired by the work done by <a href="https://sagejenson.com/physarum">Sage Jenson</a> which attempts to model the behavior of the <a href="https://uwe-repository.worktribe.com/output/980579">Physarum Polycephalum</a> slime mold using an interesting simulation methodology. They very clearly communicated the concept in a visual form on that page, which I found to be incredibly useful in implementing my own simulation. I do everything after the initialization on the GPU - during the implementation of this project, I ended up learning a few new concepts about modern OpenGL (SSBOs and GLSL atomic operations).
 </p>
 
-<img src="physarum2.gif" style="margin: 0px 0px 0px 134px; border: 2px solid #ba550b;" alt="my implementation" height="319" width="500">
+<img src="images/physarum2.gif" style="margin: 0px 0px 0px 134px; border: 2px solid #ba550b;" alt="my implementation" height="319" width="500">
 
 <p>
 &nbsp Tweaking of simulation parameters leads to some very different behavior. The parameters are as follows, and are explained in detail below: sensor angle, sensor distance, turn angle, step size, pheremone deposit amount and pheremone decay factor.
@@ -75,7 +75,7 @@ body {
 &nbsp First of all, I would again direct you to Sage Jenson's post on this topic - the hand-drawn graphic they have on their site encapsulates everything that's involved in a very concise way. I'll attempt to go into detail here on what goes on, and give some implementation notes where I can.
 </p>
 
-<img src="physarum3.png" style="margin: 0px 0px 0px 323px;" alt="agent" height="142" width="121">
+<img src="images/physarum3.png" style="margin: 0px 0px 0px 323px;" alt="agent" height="142" width="121">
 
 <h3>1 - Sense</h3>
 

@@ -30,7 +30,7 @@ body {
 
 <h2>Dithered Raymarching, Part 1</h2>
 
-<img src="sdf1_0.gif" alt="simple example" height="512" width="768">
+<img src="images/sdf1_0.gif" alt="simple example" height="512" width="768">
 
 <p>
 &nbsp This project is my first foray into raymarching/sphere tracing. I went through a video tutorial by the Art of Code youtube channel, called <a href="https://youtu.be/PGtv-dBi2wE">Raymarching for Dummies</a> and implemented a very basic raymarch shader with two primitives, based on their approach. I liked the appearance of using nearest sampling and scaling the pixels up so that the pixels are individually 2 pixels tall and 3 pixels wide - this is a neat effect I've seen employed in quite a few indie games recently.
@@ -98,7 +98,7 @@ body {
 &nbsp I've put together a very simple flowchart of what's going on in this program - the inputs are handed to the raymarch compute shader, which may eventually include an SSBO with geometry parameters, the output of which is then processed by the dithering shader, which is then passed along to the vertex/fragment shader pair represented here as the display shader. This display is doing the nearest sampling for all fragments on the screen - this involves covering the screen with two triangles, then doing a reference to the current image in the fragment shader. In so doing, the resolution of the raymarching step is completely independent of the resolution of the framebuffer, allowing me to still use dearImGui to facilitate runtime interaction.
 </p>
 
-<img src="sdf1_1.png" style="margin: 0px 0px 0px 231px;" alt="program structure" height="341" width="306">
+<img src="images/sdf1_1.png" style="margin: 0px 0px 0px 231px;" alt="program structure" height="341" width="306">
 
 
 <h3>Future Directions</h3>

@@ -57,7 +57,7 @@ body {
 &nbsp The board is represented as a 2d array of integers, initialized with zero values except for the starting location, which is marked with 1 as it is the first square to be visited. When the recursive part of the program begins, you look at the moves that are available to the knight - this is the standard set of canonical moves from chess. Of the set of 8 possible moves, some are on the board, and potentially there are some that are not. The squares that are on the board and still contain zero values are added to a list of valid moves.
 </p>
 
-<img src="knightstour1.png" alt="movement" height="314" width="768">
+<img src="images/knightstour1.png" alt="movement" height="314" width="768">
 
 <p>
 &nbsp For each of the valid moves that have been generated, you mark the square with a running counter to tell which move this is along the tour, and then if the board square you are moving to still holds a zero value (unvisited), you recurse. A new set of moves is generated, you go to the first valid one (unvisited and on the board), mark it with the incremented counter, all the way down until this counter value equals the board size squared. When this occurs, the board's representation is printed at the command line, as a 2d array of integers representing the order in which the knight visits all the board squares.
