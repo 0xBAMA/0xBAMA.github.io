@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-
 <meta charset="UTF-8">
+<title>Raytracing in One Weekend</title>
 
 <style>
 body {
@@ -23,15 +23,15 @@ body {
 <body>
 
 <h1 style='display:inline-block'>Jon Baker, Graphics Programming</h1>
-<p style='display:inline-block'> &nbsp &nbsp <a href='../index.html'>home</a></p>
-<p style='display:inline-block'> &nbsp &nbsp <a href='index.html'>writings</a></p>
+<p style='display:inline-block'> &nbsp; &nbsp; <a href='../index.html'>home</a></p>
+<p style='display:inline-block'> &nbsp; &nbsp; <a href='index.html'>writings</a></p>
 
 <div style='width:768px;'>
 
 <h2>Raytracing in One Weekend</h2>
 
 <p>
-&nbsp I got involved in a group that got started the past few weeks during the COVID measures that is essentially an online book club hosted via Zoom for graphics books and papers, organized by some people at UC Boulder. The first few meetings have been focused on implementing Raytracing in One Weekend - I made a few changes to the code supplied by the book, but a lot of the code is very similar to their implementation. I'm going to work through the rest of the series, and then I plan on implementing a GPU-based version. Some important things to focus on are the acceleration structures like BVHs, and I will need to think about how to linearize these structures to prepare them to be passed into a compute shader using SSBOs.
+&nbsp; I got involved in a group that got started the past few weeks during the COVID measures that is essentially an online book club hosted via Zoom for graphics books and papers, organized by some people at UC Boulder. The first few meetings have been focused on implementing Raytracing in One Weekend - I made a few changes to the code supplied by the book, but a lot of the code is very similar to their implementation. I'm going to work through the rest of the series, and then I plan on implementing a GPU-based version. Some important things to focus on are the acceleration structures like BVHs, and I will need to think about how to linearize these structures to prepare them to be passed into a compute shader using SSBOs.
 </p>
 
 <img src="images/rtiow.png" alt="the rtiow sample configuration" height="384" width="768">
@@ -39,7 +39,7 @@ body {
 
 <h3>Introduction</h3>
 <p>
-&nbsp The general structure of the raytracing part of the program is spelled out in detail <a href="https://raytracing.github.io/books/RayTracingInOneWeekend.html">here</a>. My changes and improvements included adding a preview that loads the averaged samples into an OpenGL texture to give you a sense of how close it is to converging, dearImGUI windows to report the number of completed samples, allowing runtime changes in the number of samples and letting the user terminate execution early if they are satisfied with the result. I also multithreaded the sampling with std::thread and saw a 6x speedup over my initial implementation. I added PNG output, made the random number generation non-deterministic with std::random, and created a few test models (materials test, apollonian gasket - see below).
+&nbsp; The general structure of the raytracing part of the program is spelled out in detail <a href="https://raytracing.github.io/books/RayTracingInOneWeekend.html">here</a>. My changes and improvements included adding a preview that loads the averaged samples into an OpenGL texture to give you a sense of how close it is to converging, dearImGUI windows to report the number of completed samples, allowing runtime changes in the number of samples and letting the user terminate execution early if they are satisfied with the result. I also multithreaded the sampling with std::thread and saw a 6x speedup over my initial implementation. I added PNG output, made the random number generation non-deterministic with std::random, and created a few test models (materials test, apollonian gasket - see below).
 </p>
 
 
@@ -47,14 +47,14 @@ body {
 <img src="images/rtiow2.png" alt="materials test for metal roughness and dielectric IOR" height="384" width="768">
 <h3>Implementation</h3>
 <p>
-&nbsp I implemented all this in my work-in-progress engine that bears the working title 'not-quite-an-engine'. My notion with this is to create a starting point that will allow me to quickly iterate on and experiment with ideas that I find in books or online, and provide a range of functionality that may be relevant to these projects. It includes things like noise functions (perlin, heightmap generation), PNG input and output with LodePNG, windowing and input capabilities through SDL2, shader compilation wrapper functions for both standard vertex/fragment pairs and compute shaders, dearImGUI windows to do all manner of interface widgets, my various C++ includes, vectors with GLM, GLEW and OpenGL includes, and provides a consistent place to do all your #define statements.
+&nbsp; I implemented all this in my work-in-progress engine that bears the working title 'not-quite-an-engine'. My notion with this is to create a starting point that will allow me to quickly iterate on and experiment with ideas that I find in books or online, and provide a range of functionality that may be relevant to these projects. It includes things like noise functions (perlin, heightmap generation), PNG input and output with LodePNG, windowing and input capabilities through SDL2, shader compilation wrapper functions for both standard vertex/fragment pairs and compute shaders, dearImGUI windows to do all manner of interface widgets, my various C++ includes, vectors with GLM, GLEW and OpenGL includes, and provides a consistent place to do all your #define statements.
 </p>
 
 <img src="images/rtiow3.png" alt="apollonian gasket" height="386" width="768">
 
 <h3>Future Directions</h3>
 <p>
-&nbsp The Apollonian gasket was a cool little demo, based on a ruby script found <a href="https://www.mitchr.me/SS/AGasket/index.html">here</a>. I am looking forward to digging into the next book in the series, <a href="https://raytracing.github.io/books/RayTracingTheNextWeek.html">Raytracing: The Next Week</a>.
+&nbsp; The Apollonian gasket was a cool little demo, based on a ruby script found <a href="https://www.mitchr.me/SS/AGasket/index.html">here</a>. I am looking forward to digging into the next book in the series, <a href="https://raytracing.github.io/books/RayTracingTheNextWeek.html">Raytracing: The Next Week</a>.
 </p>
 
 

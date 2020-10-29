@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-
 <meta charset="UTF-8">
-
+<title>Home</title>
 <style>
 body {
 	font-family: 'Rokkitt', serif;
@@ -23,8 +22,8 @@ body {
 <body>
 
 <h1 style='display:inline-block'>Jon Baker, Graphics Programming</h1>
-<p style='display:inline-block'> &nbsp &nbsp <a href='../index.html'>home</a></p>
-<p style='display:inline-block'> &nbsp &nbsp <a href='index.html'>writings</a></p>
+<p style='display:inline-block'> &nbsp; &nbsp; <a href='../index.html'>home</a></p>
+<p style='display:inline-block'> &nbsp; &nbsp; <a href='index.html'>writings</a></p>
 
 <div style='width:768px;'>
 
@@ -36,34 +35,34 @@ body {
 <h2>Background</h2>
 
 <p>
-&nbsp I have been attending a weekly online book club that covers graphics books, organized by some students at UCB for a few months now. This has been a very good opportunity to be exposed to new topics, so far we have focused on the 'Raytracing in One Weekend' series. Raytracing: The Next Week is the second book in the series, and picks up where the first leaves off - there are explorations of more different types of primitives and materials, simple motion blur, transforms such as rotation, as well as some technical improvments which greatly improved execution time.
+&nbsp; I have been attending a weekly online book club that covers graphics books, organized by some students at UCB for a few months now. This has been a very good opportunity to be exposed to new topics, so far we have focused on the 'Raytracing in One Weekend' series. Raytracing: The Next Week is the second book in the series, and picks up where the first leaves off - there are explorations of more different types of primitives and materials, simple motion blur, transforms such as rotation, as well as some technical improvments which greatly improved execution time.
 </p>
 
 <h2>Materials</h2>
 
 <p>
-&nbsp This book got into the idea of applying textures to the objects being raytraced - both 2d and 3d texturing is talked about - there are image textures loaded from png images, as well as procedural solid textures created with perlin noise. Emissive materials are created in an interesting manner, by bringing the value for the color up beyond the range that is typically used to represent colors - this greater level of intensity is interpreted as emission within the context of the renderer. Volumes, which have always fascinated me, are introduced, which have a random chance of scattering incoming rays. 
+&nbsp; This book got into the idea of applying textures to the objects being raytraced - both 2d and 3d texturing is talked about - there are image textures loaded from png images, as well as procedural solid textures created with perlin noise. Emissive materials are created in an interesting manner, by bringing the value for the color up beyond the range that is typically used to represent colors - this greater level of intensity is interpreted as emission within the context of the renderer. Volumes, which have always fascinated me, are introduced, which have a random chance of scattering incoming rays. 
 </p>
 
 <h2>Technical Improvements</h2>
 
 <p>
-&nbsp As before, the problem of raytracing, or in this case, pathtracing, can be classified as 'embarassingly parallel' - that is, the final color value for each pixel is completely independent of the pixels around it, if you had enough execution units, they could all be run at once, with no sequential dependence. Bearing this in mind, multithreading is a very simple thing to implement, you'll just need to figure out how you want to divide up the work. I profiled different numbers of threads on an 8-core 16-thread machine and while it didn't scale quite linearly, 16 threads of execution was the fastest.
+&nbsp; As before, the problem of raytracing, or in this case, pathtracing, can be classified as 'embarassingly parallel' - that is, the final color value for each pixel is completely independent of the pixels around it, if you had enough execution units, they could all be run at once, with no sequential dependence. Bearing this in mind, multithreading is a very simple thing to implement, you'll just need to figure out how you want to divide up the work. I profiled different numbers of threads on an 8-core 16-thread machine and while it didn't scale quite linearly, 16 threads of execution was the fastest.
 </p>
 
 <p>
-&nbsp In addition to this, the concept of acceleration structures was introduced. A simple BVH class is presented, which used the idea that some group of multiple objects could be represented as a larger object that contained them, to prevent having to check as many rays against your scene. If the top level object is hit, there is an indication that it is possible that one or more of the group of objects contained might be hit, and you would then check the children of this top level node. This can done recursively, and one idea I had for an application was to extend this BVH class to represent an octree type of structure, which would hold models created in Voraldo (with RTTNW's volumes, Voraldo's variable alpha channel could be represented). 
+&nbsp; In addition to this, the concept of acceleration structures was introduced. A simple BVH class is presented, which used the idea that some group of multiple objects could be represented as a larger object that contained them, to prevent having to check as many rays against your scene. If the top level object is hit, there is an indication that it is possible that one or more of the group of objects contained might be hit, and you would then check the children of this top level node. This can done recursively, and one idea I had for an application was to extend this BVH class to represent an octree type of structure, which would hold models created in Voraldo (with RTTNW's volumes, Voraldo's variable alpha channel could be represented). 
 </p>
 
 <p>
-&nbsp Because of the lengthy execution time, I decided to add some interactivity - this is achieved by loading a texture with the current samples onto the GPU and displaying it to a fullscreen quad once each sample has completed. There is a dearImGUI window and some SDL input handling which allows the user to terminate the process early, either if they find problems with the render or find that it converges faster than they expected. It also provides the opportunity to add to the number of samples that will be taken to produce the final image.
+&nbsp; Because of the lengthy execution time, I decided to add some interactivity - this is achieved by loading a texture with the current samples onto the GPU and displaying it to a fullscreen quad once each sample has completed. There is a dearImGUI window and some SDL input handling which allows the user to terminate the process early, either if they find problems with the render or find that it converges faster than they expected. It also provides the opportunity to add to the number of samples that will be taken to produce the final image.
 </p>
 
 
 <h2>Future Directions</h2>
 
 <p>
-&nbsp This is a good little toy renderer, but it deals primarily with spheres, rectangular prisms and flat rectangles. In order to look at loading models from standard formats like OBJ, it would make sense to add a triangle primitive, in order to construct meshes. This would involve a bit of work to support texture mapping, and to construct a decent BVH out of a list of triangles, but would open up a lot of possibilities. The next book gets into concepts like importance sampling, which constructs a model for each hit, to determine which objects should be considered when looking at bounce rays.
+&nbsp; This is a good little toy renderer, but it deals primarily with spheres, rectangular prisms and flat rectangles. In order to look at loading models from standard formats like OBJ, it would make sense to add a triangle primitive, in order to construct meshes. This would involve a bit of work to support texture mapping, and to construct a decent BVH out of a list of triangles, but would open up a lot of possibilities. The next book gets into concepts like importance sampling, which constructs a model for each hit, to determine which objects should be considered when looking at bounce rays.
 </p>
 
 

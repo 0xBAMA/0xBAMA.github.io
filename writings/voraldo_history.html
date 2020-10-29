@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-
 <meta charset="UTF-8">
+<title>Voraldo History</title>
 
 <style>
 body {
@@ -25,13 +25,13 @@ body {
 <body>
 
 <h1 style='display:inline-block'>Jon Baker, Graphics Programming</h1>
-<p style='display:inline-block'> &nbsp &nbsp <a href='../index.html'>home</a></p>
-<p style='display:inline-block'> &nbsp &nbsp <a href='index.html'>writings</a></p>
+<p style='display:inline-block'> &nbsp; &nbsp; <a href='../index.html'>home</a></p>
+<p style='display:inline-block'> &nbsp; &nbsp; <a href='index.html'>writings</a></p>
 
 <div style='width:768px; margin: 0px 0px 0px 10px;'>
 <h2 style="margin: 0px 0px 0px -5px;">History of Voraldo</h2>
 <p>
-&nbsp The Voraldo project has taken multiple forms over the two odd years I’ve been working
+&nbsp; The Voraldo project has taken multiple forms over the two odd years I’ve been working
 on it - some of the ideas go back to some projects in 2014 where I had rendered some
 heightmaps and figured out the BMP image specification to do some image output. I was
 very much interested by this sort of grid based representation of space. I had also done
@@ -52,7 +52,7 @@ class final project, which really served as the basis for how v1.0 used compute 
 
 <p>
 
-&nbsp In the earliest iterations, I used an image processing library called CImg, and
+&nbsp; In the earliest iterations, I used an image processing library called CImg, and
 simple pixel offsets mapped to x, y and z in a 3 dimensional array - I have a few
 images here, showing what we’re talking about. The first few versions were relatively
 similar, changing only really a little bit and experimenting with different ways to
@@ -64,7 +64,7 @@ represent the colors.
 
 <p>
 
-&nbsp Eventually moving forward, I used some of the drawing primitives offered by CImg,
+&nbsp; Eventually moving forward, I used some of the drawing primitives offered by CImg,
 and used their transparency to implement transparency of my own. There are a few
 worthwhile images produced with that - I liked the look of some of these. But one of
 the main drawbacks here was the huge redundancy that’s inherent in drawing these
@@ -79,7 +79,7 @@ with the vector math to do anything more advanced.
 
 <p>
 
-&nbsp The next step took significantly longer, which ended up being probably towards
+&nbsp; The next step took significantly longer, which ended up being probably towards
 the end of 2018 or early 2019. I started to experiment with methods of looking at a
 ray for each pixel, traced through the voxel space. My first naive implementation
 took small steps through space, looking to see if there was contents in the space
@@ -104,7 +104,7 @@ every frame, as lighting calculations directly effected the color values in the 
 
 <p>
 
-    &nbsp Some of the implemented features at this time were a simplified model of ambient occlusion (on the right) and my own calculation of the alpha blending (bottom left). I did some simple volumetric lighting based on the way the ray-based display worked (top left). This was all rendered offline and some of the animations took all day as a single threaded CPU process <a href="https://www.youtube.com/watch?v=ABLM5HDZmJs">(video 1)</a> <a href="https://www.youtube.com/watch?v=uUwM5ZjEn5s">(video 2)</a>. The way the color was represented at this point had changed to RGBA values, so that these kinds of effects could be implemented.
+    &nbsp; Some of the implemented features at this time were a simplified model of ambient occlusion (on the right) and my own calculation of the alpha blending (bottom left). I did some simple volumetric lighting based on the way the ray-based display worked (top left). This was all rendered offline and some of the animations took all day as a single threaded CPU process <a href="https://www.youtube.com/watch?v=ABLM5HDZmJs">(video 1)</a> <a href="https://www.youtube.com/watch?v=uUwM5ZjEn5s">(video 2)</a>. The way the color was represented at this point had changed to RGBA values, so that these kinds of effects could be implemented.
 
 </p>
 
@@ -112,7 +112,7 @@ every frame, as lighting calculations directly effected the color values in the 
 
 <p>
 
-&nbsp That brings us to v0.7 - the first hardware accelerated version of the project. By
+&nbsp; That brings us to v0.7 - the first hardware accelerated version of the project. By
 using an OpenGL based representation, it went from something that was measured in
 seconds per frame, to frames per second. Although the rendering was much faster, there are certain limitations on what I was able to do with it. The project at this point split into two
 pieces, which ran separately: gen, which had all the commands to draw geometry into
@@ -144,7 +144,7 @@ slices were viewed side on, as the geometry has zero thickness.
 <p>
 
 
-&nbsp I had controls to vary a value between -1 and 1, while your slice width was zero,
+&nbsp; I had controls to vary a value between -1 and 1, while your slice width was zero,
 mapped that to the offset of the slices, to pass through a sort of a highlighted slice.
 When you get that slice to the area you want to look closer at, you could hit another
 control to increase the slice width from zero and the geometry would change to reflect
@@ -157,7 +157,7 @@ OpenGL 3D texture as a very long byte array.
 
 </p>
 <p>
-&nbsp Experimenting with some more different representations, I looked at some things in
+&nbsp; Experimenting with some more different representations, I looked at some things in
 VoraldoRealtime which basically went back to the representation of grids of points to
 represent the voxels. I wanted to better understand the use of different types of
 textures. The VIVS project was an interesting stab at something closer to what this
@@ -169,7 +169,7 @@ project has turned into.
 
 <p>
 
-&nbsp Voxelization in the Vertex Shader was the idea, and basically the way this
+&nbsp; Voxelization in the Vertex Shader was the idea, and basically the way this
 manifested was using uniform arrays of parameters and doing the checking for each point
 in this dense space against these parametric representations of the geometry, in the vertex shader. Each frame update on the CPU, I
 generated and animated the parameters of the shapes over time and got the data ready to send each frame. I did
@@ -189,7 +189,7 @@ is handled very differently, pretty far divorced from OpenGL's handling of geome
 
 <p>
 
-&nbsp The last version to discuss here is v0.8, which implemented a client-server model using
+&nbsp; The last version to discuss here is v0.8, which implemented a client-server model using
 some unix interprocess communication stuff (read(), write(), poll()). It supported multiple clients manipulating a
 voxel block which was held in a server process, but it was relatively limited and I never
 really developed the idea. I was looking for applications for some things I learned in an Operating Systems class - I never added image output, instead outputting terminal color codes and characters to represent the block in slices. A somewhat similar structure now exists in the way that voxels
