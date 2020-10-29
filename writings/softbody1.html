@@ -96,13 +96,13 @@ struct node
    float mass;		//mass of this node
    bool anchored;	//if anchored, this node does not move
 
-   std::vector<edge> edges;	//the list of edges this node is part of
+   std::vector&lt;edge> edges;	//the list of edges this node is part of
 }
 
 
 //these are populated with your nodes and edges
-std::vector<node> nodes;
-std::vector<edge> edges;	//this is redundant, but kept for rendering purposes
+std::vector&lt;node> nodes;
+std::vector&lt;edge> edges;	//this is redundant, but kept for rendering purposes
 
 
 //only including the update function, not getting into support functions/init, etc.
