@@ -51,7 +51,7 @@ body {
 &nbsp; The program starts with a few parameters supplied via the command line:
 </p>
 
-<pre>	./knightstour < board size > < starting x position > < starting y position ></pre>
+<pre>	./knightstour &lt; board size > &lt; starting x position > &lt; starting y position ></pre>
 
 <p>
 &nbsp; The board is represented as a 2d array of integers, initialized with zero values except for the starting location, which is marked with 1 as it is the first square to be visited. When the recursive part of the program begins, you look at the moves that are available to the knight - this is the standard set of canonical moves from chess. Of the set of 8 possible moves, some are on the board, and potentially there are some that are not. The squares that are on the board and still contain zero values are added to a list of valid moves.
