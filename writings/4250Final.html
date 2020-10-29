@@ -38,7 +38,6 @@ body {
 	&nbsp; This started with a curiosity about textures and the kinds of things that are possible to do with them – one of my first thoughts was, ‘do you have write access?’. Turns out, no, you do not have write access with standard textures. I was not convinced that this was a hard limitation based on some things I had seen done, and through some research and asking around (huge thanks to <a href='https://twitter.com/erkaman2'>Eric Arnebäck</a>, who helped me a lot in figuring out how the initialization and use differed from standard textures), I found out about Image Load/Store which was intended to serve this purpose. This set of functionality gives you image objects in GLSL – this is different from a sampler, which takes normalized coordinates (coordinates fall in the floating point range 0-1) and is read only, in that all references are done with ivecs (integer vectors, which refer to specific pixel/texel offsets), and you have functions to both load info from them, and store info to them.
 </p>
 <h2>CELLULAR AUTOMATA</h2>
-</p>
 <p>
 	&nbsp; This is a deeply interesting concept that I came into contact with early on in my Computer Science career – I believe the first one I encountered was Conway’s game of life, I thought the organic nature of the patterns and the logic of ‘my next state relies upon my current state and the current state of my neighborhood’ was incredibly fascinating.
 </p>
