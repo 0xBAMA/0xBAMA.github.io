@@ -79,7 +79,7 @@ body {
 		 uvec4 l = uvec4(255);
 
 		 l.xyz = h.xyz & uvec3(0xFU); // low bits
-		 h.xyz = (h.xyz>>4)<<4;      // high bits
+		 h.xyz = (h.xyz>>4)&lt;&lt;4;      // high bits
 
 		 // get the red
 		 l.r = (indexValue4() >= l.r) ? h.r : h.r + 0xFU;
