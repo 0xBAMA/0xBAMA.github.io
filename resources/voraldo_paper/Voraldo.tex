@@ -150,7 +150,6 @@ The rendering method itself is inspired by early approaches to 3D -- I believe t
 
 
 In this computation, two buffers are referenced -- one four-channel image3D which determine the current color and opacity, and a single-channel image3D with the current lighting data. The value in the lighting buffer is used to scale the intensity of the R, G and B color channels' contributions to the blending operation. The pixel color, C, is initialized with the OpenGL clear color, and is updated using a color sample, T, and a light sample, L, according to the following recurrence relation:
-
 \begin{align*}
  C_{n+1}.rgb &= (T.rgb*4.0*L) * T.a^{\alpha power} \\ 
  &+ C_{n}.rgb * C_{n}.a * (1 - T.a^{\alpha power})
