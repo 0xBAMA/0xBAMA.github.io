@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2020.10.28)  2 NOV 2020 03:37
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019/Debian) (preloaded format=pdflatex 2020.10.28)  2 NOV 2020 04:11
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -684,18 +684,18 @@ Underfull \hbox (badness 10000) in paragraph at lines 235--236
  []
 
 
-Underfull \hbox (badness 1946) in paragraph at lines 238--239
-\T1/pplx/m/n/10 (+20) ac-tions on Graph-ics, vol. 21, no. 3,
- []
-
-
-Underfull \hbox (badness 5133) in paragraph at lines 238--239
-\T1/pplx/m/n/10 (+20) pp. 339--346, (Pro-ceed-ings of ACM
+Underfull \hbox (badness 4441) in paragraph at lines 238--239
+\T1/pplx/m/n/10 (+20) Con-tour-ing of Her-mite Data. ACM
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 238--239
-\T1/pplx/m/n/10 (+20) SIG-GRAPH2002). Re-trieved from
+\T1/pplx/m/n/10 (+20) Trans-ac-tions on Graph-ics, vol. 21,
+ []
+
+
+Underfull \hbox (badness 2343) in paragraph at lines 238--239
+\T1/pplx/m/n/10 (+20) no. 3, pp. 339--346, (Pro-ceed-ings of
  []
 
 
@@ -790,24 +790,24 @@ p /
 <./images/editor.jpeg, id=161, 462.528pt x 260.172pt>
 File: ./images/editor.jpeg Graphic file (type jpg)
 <use ./images/editor.jpeg>
-Package pdftex.def Info: ./images/editor.jpeg  used on input line 273.
+Package pdftex.def Info: ./images/editor.jpeg  used on input line 272.
 (pdftex.def)             Requested size: 430.00462pt x 241.88994pt.
 <./images/examples.png, id=162, 2609.75pt x 1065.9825pt>
 File: ./images/examples.png Graphic file (type png)
 <use ./images/examples.png>
-Package pdftex.def Info: ./images/examples.png  used on input line 278.
+Package pdftex.def Info: ./images/examples.png  used on input line 277.
 (pdftex.def)             Requested size: 430.00462pt x 175.63554pt.
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 283.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 282.
  [7
 
  <./images/editor.jpeg> <./images/examples.png>]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 283.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 282.
  (./Voraldo.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 283.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 283.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 282.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 282.
 Package rerunfilecheck Info: File `Voraldo.out' has not changed.
 (rerunfilecheck)             Checksum: 2504F002DD76CB5BB12D6839DDAF83EF;570.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 283.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 282.
  ) 
 Here is how much of TeX's memory you used:
  11702 strings out of 483183
@@ -826,7 +826,7 @@ s/type1/public/mathpazo/fplmri.pfb></usr/share/texlive/texmf-dist/fonts/type1/p
 ublic/fpl/fplrc8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/palatino/u
 plb8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb></
 usr/share/texlive/texmf-dist/fonts/type1/urw/palatino/uplri8a.pfb>
-Output written on Voraldo.pdf (7 pages, 4873499 bytes).
+Output written on Voraldo.pdf (7 pages, 4873493 bytes).
 PDF statistics:
  291 PDF objects out of 1000 (max. 8388607)
  195 compressed objects within 2 object streams
