@@ -133,7 +133,7 @@ During the 1990's, there were a number of video games which were released that m
 
 More recently, with approaches like marching cubes \cite{MarchingCubes}\footnote{Originally developed for visualization of medical data like CAT, MRI and PET scans.} and dual contouring \cite{DualContour} being applied to realtime applications, there exist relatively general methods to convert from a volume representation to a polygonal surface representation. So why consider voxels as a rendering technology at all? I hope to answer this question to the reader's satisfaction in the following sections.
 
-As mentioned previously, this is not the first project I have done before arriving at this approach\footnote{See \url{https://jbaker.graphics/writings/voraldo_history.html} for more information on older approaches.}. Initially, this was an offline process, which would produce an image to a file. Once I was introduced to OpenGL, I had taken a number of different approaches using the existing geometric primitives.
+As mentioned previously, v1.1 is not the first project I have done before arriving at this approach\footnote{See \url{https://jbaker.graphics/writings/voraldo_history.html} for more information on older approaches.}. Initially, this was an offline process, which would produce an image to a file. Once I was introduced to OpenGL, I had taken a number of different approaches using the existing geometric primitives.
 
 First, I used simple points with static contents defined as vertex attributes before graduating to a representation with voxel contents evaluated in the vertex shader. These shared the limitation of relying upon OpenGL's order-dependent alpha blending, and would create severe artifacts when viewed in certain orientations. I explored solutions to this problem, such as Inigo Quilez's Volumetric Sort \cite{VolSort}\footnote{This keeps many copies of the data, in different orderings, and swaps out which is being used for display when back-to-front ordering would be violated, due to rotation.} but eventually moved to the use of CPU-generated 3D textures sampled by polygonal slices. In this case, maintaining front-to-back ordering is much simpler but when viewed side-on the polygons disappear.
 
@@ -151,11 +151,11 @@ The rendering method itself is inspired by early approaches to 3D -- I believe t
 
 In this computation, two buffers are referenced -- one four-channel image3D which determines the current color and opacity, and a single-channel image3D containing the current lighting data. The value in the lighting buffer is used to scale the intensity of the R, G and B color channels' contributions to the blending operation. The pixel color, C, is initialized with the OpenGL clear color, and is updated using a color sample, T, and a light sample, L, according to the following recurrence relation:
 \begin{align*}
- C_{n+1}.rgb &= (T.rgb*4.0*L) * T.a^{\alpha power} \\ 
- &+ C_{n}.rgb * C_{n}.a * (1 - T.a^{\alpha power})
+ C_{n+1}.rgb &= (T.rgb \cdot 4.0 \cdot L) \cdot T.a^{\alpha power} \\
+ &+ C_{n}.rgb \cdot C_{n}.a \cdot (1 - T.a^{\alpha power})
 \end{align*}
 \begin{align*}
- C_{n+1}.a &= T.a^{\alpha power} + C_{n}.a * (1 - T.a^{\alpha power})
+ C_{n+1}.a &= T.a^{\alpha power} + C_{n}.a \cdot (1 - T.a^{\alpha power})
 \end{align*}
 
 A series of samples is composited between the intersection points, based on some given step size and a maximum number of allowed steps. The final value of C.rgb is stored in the framebuffer texture.
@@ -183,7 +183,7 @@ Point lights are computed using a shader invocation for each voxel. The inputs t
 
 Similar to how the display function operates, there is a process of sampling in discrete steps. In this case, it is done forwards, rather than backwards, and tracks the ray intensity as it is attenuated from a user defined initial value. The value of decay power determines how much the intensity of the ray is attenuated by the alpha value at sampled points along the ray. This also can be expressed as a recurrence relation:
 \begin{equation*}
-Intensity_{n+1} = Intensity_{n}*1-alpha^{decay power}
+Intensity_{n+1} = Intensity_{n}\cdot(1-alpha^{decay power})
 \end{equation*}
 
 This process is repeated until the ray reaches or passes the location of the current voxel. The value of distance power is then used to compute a scale factor that approximates the inverse square law, at the default value of 2.0. It can be set to zero to have the scale factor go to one, or raised to a higher power to decay more in a shorter distance. The final result of the computation is then added to the existing value in voxel in the lighting buffer associated with the shader invocation.
@@ -212,7 +212,7 @@ There are several other improvements to the interface which made the editor much
 
 One of the largest benefits that comes from this voxel representation of space is a constant-time reference to a global representation of all the geometry. This makes it easier to talk about some parts of how light behaves, but lacks the normal data that would be required in order to determine accurately how it would bounce or refract. Another buffer could be added to keep the normal data when you draw new shapes, but that may not correlate well with things like the blurring operations.
 
-One of the things I have been considering is moving from a single channel representation of light intensity, to an RGB representation to allow for colored lights. Also related to lighting, I have some ideas about cone lights which would be specified similarly to point lights, but with direction and a solid angle, perhaps something to express how it falls off towards the edges of this angle. 
+The current system has a limitation in that it uses a single channel representation of light intensity. One direction for future develoments is to convert to an RGB representation, to allow for arbitrarily colored lights. Also related to lighting, I have some ideas about cone lights which would be specified similarly to point lights, but with direction and a solid angle, perhaps something to express how it falls off towards the edges of this angle. With a current desktop GPU, the lighting functions are fast enough to support realtime animation. By caching an ambient level in one of the lighting buffers and applying point or directional lights with varying parameters each frame, this could open up more creative possibilities.
 
 There are a few other features for which I have yet to come up with a usable interface. The first is a scriptable interface for the use of things like signed distance fields, which would allow for fractals and other complex shapes to be defined by the user. Another is a copy/paste operation which would take volume data from one location and apply it elsewhere. By using 3D texture samplers, this could be extended to allow for rotation, scaling, mirrored repeats and more.
 
