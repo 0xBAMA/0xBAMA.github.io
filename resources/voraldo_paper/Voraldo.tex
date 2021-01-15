@@ -96,7 +96,7 @@
 
 \renewcommand{\maketitlehookd}{%
 \begin{abstract}
-\noindent Volume graphics in realtime applications had seen some development in the 1990's before being largely superceded by rasterized polygons due to memory limitations. Today, commodity graphics hardware provides large, fast memory buffers and a highly parallel model for computation. This paper presents a demonstration of volume modeling functions and a realtime rendering method which traces rays through RGBA volume data for each pixel. Also presented is a lighting model which allows for volumetric lighting effects, by considering how light rays traverse this volume.
+\noindent Volume graphics in realtime applications had seen some development in the 1990's before being largely superceded by rasterized polygons due to memory limitations. Today, commodity graphics hardware provides large, fast memory buffers and a highly parallel model for computation. This paper presents a demonstration of volume modeling functions and a realtime rendering method which traces rays through RGBA volume data for each pixel. Also presented is a realtime lighting model which allows for volumetric lighting effects, by considering how light rays traverse this volume.
 \end{abstract}
 }
 
@@ -114,7 +114,32 @@
 
 %% \lettrine[nindent=0em,lines=3]{V} oxels, or volume elements, are a discrete means of representing volume data -- here, they are arranged orthogonally, and can be thought of as a 3 dimensional raster. A single value, or set of values, exists and is stored for each of these volume elements. This value can be associated with any point in the space defined by the voxel's extents. This has seen applications in physical simulation as well as computer graphics.
 
-\lettrine[nindent=0em,lines=3]{V} oxels, or volume elements, are a discrete means to represent volume data. Here, they are regular cubes, arranged orthogonally, and can be thought of as a 3D raster. A single value, or set of values, exists and is stored for each volume element. This value can be associated with any point in the space defined by the voxels 4.2 Image Load/Store functionality \cite{ImgLoadStoreWiki}. This provides a GLSL interface called images, which allow for read/write access where texture samplers provide read-only access. Three sets of image3D objects are used: color, mask, and lighting, the use of which are detailed in the following sections. Color holds four-channel RGBA values, while mask and lighting are single-channel images with only one value per voxel. The use of this type of buffer has allowed almost all computation to be moved to the GPU.
+\lettrine[nindent=0em,lines=3]{V} oxels, or volume elements, are a discrete means to represent volume data. Here, they are regular cubes, arranged orthogonally, and can be thought of as a 3D raster. A single value, or set of values, exists and is stored for each volume element. This value can be associated with any point in the space defined by the voxel’s extents. This concept has seen applications in physical simulation as well as computer graphics.
+
+This project explores applications for this representation in the domain of realtime graphics. In the 1990s, there was contention on best practices for realtime hardware. As the market settled, polygonal representations would become the de facto standard for producing realtime 3D graphics. The math governing their use is well understood. Transforms exist which allow arbitrary rotation, scaling, shearing, flipping, and many other types of operations to be performed on models defined as a set of triangles. Due to the simplicity of this shape -- three vertices -- there is an unambiguous definition of geometry: these three points define a plane, as long as they are noncollinear.
+
+Competing rendering technologies existed, though many have largely fallen out of use. Voxels are one example of this. It is common today to see polygonal representations of voxels, but until very recently, it was not common to see them used directly as a realtime rendering method \cite{VoxelGI}. The following is a list of games which have made use of this representation for realtime rendering purposes. This list is not complete, but it represents a diverse set of approaches to getting an image to the screen.
+
+\begin{itemize}
+\item Commanche (Novalogic, 1992)
+\item Blade Runner (Westwood, 1997)
+\item Shadow Warrior (3DRealms, 1997)
+\item Blood (Monolith, 1997)
+\item Hexplore (Heliovision, 1998)
+\item Outcast (Appeal, 1999)
+\item RollerCoaster Tycoon (Chris Sawyer, 1999)
+\item Command and Conquer: Tiberian Sun (Westwood, 1999)
+\item Dwarf Fortress (Bay 12, 2006)
+\end{itemize}
+
+More recently, with approaches like marching cubes \cite{MarchingCubes}\footnote{Originally developed for visualization of medical data like CAT, MRI and PET scans.} and dual contouring \cite{DualContour} being applied to realtime applications, there exist relatively general methods to convert from a volume representation to a polygonal surface representation. This project centers around potential benefits of the direct volume representation, and why it might be considered as an alternative.
+%% As mentioned previously, v1.1 is not the first project I have done before arriving at this approach\footnote{See \url{https://jbaker.graphics/writings/voraldo_history.html} for more information on older approaches.}. Initially, this was an offline process, which would produce an image to a file. Once I was introduced to OpenGL, I had taken a number of different approaches using the existing geometric primitives.
+%% First, I used points to represent voxels. These had the limitation of relying upon OpenGL's order-dependent alpha blending, and would create severe artifacts when viewed in certain orientations. I explored solutions to this problem, such as Inigo Quilez's Volumetric Sort \cite{VolSort}\footnote{This keeps many copies of the data, in different orderings, and swaps out which is being used for display when back-to-front ordering would be violated, due to rotation.} but eventually moved to the use of CPU-generated 3D textures sampled by polygonal slices. In this case, maintaining front-to-back ordering is much simpler but when viewed side-on the polygons disappear.
+%% To overcome these limitations, and to move more computation to the GPU, I stopped using OpenGL primitives at all and explored the use of the 4.2 Image Load/Store functionality \cite{ImgLoadStoreWiki}, which provides a GLSL interface for read/write access where texture samplers provide read-only access. Through a combination of this and the use of two triangles to cover the screen \cite{RWWTT}, the fragment shader became a very good place to composite samples through this volume\footnote{This led to the display method used in Voraldo v1.0 -- for more information, see \url{https://jbaker.graphics/writings/voraldo.html}.}.
+%% %------------------------------------------------
+\section{Methods}
+\subsection{Representation}
+The project almost entirely eschews the use of OpenGL geometry, in order to avoid problems with the order dependence in alpha blending\footnote{For more information on past approaches, including methods for overcoming alpha blending limitations in OpenGL geometry \cite{VolSort} see \url{https://jbaker.graphics/writings/voraldo_history.html}}. Two triangles are used to cover the screen, in order to get a fragment and a corresponding shader invocation for every pixel on the screen \cite{RWWTT}. The voxel data itself is kept using OpenGL’s 4.2 Image Load/Store functionality \cite{ImgLoadStoreWiki}. This provides a GLSL interface called images, which allow for read/write access where texture samplers provide read-only access. Three sets of image3D objects are used: color, mask, and lighting, the use of which are detailed in the following sections. Color holds four-channel RGBA values, while mask and lighting are single-channel images with only one value per voxel. The use of this type of buffer has allowed almost all computation to be moved to the GPU.
 
 \subsection{Rendering}
 Logically, the rendering process is done per-pixel in a fragment shader. The reality is a little more complicated, in order to implement a two-fold optimization that makes the program much more efficient. A framebuffer image is used to hold the result and present it to the user.
@@ -191,44 +216,44 @@ There are a few other features for which a usable interface has yet to be determ
 
 \begin{thebibliography}{99} % Bibliography - this is intentionally simple in this template
 
-\bibitem[Lorenson \& Cline, 1987]{MarchingCubes}
+\bibitem[1]{MarchingCubes}
 Lorenson, W. \& Cline, H. (July, 1987). Marching Cubes: A High-Resolution 3D Surface Construction Algorithm. ACM Computer Graphics, vol. 21, no. 4, pp. 163--169. Retrieved from \url{http://academy.cba.mit.edu/classes/scanning_printing/MarchingCubes.pdf}.
 
-\bibitem[LodePNG]{LodePNG}
+\bibitem[2]{LodePNG}
 Vandevenne, L. LodePNG. \url{https://lodev.org/lodepng/}.
  
-\bibitem[dearImGUI]{dearImGUI}
+\bibitem[3]{dearImGUI}
 Cornut, O. DearImGUI. \url{https://github.com/ocornut/imgui}.
 
-\bibitem[Panteleev, 2014]{VoxelGI}
+\bibitem[4]{VoxelGI}
 Panteleev, A. Practical Real-Time Voxel-Based Global Illumination for Current GPUs. {\em GPU Technology Conference 2014}. Retrieved from \url{https://on-demand.gputechconf.com/gtc/2014/presentations/S4552-rt-voxel-based-global-illumination-gpus.pdf}.
  
-\bibitem[Ju et al., 2002]{DualContour}
+\bibitem[5]{DualContour}
 T. Ju, F. Losasso, S. Schaefer, and J. Warren. (July, 2002). Dual Contouring of Hermite Data. ACM Transactions on Graphics, vol. 21, no. 3, pp. 339--346, (Proceedings of ACM SIGGRAPH2002). Retrieved from \url{https://www.cse.wustl.edu/~taoju/research/dualContour.pdf}.
  
-\bibitem[Quilez, 2006]{VolSort}
+\bibitem[6]{VolSort}
 Quilez, I. (2006). Volumetric Sort.
 \url{https://www.iquilezles.org/www/articles/volumesort/volumesort.htm}.
 
-\bibitem[Quilez, 2008]{RWWTT}
+\bibitem[7]{RWWTT}
 Quilez, I. (2008). Rendering Worlds With Two Triangles. {\em NVScene 2008}. Retrieved from \url{https://www.iquilezles.org/www/material/nvscene2008/nvscene2008.htm}.
 
-\bibitem[Mendoza, 2013]{ArbitraryRotation}
+\bibitem[8]{ArbitraryRotation}
 Mendoza, N. (2013). GLSL Rotation About an Arbitrary Axis.
 \url{http://www.neilmendoza.com/glsl-rotation-about-an-arbitrary-axis/}
 
-\bibitem[Khronos, 2012]{ImgLoadStoreWiki}
+\bibitem[9]{ImgLoadStoreWiki}
 Image Load/Store. (2019).
 \url{https://www.khronos.org/opengl/wiki/Image_Load_Store} 
 
-\bibitem[Williams et al., 2005]{RayBox}
+\bibitem[10]{RayBox}
 Williams, Barrus, Morley, Shirley. (July, 2005). An Efficient and Robust Ray-Box Intersection Algorithm. ACM SIGGRAPH 2005 Courses. Retrieved from \url{https://dl.acm.org/doi/10.1145/1198555.1198748} 
 
-\bibitem[Werness, 2017]{VoxelAutomataTerrain}\footnote{I wish to express appreciation to Brent Werness for helping me understand his Voxel Automata Terrain and fake Global Illumination code in order to convert it for my application.}
+\bibitem[11]{VoxelAutomataTerrain}\footnote{I wish to express appreciation to Brent Werness for helping me understand his Voxel Automata Terrain and fake Global Illumination code in order to convert it for my application.}
 Werness, B. (April, 2017). Voxel Automata Terrain.
 \url{https://bitbucket.org/BWerness/voxel-automata-terrain/src/master/} 
 
-\bibitem[Porter \& Duff, 1984]{AlphaBlending}
+\bibitem[12]{AlphaBlending}
 Duff, T. \& Porter, T. (July, 1984). Compositing Digital Images. {\em Computer Graphics}, Volume 18, Number 3, 253-259. Retrieved from \url{https://keithp.com/~keithp/porterduff/p253-porter.pdf}  
  
 \end{thebibliography}
