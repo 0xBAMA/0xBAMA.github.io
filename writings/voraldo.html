@@ -112,9 +112,13 @@ body {
 
 <img src="images/voraldo5.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="simple example" height="498" width="768">
 
+
 <p>
 &nbsp; Shown here is the lighting config menu. Clearing will set a uniform level in the lighting buffer. Ambient occlusion will darken cells based on a neighborhood of a certain radius - it looks at the alpha values across this and computes an average weighted by transparency. More transparent neighborhoods will mean less darkening, more opaque neighborhoods will mean more darkening - the effect is subtle, but I think it adds quite a bit to the lighting system. Directional lighting is applied in a very similar way to the main display function, in that it has a grid of starting positions for rays that are then traced into the volumes. The difference here is that they are considered from nearest point to farthest point, with the intensity decremented by the alpha value and then applied to the lighting buffer at each step. This has the potential to create sunshafts through the volume that I find very visually appealing. The latest addition to this has been the ability to 'mash' the lighting value into the RGB data - this basically goes through and applies the scaling that would be applied in the display shader, so that this data is retained and can be saved with the voxel data.
 </p>
+
+<iframe width="768" height="432" src="https://www.youtube.com/embed/ZdiN8sVbpQU" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 
 <h3>&nbsp;-Utility Operations-</h3>
 <p>
