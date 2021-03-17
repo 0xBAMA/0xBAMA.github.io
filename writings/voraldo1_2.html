@@ -80,6 +80,11 @@ body {
     &nbsp;This has been a major improvement in the possibilities of the types of images you are able to produce with this program. Previously, a single channel was provided for lighting intensity, and that single value uniformly scaled all three components of the color buffer when rendering. Now, there exists indpendent scale factors for each channel. There is still an issue with clipping, which I intend to fix by converting to a floating point texture and removing the 4.0f scale factor that currently exists in the raycast code. This will also require that the tonemapping is moved from the blit shader to the raycast shader, so that it happens before the data has been stored in the render texture. This will fix the issue of the tonemapping creating too dark an image, since I won't have to deal with these values being clamped to the range [0.-1.] when the values are passed through a texture. These changes will be a little complicated, there are a few moving parts - it requires changes in about 6 places in the code. 
 </p>
 
+<p>
+&nbsp;UPDATE 3/16: Floating point texture conversion was easier than I expected. It required changing some values in the texture initialization, changing the layout qualifiers for the lighting texture in all the related shaders to rgba16f (there isn't an 8 bit floating point type available for textures from what I can tell), removing the scale factor from the lighting reference in the raycast code, moving the tonemapping from the blit shader to the raycast shader, and a few changes to the layout of the menu. I am still sending vec4's to the GPU - only now, the alpha channel of this value is used as a scale factor for the other three channels, to boost the amount of light you can apply at once. I provide a slider with the range 0.-5., which seems reasonable after some experimentation, but you can enter a larger numerical value if you want. This helps compensate for the removal of the scale factor in the renderer.
+</p>
+
+
 <h2>Grayscale Masking</h2>
 <img src="images/voraldo1_2/8bmask.png" style="border: 2px solid #ba550b;" alt="8 bit masking" width="768">
 <p>
