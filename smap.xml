@@ -1,115 +1,136 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset
-      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9             http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 <!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
 
 
 <url>
   <loc>https://jbaker.graphics/</loc>
-  <lastmod>2020-10-25T08:12:04+00:00</lastmod>
+  <lastmod>2021-03-17T21:01:34+00:00</lastmod>
   <priority>1.00</priority>
 </url>
 <url>
   <loc>https://jbaker.graphics/resources/Resume.pdf</loc>
-  <lastmod>2020-10-25T08:12:04+00:00</lastmod>
+  <lastmod>2021-03-17T21:01:34+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
   <loc>https://jbaker.graphics/js+canvas/index.html</loc>
-  <lastmod>2020-10-25T08:12:04+00:00</lastmod>
+  <lastmod>2021-03-17T21:01:34+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
   <loc>https://jbaker.graphics/writings/index.html</loc>
-  <lastmod>2020-10-25T08:12:06+00:00</lastmod>
+  <lastmod>2021-03-17T21:01:37+00:00</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
   <loc>https://jbaker.graphics/index.html</loc>
-  <lastmod>2020-10-25T08:12:04+00:00</lastmod>
+  <lastmod>2021-03-17T21:01:34+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://jbaker.graphics/writings/voraldo_talk.html</loc>
+  <lastmod>2021-03-17T21:01:37+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://jbaker.graphics/writings/voraldo1_2.html</loc>
+  <lastmod>2021-03-17T21:01:37+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://jbaker.graphics/writings/software_rasterizer.html</loc>
+  <lastmod>2021-03-17T21:01:37+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://jbaker.graphics/writings/wfc.html</loc>
+  <lastmod>2021-03-17T21:01:37+00:00</lastmod>
+  <priority>0.64</priority>
+</url>
+<url>
+  <loc>https://jbaker.graphics/writings/sdf2.html</loc>
+  <lastmod>2021-03-17T21:01:37+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://jbaker.graphics/writings/fft.html</loc>
-  <lastmod>2020-10-25T08:12:04+00:00</lastmod>
+  <lastmod>2021-03-17T21:01:34+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://jbaker.graphics/writings/cnc.html</loc>
-  <lastmod>2020-10-25T08:12:04+00:00</lastmod>
+  <lastmod>2021-03-17T21:01:34+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://jbaker.graphics/writings/rttnw.html</loc>
-  <lastmod>2020-10-25T08:12:06+00:00</lastmod>
+  <lastmod>2021-03-17T21:01:37+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://jbaker.graphics/writings/voraldo1_1.html</loc>
-  <lastmod>2020-10-25T08:12:06+00:00</lastmod>
+  <lastmod>2021-03-17T21:01:37+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://jbaker.graphics/writings/rtiow.html</loc>
-  <lastmod>2020-10-25T08:12:06+00:00</lastmod>
+  <lastmod>2021-03-17T21:01:37+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://jbaker.graphics/writings/knightstour.html</loc>
-  <lastmod>2020-10-25T08:12:06+00:00</lastmod>
+  <lastmod>2021-03-17T21:01:37+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://jbaker.graphics/writings/sdf1.html</loc>
-  <lastmod>2020-10-25T08:12:06+00:00</lastmod>
+  <lastmod>2021-03-17T21:01:37+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://jbaker.graphics/writings/physarum.html</loc>
-  <lastmod>2020-10-25T08:12:06+00:00</lastmod>
+  <lastmod>2021-03-17T21:01:37+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://jbaker.graphics/writings/markov.html</loc>
-  <lastmod>2020-10-25T08:12:06+00:00</lastmod>
+  <lastmod>2021-03-17T21:01:37+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://jbaker.graphics/writings/softbody2.html</loc>
-  <lastmod>2020-10-25T08:12:06+00:00</lastmod>
+  <lastmod>2021-03-17T21:01:37+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://jbaker.graphics/writings/softbody1.html</loc>
-  <lastmod>2020-10-25T08:12:06+00:00</lastmod>
+  <lastmod>2021-03-17T21:01:37+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://jbaker.graphics/writings/voraldo.html</loc>
-  <lastmod>2020-10-25T08:12:06+00:00</lastmod>
+  <lastmod>2021-03-17T21:01:37+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://jbaker.graphics/writings/chess.html</loc>
-  <lastmod>2020-10-25T08:12:04+00:00</lastmod>
+  <lastmod>2021-03-17T21:01:34+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://jbaker.graphics/writings/4250Final.html</loc>
-  <lastmod>2020-10-25T08:12:04+00:00</lastmod>
+  <lastmod>2021-03-17T21:01:34+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://jbaker.graphics/writings/vertexture.html</loc>
-  <lastmod>2020-10-25T08:12:06+00:00</lastmod>
+  <lastmod>2021-03-17T21:01:37+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 <url>
   <loc>https://jbaker.graphics/writings/voraldo_history.html</loc>
-  <lastmod>2020-10-25T08:12:06+00:00</lastmod>
+  <lastmod>2021-03-17T21:01:37+00:00</lastmod>
   <priority>0.64</priority>
 </url>
 
