@@ -88,7 +88,7 @@ body {
 <h2>Grayscale Masking</h2>
 <img src="images/voraldo1_2/8bmask.png" style="border: 2px solid #ba550b;" alt="8 bit masking" width="768">
 <p>
-    &nbsp;This has really been a major improvement, and it is fully a superset of the previous masking functionality. Basically, now, instead of a bool which tells whether or not a cell can be written to, there is a value in the range 0-255. This controls the blending of the existing raster data with data which would be applied by subsequent drawing commands. A value of zero indicates that it will be fully overwritten, where a value of 255 indcates that the existing raster data is fully retained. as you can see in the image above, the pieces of XOR texture have been masked to a varying degree, increasing from left to right. When the XOR texture is then overwritten by a drawing operation that puts a low-alpha value all through the volume, you can see the varying degree to which that information is retained. In order to achieve the old functionality, you simply mask with 255 any time you want to mask.
+    &nbsp;This has really been a major improvement, and it is fully a superset of the previous masking functionality. Basically, now, instead of a bool which tells whether or not a cell can be written to, there is a value in the range 0-255. This controls the blending of the existing raster data with data which would be applied by subsequent drawing commands. A value of zero indicates that it will be fully overwritten, where a value of 255 indcates that the existing raster data is fully retained. As you can see in the image above, the pieces of XOR texture have been masked to a varying degree, increasing from left to right. When the XOR texture is then overwritten by a drawing operation that puts a low-alpha value all through the volume, you can see the varying degree to which that information is retained. In order to achieve the old functionality, you simply mask with 255 any time you want to mask.
 </p>
 
 <h2>Tonemapping and Color Temp Adjustment</h2>
@@ -96,6 +96,11 @@ body {
 <p>
     &nbsp;I encourage you to read about tonemapping <a href="https://64.github.io/tonemapping/">here</a> - it is a way of remapping color values from HDR to LDR (as presented onscreen), often employed for stylistic effects. You can see how the tonemapping operations are dimming the colors a little too much. This is the main motivation for my decision to convert to floating point lighting textures, effectively to give myself the ability to compensate for this by giving it more light.
 </p>
+
+<p>
+	&nbsp;<strong>UPDATE (4/1/2021):</strong> As pointed out by some people on the Graphics Programming discord, this is actually correctly handled by Gamma correction. I have implemented this, as well as a total of 16 tonemapping operators which can be used to apply subtle (or not so subtle) shifts to the color data.
+</p>
+
 <p>
     &nbsp;Color temperature adjustment may be a little more familiar for most people. The method I'm using has some code to generate a color for a given color temperature - this is a 3-tuple, r, g, and b. I then use this as a scale factor for the r, g, and b values by constructing an identity matrix with the diagonal scaled by the tuple. Shown above is a comparison grid - it is higher resolution if you view the image directly - the first row is linear color values, second row is a cheap ACES approximation, and the third row is the full UE4 style ACES tonemapping implementation. From left to right, the values go from cool (1800K, orange) to neutral (6500K, white) and then to warmer (18000K, blue).
 </p>
@@ -150,6 +155,18 @@ body {
 <p>
 &nbsp;I have had a few issues with the actual runtime execution speed of this library, I believe it is related to the use of AVX instructions (or rather that for some reason, they are not being used). I believe it is something on my end - this is something I need to dig into more later. For the time being, I have two other options for noise, my standalone header and the routines provided by GLM.</p>
 
+<p>
+	&nbsp;<strong>UPDATE (4/1/2021):</strong> After working with the author, Auburn, on discord, I discovered that by default the way I was using cmake would build the debug target rather than the release target. By fixing this, I have seen an approximately 70x speedup in the noise generation by FastNoise2. Much, much faster than my existing solutions. He was hugely helpful in getting this working. Below is an animation of a node config given by the string:
+</p>
+<pre>
+&nbsp;DQADAAAAAAAAQB8AEAAAAAA/CwABAAAAAAAAAAEAAAAAAAAAARUAzcyMP+xROD8AAAA/AgAAAIA/AQkAARcAFK5HP8P1KECkcD1A7FEYwBsABQAAAAAAAAAAAAAAAAAAAAAAAAAAAACamZk+AArXI70BBABcj4I/AAAAAClcjz8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+</pre>
+
+<video width="768" autoplay controls loop>
+    <source src="images/voraldo1_2/out9.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+</video> 
+
 <h2>Cmake Config Done - Windows Build Soon</h2>
 <p>
     &nbsp;Up to now, I have had an issue with drivers other than Mesa - when compiling on different systems with different drivers, there was an issue with image3D access. I believe I have a line on this issue, due to the help of one of the people involved with FastNoise2 - they got it to compile on Windows pretty simply with the Cmake config, but then they were unable to manipulate textures. They ran it through the Nvidia Nsight profiler, which said something about incomplete textures - I believe this has to do with the use of a NULL value as the last argument to glTexImage3D. Something like an optimization where there is no allocation of backing memory when there is no data passed. I need to get ahold of them again and see if my fixes have made a difference. 
@@ -170,9 +187,15 @@ body {
 &nbsp;There are a few things related to image quality that are still bugging me. You can see both of them in this image - the banding towards the right hand side, which is present in some parts of the volume that should appear as a continuous gradient, and the aliasing on the surfaces of primitives. I have a line on fixing both of these issues (<a href="https://www.anisopteragames.com/how-to-fix-color-banding-with-dithering/">dithering</a> for the banding and multisampling inside the voxel extents in the compute shaders for the aliasing), and I will be updating this page as that develops.
 </p>
 
+<p>
+	&nbsp;<strong>UPDATE (4/1/2021):</strong> I have implemented this dithering scheme, and the banding is completely gone. My plans are to convert it to use a blue noise texture as generated by <a href="https://gist.github.com/kajott/d9f9bb93043040bfe2f48f4f499903d8">this</a> void-and-cluster algorithm. There's only minimal work to convert it, and it's a cool use for blue noise. Planning on adding this same logic to my Dithered Raymarching project, as well. Upcoming plans for that project include a scheme for refraction (lenses and things with different IOR, bending the view ray), distance estimated fractals, and doing the dithering operation in even more color spaces (also streamlining how the dithering shader works). Voraldo's SDF multisample is still WIP, but I have a plan on how it's going to work.
+</p>
+
+<img src="images/voraldo1_2/dithered.png" style="border: 2px solid #ba550b;" alt="problems fixed" width="768">
+
 
 </div>
 <br>
-<p>Last updated 3/16/2021</p>
+<p>Last updated 4/1/2021</p>
 </body>
 </html>
