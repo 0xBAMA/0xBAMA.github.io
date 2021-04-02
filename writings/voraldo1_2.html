@@ -44,23 +44,37 @@ body {
 
 <ul>
 
-    <li>RGB Lighting buffer</li>
+    <li>RGB voxel lighting buffer</li>
     &nbsp;
-    <li>8-bit grayscale masking</li>
+    <li>8-bit grayscale masking greatly extends capabilities of masking</li>
     &nbsp;
-    <li>ACES Tonemapping and color temperature adjustment</li>
+    <li>16 selectable tonemapping operators, color temperature and gamma adjustment</li>
     &nbsp;
     <li>Single triangle screen coverage for efficiency</li>
     &nbsp;
     <li>Integrated operation logging/JSON scripting interface (animation)</li>
     &nbsp;
-    <li>Renderer using mipmapped samplers</li>
+    <li>Architecture for swappable renderers via dropdown menu</li>
+        &nbsp;
+    	<ul>
+    	<li>Renderer using mipmapped samplers (nearest and linear modes)</li>
+    	&nbsp;
+    	<li>Renderer to visualize "alpha weighted average depth"</li>
+    	&nbsp;
+    	<li>Renderer to visualize voxel position as RGB</li>
+    	&nbsp;
+    	<li>Older renderer using Image3D reference</li>
+    	&nbsp;
+    	<li>WIP renderer using Image3D reference + supercover traversal</li>
+    	</ul>
     &nbsp;
-    <li>Small improvements on the use of the render texture</li>
+    <li>Small improvements on the use of the render texture (floating point)</li>
+    &nbsp;
+    <li>Light dithering completely removes all banding problems</li>
     &nbsp;
     <li>ImGUI Docking Branch and improved tab interface</li>
     &nbsp;
-    <li>Noise generation with FastNoise2</li>
+    <li>Noise generation with FastNoise2, much faster than existing solutions (>10x)</li>
     &nbsp;
     <li>Cmake config done for eventual Windows build</li>
     &nbsp;
@@ -126,7 +140,7 @@ body {
 
 <h2>Renderer and Render Texture Improvements</h2>
 <p>
-    &nbsp;The cooperation between the tile-based renderer and my sampling scheme has proved to be very powerful for producing a smooth image. I have talked about this before, but will quickly go over the current state of the whole procedure here. The first thing to be considered is the render texture. It is the medium by which an image is put to the screen. There is a scale factor which determines how many times the size the width and height of the screen that this render texture will be. If the number is less than one, a single pixel in the render texture will span more than one pixel in the output - correspondingly, a value greater than one means that there will be effective supersampling - that is, multiple render texture pixels taken into consideration when calculating an output pixel. Because of the limitation on compute shader job dispatch siZe, the tile based renderer is used, where 256x256 squares across the texture are populated with color data at a time. This is very fast, since there is no synchronization required between these squares. Each compute shader invocation does the alpha blending calculation with a number of mipmapped linearly filtered samples of the voxels, acquired here using a sampler3D interface instead of the image3D used by the read/write operations (drawing, etc). 
+    &nbsp;The cooperation between the tile-based renderer and my sampling scheme has proved to be very powerful for producing a smooth image. I have talked about this before, but will quickly go over the current state of the whole procedure here. The first thing to be considered is the floating point render texture. It is the medium by which an image is put to the screen. There is a scale factor which determines how many times the size the width and height of the screen that this render texture will be. If the number is less than one, a single pixel in the render texture will span more than one pixel in the output - correspondingly, a value greater than one means that there will be effective supersampling - that is, multiple render texture pixels taken into consideration when calculating an output pixel. Because of the limitation on compute shader job dispatch size, the tile based renderer is used, where 256x256 squares across the texture are populated with color data at a time. This is very fast, since there is no synchronization required between these squares. Each compute shader invocation does the alpha blending calculation with a number of mipmapped linearly filtered samples of the voxels, acquired here using a sampler3D interface instead of the image3D used by the read/write operations (drawing, etc). 
 </p>
 
 <p>
@@ -134,7 +148,7 @@ body {
 </p>
 
 <p>
-    &nbsp;The process of presentation also has some more considerations than may first be apparent. There is a simple fullscreen triangle, as previously described, and a simple vertex/fragment pair which draws it. By setting up 8x multisample buffers via OpenGL, my fullscreen triangle now runs my fragment shader 8 times for every screen pixel. In each of these shader invocations, I take a linearly filtered sample from the render texture, using gl_FragCoord + gl_SamplePosition to take advantage of the multisample offset when sampling the texture. Thus the final output pixel is produced, as an average of these samples.
+    &nbsp;The process of presentation also has some more considerations than may first be apparent. There is a simple fullscreen triangle, as previously described, and a simple vertex/fragment pair which draws it. By setting up 8x multisample buffers via OpenGL, my fullscreen triangle now runs my fragment shader 8 times for every screen pixel. In each of these shader invocations, I take a linearly filtered sample from the render texture, using gl_FragCoord + gl_SamplePosition to take advantage of the multisample offset when sampling the texture. Thus the final output pixel is produced, as an average of these samples. This takes advantage of hardware/API features to do some antialiasing. 
 </p>
 
 <h2>ImGUI Docking Branch</h2>
