@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dithered Raymarching 2</title>
+
+<style>
+body {
+	font-family: 'Rokkitt', serif;
+	color:#481203;
+    background-color: #f7f0de;
+    margin: 50px 50px 50px 100px;
+    line-height: 15px;
+}
+a:link,
+a:visited {
+ color:blue;
+ text-decoration:none;
+ transition:.85s ease-out
+}
+a:hover {
+ color:#FF1203;
+ text-decoration:none;
+ transition:0s
+}
+</style>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Rokkitt:wght@600&display=swap');
+</style>
+<link rel = "icon" href = "https://jbaker.graphics/resources/icon.png" type = "image/x-icon">
+</head>
+<body>
+
+<h1 style='display:inline-block'>Jon Baker, Graphics Programming</h1>
+<p style='display:inline-block'> &nbsp; &nbsp; <a href='../index.html'>home</a></p>
+<p style='display:inline-block'> &nbsp; &nbsp; <a href='index.html'>writings</a></p>
+
+<div style='width:768px;'>
+
+<h2>The Distance Estimator Compendium (DEC)</h2>
+
+
+<a href="#introduction">Introduction</a><br />
+<a href="#simple"      >Simple Primitives</a><br />
+<a href="#operators"   >Operators</a><br />
+<a href="#fractals"    >Fractals</a><br />
+<a href="#licensing"   >Licensing</a><br />
+
+<a id="introduction"><h2>Introduction</h2></a>
+<p>
+&nbsp; My goal here is to provide a collected resource of these signed distance functions (SDFs) in a standardized format given by <code>float de(vec3 p){...}</code>. SDFs are an interesting method for representing geometry as an implicit functional representation, which produces a result by querying with a given point in space and returning an estimate of the distance to the surface - positive outside, and negative inside. I emphasize that this result is an estimate, especially for some of the fractal SDFs which produce a result by distorting the space in a highly nonlinear fashion. This representation is often used in realtime raymarching, but I have also seen other uses like pathtracing and production of meshes. 
+</p>
+
+
+
+<a id="licensing"><h2>Licensing</h2></a>
+<p>
+&nbsp; I am releasing this resource under the <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/legalcode"> CC Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>. This is the default Shadertoy license unless otherwise specified by the shader author, and the same license provided with the hg_sdf header, and which seems similarly appropriate for this resource. There are some utility functions which are provided by the <a href="../resources/noise.glsl">Twigl noise header</a>, available under the MIT license, and the <a href="../resources/hg_sdf.glsl">hg_sdf header</a>.
+</p>
+
+<p>
+&nbsp; I have gathered these distance estimator functions from several sources (hg_sdf, Shadertoy, and code deobfuscated from the #つぶやきGLSL tag on Twitter). I have done my best to give credit to the authors, but I do not have a complete record - if you have information to that end, please contact me via email. If you are doing something cool with them, or would like to contribute to this resource, please contact me at jb239812@ohio.edu.
+</p>
+
+</div>
+<br>
+<p>Last updated 5/19/2021</p>
+</body>
+</html>
