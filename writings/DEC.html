@@ -23,6 +23,19 @@ a:hover {
  text-decoration:none;
  transition:0s
 }
+
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  text-align: Left;
+  padding: 4px;
+}
+
+td.fitwidth {
+    width: 1px;
+    white-space: nowrap;
+}
+
 </style>
 
 <style>
@@ -41,22 +54,1211 @@ a:hover {
 <h2>The Distance Estimator Compendium (DEC)</h2>
 
 
-<a href="#introduction">Introduction</a><br />
-<a href="#simple"      >Simple Primitives</a><br />
-<a href="#operators"   >Operators</a><br />
-<a href="#fractals"    >Fractals</a><br />
-<a href="#licensing"   >Licensing</a><br />
+<a href="#introduction">&nbsp;Introduction</a><br />
+<a href="#simple"      >&nbsp;Simple Primitives</a><br />
+<a href="#operators"   >&nbsp;Operators</a><br />
+<a href="#fractals"    >&nbsp;Fractals</a><br />
+<a href="#composed"    >&nbsp;Composed Shapes</a><br />
+<a href="#licensing"   >&nbsp;Licensing</a><br />
 
-<a id="introduction"><h2>Introduction</h2></a>
+<a id="introduction"></a><h2>Introduction</h2>
 <p>
-&nbsp; My goal here is to provide a collected resource of these signed distance functions (SDFs) in a standardized format given by <code>float de(vec3 p){...}</code>. SDFs are an interesting method for representing geometry as an implicit functional representation, which produces a result by querying with a given point in space and returning an estimate of the distance to the surface - positive outside, and negative inside. I emphasize that this result is an estimate, especially for some of the fractal SDFs which produce a result by distorting the space in a highly nonlinear fashion. This representation is often used in realtime raymarching, but I have also seen other uses like pathtracing and production of meshes. 
+&nbsp; My goal here is to provide a collected resource of these signed distance functions (SDFs) in a standardized format given by <code>float de( vec3 p ){...}</code>. SDFs are an interesting method for representing geometry as an implicit functional representation, which produces a result by querying with a given point in space and returning an estimate of the distance to the surface - positive outside, and negative inside. I emphasize that this result is an estimate, especially for some of the fractal SDFs which produce a result by distorting the space in a highly nonlinear fashion. This representation is often used in realtime raymarching, but I have also seen other uses like pathtracing and production of meshes. 
 </p>
 
 
+<a id="simple"></a><h2>Simple Primitives</h2>
+<table style="width:100%">
+  <tr>
+    <th>Author</th>
+    <th>Code</th> 
+    <th>Example</th>
+  </tr>
+  <tr>
+    <td>wip</td>
+    <td>wip</td>
+    <td>wip</td>
+  </tr>
+</table>
+<br>
 
-<a id="licensing"><h2>Licensing</h2></a>
+
+<a id="operators"></a><h2>Operators</h2>
+<table style="width:100%">
+  <tr>
+    <th>Author</th>
+    <th>Code</th> 
+    <th>Example</th>
+  </tr>
+  <tr>
+    <td>wip</td>
+    <td>wip</td>
+    <td>wip</td>
+  </tr>
+</table>
+<br>
+
+
+
+
+<a id="fractals"></a><h2>Fractals</h2>
+<table style="width:100%">
+  <tr>
+    <th>Author</th>
+    <th>Code</th> 
+    <th>Example</th>
+  </tr>
+  
+  
+  
+  
+<tr><td><code>unknown<code></td>    
+<td><pre>
+float de( vec3 p0 ){
+  vec4 p = vec4(p0, 1.);
+  for(int i = 0; i < 8; i++){
+    p.xyz = mod(p.xyz-1.,2.)-1.;
+    p*=1.4/dot(p.xyz,p.xyz);
+  }
+  return (length(p.xz/p.w)*0.25);
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de.png" alt="fractal_de", height=200px></td>
+</tr>
+  
+  <!-- fractal_de2 looks like shit -->
+  
+<tr><td><code>unknown<code></td>    
+<td><pre>
+float de( vec3 p0 ){
+  vec4 p = vec4(p0, 1.);
+  for(int i = 0; i < 8; i++){
+    p.xyz = mod(p.xyz-1., 2.)-1.;
+    p*=(1.2/dot(p.xyz,p.xyz));
+  }
+  p/=p.w;
+  return abs(p.x)*0.25;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de3.png" alt="fractal_de3", height=200px></td>
+</tr>
+  
+  
+<tr><td><code>unknown<code></td>    
+<td><pre>
+float de( vec3 p0 ){
+  vec4 p = vec4(p0, 1.);
+  for(int i = 0; i < 8; i++){
+    if(p.x > p.z)p.xz = p.zx;
+    if(p.z > p.y)p.zy = p.yz;
+    p = abs(p);
+    p.xyz = mod(p.xyz-1., 2.)-1.;
+    p*=1.23;
+  }
+  p/=p.w;
+  return abs(p.y)*0.25;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de4.png" alt="fractal_de4", height=200px></td>
+</tr>
+  
+  
+
+<tr><td><code>unknown<code></td>    
+<td><pre>
+float de( vec3 pos ) 
+{
+#define SCALE 2.8
+#define MINRAD2 .25
+#define scale (vec4(SCALE, SCALE, SCALE, abs(SCALE)) / minRad2)
+  float minRad2 = clamp(MINRAD2, 1.0e-9, 1.0);
+  float absScalem1 = abs(SCALE - 1.0);
+  float AbsScale = pow(abs(SCALE), float(1-10));
+  vec4 p = vec4(pos,1);
+  vec4 p0 = p;
+  for (int i = 0; i < 9; i++)
+  {
+    p.xyz = clamp(p.xyz, -1.0, 1.0) * 2.0 - p.xyz;
+    float r2 = dot(p.xyz, p.xyz);
+    p *= clamp(max(minRad2/r2, minRad2), 0.0, 1.0);
+    p = p*scale + p0;
+  }
+  return ((length(p.xyz) - absScalem1) / p.w - AbsScale);
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de5.png" alt="fractal_de5", height=200px></td>
+</tr>
+
+
+
+
+<tr><td><code>unknown<code></td>    
+<td><pre>
+// highly varied domain - take a look around
+float de( vec3 p ){ 
+  p = p.xzy;
+  vec3 cSize = vec3(1., 1., 1.3);
+  float scale = 1.;
+  for( int i=0; i < 12; i++ ){
+    p = 2.0*clamp(p, -cSize, cSize) - p;
+    float r2 = dot(p,p);
+    float k = max((2.)/(r2), .027);
+    p *= k; scale *= k;
+  }
+  float l = length(p.xy);
+  float rxy = l - 4.0;
+  float n = l * p.z;
+  rxy = max(rxy, -(n) / 4.);
+  return (rxy) / abs(scale);
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de6.png" alt="fractal_de6", height=200px></td>
+</tr>
+  
+
+
+
+
+
+<tr><td><code>unknown<code></td>    
+<td><pre>
+// highly varied domain - take a look around
+float de( vec3 p ){
+  p = p.xzy;
+  vec3 cSize = vec3(1., 1., 1.3);
+  float scale = 1.;
+  for( int i=0; i < 12;i++ ){
+    p = 2.0*clamp(p, -cSize, cSize) - p;
+    float r2 = dot(p,p+sin(p.z*.3));
+    float k = max((2.)/(r2), .027);
+    p *= k;  scale *= k;
+  }
+  float l = length(p.xy);
+  float rxy = l - 4.0;
+  float n = l * p.z;
+  rxy = max(rxy, -(n) / 4.);
+  return (rxy) / abs(scale);
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de7.png" alt="fractal_de7", height=200px></td>
+</tr>
+
+
+
+
+<tr><td><code>iq<code></td>    
+<td><pre>
+float de( vec3 p ){
+  float scale = 1.0;
+  float orb = 10000.0;
+  for( int i=0; i<6; i++ ){
+    p = -1.0 + 2.0*fract(0.5*p+0.5);
+    p -= sign(p)*0.04; // trick
+    float r2 = dot(p,p);
+    float k = 0.95/r2;
+    p  *= k;  scale *= k;
+    orb = min( orb, r2);
+  }
+
+  float d1 = sqrt( min( min( dot(p.xy,p.xy), 
+    dot(p.yz,p.yz) ), dot(p.zx,p.zx) ) ) - 0.02;
+  float d2 = abs(p.y);
+  float dmi = d2;
+  if( d1 < d2 ) dmi = d1;
+  return 0.5*dmi/scale;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de8.png" alt="fractal_de8", height=200px></td>
+</tr>
+
+
+
+
+<tr><td><code>unknown<code></td>    
+<td><pre>
+// highly varied domain - take a look around
+float de( vec3 p ){
+  vec3 CSize = vec3(1., 1.7, 1.);
+  p = p.xzy;
+  float scale = 1.1;
+  for( int i=0; i < 8;i++ ){
+    p = 2.0*clamp(p, -CSize, CSize) - p;
+    float r2 = dot(p,p);
+    float k = max((2.)/(r2), .5);
+    p *= k; scale *= k;
+  }
+  float l = length(p.xy);
+  float rxy = l - 1.0;
+  float n = l * p.z;
+  rxy = max(rxy, (n) / 8.);
+  return (rxy) / abs(scale);
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de9.png" alt="fractal_de9", height=200px></td>
+</tr>
+
+
+
+
+<tr><td><code>unknown<code></td>    
+<td><pre>
+// highly varied domain - take a look around
+float de( vec3 p ){
+  vec3 CSize = vec3(1., 1.7, 1.);
+  p = p.xzy;
+  float scale = 1.1;
+  for( int i=0; i < 8;i++ ){
+    p = 2.0*clamp(p, -CSize, CSize) - p;
+    float r2 = dot(p,p+sin(p.z*.3));
+    float k = max((2.)/(r2), .5);
+    p *= k; scale *= k;
+  }
+  float l = length(p.xy);
+  float rxy = l - 1.0;
+  float n = l * p.z;
+  rxy = max(rxy, (n) / 8.);
+  return (rxy) / abs(scale);
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de10.png" alt="fractal_de10", height=200px></td>
+</tr>
+
+  <!-- fractal_de11 looks like shit -->
+
+<tr><td><code>unknown<code></td>    
+<td><pre>
+vec3 fold( vec3 p0 ){
+  vec3 p = p0;
+  if(length(p) > 1.2) return p;
+  p = mod(p,2.)-1.;
+  return p;
+}
+
+float de( vec3 p0 ){
+  vec4 p = vec4(p0, 1.);
+  for(int i = 0; i < 12; i++){
+    if(p.x > p.z)p.xz = p.zx;
+    if(p.z > p.y)p.zy = p.yz;
+    p = abs(p);
+    p.xyz = fold(p.xyz);
+    p.xyz = mod(p.xyz-1., 2.)-1.;
+    p*=(1.2/dot(p.xyz,p.xyz));
+  }
+  p/=p.w;
+  return abs(p.x)*0.25;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de12.png" alt="fractal_de12", height=200px></td>
+</tr>
+
+
+  <!-- fractal_de13 looks like shit -->
+  <!-- fractal_de14 looks like shit -->
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre>
+float de( vec3 p ){
+  p=abs(p)-1.2;
+  if(p.x < p.z)p.xz=p.zx;
+  if(p.y < p.z)p.yz=p.zy;
+  if(p.x < p.y)p.xy=p.yx;
+  float s=1.;
+  for(int i=0;i<6;i++){
+    p=abs(p);
+    float r=2./clamp(dot(p,p),.1,1.);
+    s*=r; p*=r; p-=vec3(.6,.6,3.5);
+  }
+  float a=1.5;
+  p-=clamp(p,-a,a);
+  return length(p)/s;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de15.png" alt="fractal_de15", height=200px></td>
+</tr>
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre>
+float de( vec3 p ){
+    // box fold
+    p=abs(p)-15.;
+    if(p.x < p.z)p.xz=p.zx;
+    if(p.y < p.z)p.yz=p.zy;
+    if(p.x < p.y)p.xy=p.yx;
+    float s=2.;
+    for (int i=0; i<8; i++){
+        p=-sign(p)*(abs(abs(abs(p)-2.)-1.)-1.);
+        float r=-1.55/max(.41,dot(p,p));
+        s*=r; p*=r; p-=.5;
+    }
+    s=abs(s);
+    return dot(p,normalize(vec3(1,2,3)))/s;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de16.png" alt="fractal_de16", height=200px></td>
+</tr>
+  
+  
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre>
+void sFold90( inout vec2 p ){
+    vec2 v=normalize(vec2(1,-1));
+    float g=dot(p,v);
+    p-=(g-sqrt(g*g+1e-1))*v;
+}
+
+float de( vec3 p ){
+#define rot(a) mat2(cos(a),sin(a),-sin(a),cos(a))
+    p=abs(p)-1.8;
+    sFold90(p.zy);
+    sFold90(p.xy);
+    sFold90(p.zx);
+    float s=2.;
+    vec3  offset=p*.5;
+    for(int i=0;i<8;i++){
+        p=1.-abs(p-1.);
+        float r=-1.3*max(1.5/dot(p,p),1.5);
+        s*=r; p*=r; p+=offset;
+        p.zx*=rot(-1.2);
+    }
+    s=abs(s); float a=8.5;
+    p-=clamp(p,-a,a);
+    return length(p)/s;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de17.png" alt="fractal_de17", height=200px></td>
+</tr>
+  
+  
+  
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float lpNorm( vec3 p, float n ){
+    p = pow(abs(p), vec3(n));
+    return pow(p.x+p.y+p.z, 1.0/n);
+}
+
+float de( vec3 p ){
+  vec3 offset=p*.5;
+  float s=2.;
+  for (int i=0; i<5; i++){
+    p=clamp(p,-1.,1.)*2.-p;
+    float r=-10.*clamp(max(.3/pow(
+    lpNorm(p,5.),2.),.3),.0,.6);
+    s*=r; p*=r; p+=offset;
+  }
+  s=abs(s); float a=10.;
+  p-=clamp(p,-a,a);
+  return length(p)/s;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de18.png" alt="fractal_de18", height=200px></td>
+</tr>
+  
+  
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+#define sabs1(p)sqrt((p)*(p)+1e-1)
+#define sabs2(p)sqrt((p)*(p)+1e-3)
+float de( vec3 p ){
+  float s=2.; p=abs(p);
+  for (int i=0; i<4; i++){
+    p=1.-sabs2(p-1.);
+    float r=-9.*clamp(max(.2/pow(min(min(sabs1(p.x),
+      sabs1(p.y)),sabs1(p.z)),.5), .1), 0., .5);
+    s*=r; p*=r; p+=1.;
+  }
+  s=abs(s); float a=2.;
+  p-=clamp(p,-a,a);
+  return length(p)/s-.01;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de19.png" alt="fractal_de19", height=200px></td>
+</tr>
+  
+  
+  
+  
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float de( vec3 p ){
+    float s=3.;
+    for(int i = 0; i < 4; i++) {
+        p=mod(p-1.,2.)-1.;
+        float r=1.2/dot(p,p);
+        p*=r; s*=r;
+    }
+    p = abs(p)-0.8;
+    if (p.x < p.z) p.xz = p.zx;
+    if (p.y < p.z) p.yz = p.zy;
+    if (p.x < p.y) p.xy = p.yx;
+    return length(cross(p,normalize(vec3(0,1,1))))/s-.001;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de20.png" alt="fractal_de20", height=200px></td>
+</tr>
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float de( vec3 p ){
+    float s=3.; p=abs(p);
+    for (float i=0.; i<9.; i++){
+        p-=clamp(p,-1.,1.)*2.;
+        float r=6.62*clamp(.12/min(dot(p,p),1.),0.,1.);
+        s*=r; p*=r; p+=1.5;
+    }
+    s=abs(s); float a=.8;
+    p-=clamp(p,-a,a);
+    return length(p)/s;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de21.png" alt="fractal_de21", height=200px></td>
+</tr>
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float de( vec3 p ){
+    float s=12.; p=abs(p);
+    vec3 offset=p*3.;
+    for (float i=0.; i<5.; i++){
+        p=1.-abs(p-1.);
+        float r=-5.5*clamp(.3*max(2.5/dot(p,p),.8),0.,1.5);
+        p*=r; p+=offset; s*=r;
+    }
+    s=abs(s); p=abs(p)-3.;
+    if(p.x < p.z)p.xz=p.zx;
+    if(p.y < p.z)p.yz=p.zy;
+    if(p.x < p.y)p.xy=p.yx;
+    float a=3.;
+    p-=clamp(p,-a,a);
+    return length(p.xz)/s;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de22.png" alt="fractal_de22", height=200px></td>
+</tr>
+
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float de( vec3 p ){
+#define rot(a) mat2(cos(a),sin(a),-sin(a),cos(a))
+    p=abs(p)-3.;
+    if(p.x < p.z)p.xz=p.zx;
+    if(p.y < p.z)p.yz=p.zy;
+    if(p.x < p.y)p.xy=p.yx;
+    float s=3.;
+    vec3  offset=p*1.2;
+    for (float i=0.;i<8.;i++){
+        p=1.-abs(p-1.);
+        float r=-6.5*clamp(.41*max(1.1/dot(p,p),.8),.0,1.8);
+        s*=r; p*=r; p+=offset;
+        p.yz*=rot(-1.2);
+    }
+    s=abs(s);
+    float a=20.;
+    p-=clamp(p,-a,a);
+    return length(p)/s;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de23.png" alt="fractal_de23", height=200px></td>
+</tr>
+
+
+
+
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float de( vec3 p ) {
+#define rot(a) mat2(cos(a),sin(a),-sin(a),cos(a))
+    p=abs(p)-2.;
+    if(p.x < p.z)p.xz=p.zx;
+    if(p.y < p.z)p.yz=p.zy;
+    if(p.x < p.y)p.xy=p.yx;
+    float s=2.5;
+    vec3 off=p*2.8;
+    for (float i=0.;i<6.;i++) {
+        p=-sign(p)*(abs(abs(abs(p)-2.)-1.)-1.);
+        float r=-11.*clamp(.8*max(2.5/dot(p,p),.2),.3,.6);
+        s*=r; p*=r; p+=off;
+        p.yz*=rot(2.1);
+    }
+    s=abs(s);
+    float a=30.;
+    p-=clamp(p,-a,a);
+    return length(p)/s;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de24.png" alt="fractal_de24", height=200px></td>
+</tr>
+
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float de( vec3 p ){
+    p=abs(p);
+    float s=3.;
+    vec3  offset = p*.5;
+    for (float i=0.; i<5.; i++){
+        p=1.-abs(p-1.);
+        float r=-3.*clamp(.57*max(3./dot(p,p),.9),0.,1.);
+        s*=r; p*=r; p+=offset;
+    }
+    s=abs(s);
+    return length(cross(p,normalize(vec3(1))))/s-.008;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de25.png" alt="fractal_de25", height=200px></td>
+</tr>
+
+
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float de( vec3 p ){
+    p.xy=abs(p.xy)-2.;
+    if(p.x < p.y)p.xy=p.yx;
+    p.z=mod(p.z,4.)-2.;
+    p.x-=3.2; p=abs(p);
+    float s=2.;
+    vec3 offset= p*1.5;
+    for (float i=0.; i<5.; i++){
+        p=1.-abs(p-1.);
+        float r=-7.5*clamp(.38*max(1.2/dot(p,p),1.),0.,1.);
+        s*=r; p*=r; p+=offset;
+    }
+    s=abs(s);
+    float a=100.;
+    p-=clamp(p,-a,a);
+    return length(p)/s;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de26.png" alt="fractal_de26", height=200px></td>
+</tr>
+
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float de( vec3 p ){
+#define rot(a) mat2(cos(a),sin(a),-sin(a),cos(a))
+  float s=1.;
+  for(int i=0;i<3;i++){
+    p=abs(p)-.3;
+    if(p.x < p.y)p.xy=p.yx;
+    if(p.x < p.z)p.xz=p.zx;
+    if(p.y < p.z)p.yz=p.zy;
+    p.xy=abs(p.xy)-.2;
+    p.xy*=rot(.3);
+    p.yz*=rot(.3);
+    p*=2.; s*=2.;
+  }
+  p/=s;
+  float h=.5;
+  p.x-=clamp(p.x,-h,h);
+  return length(vec2(length(p.xy)-.5,p.z))-.05;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de27.png" alt="fractal_de27", height=200px></td>
+</tr>
+
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float de( vec3 p ){
+  float s=1.;
+  for(int i=0;i<3;i++){
+    p=abs(p)-.3;
+    if(p.x < p.y)p.xy=p.yx;
+    if(p.x < p.z)p.xz=p.zx;
+    if(p.y < p.z)p.yz=p.zy;
+    p.xy-=.2; p*=2.; s*=2.;
+  }
+  p/=s;
+  float h=.5;
+  p.x-=clamp(p.x,-h,h);
+  return length(vec2(length(p.xy)-.5,p.z))-.05;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de28.png" alt="fractal_de28", height=200px></td>
+</tr>
+
+
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float de( vec3 p ){
+#define rot(a) mat2(cos(a),sin(a),-sin(a),cos(a))
+  for(int i=0;i<3;i++){
+    p=abs(p)-.3;
+    if(p.x < p.y)p.xy=p.yx;
+    if(p.x < p.z)p.xz=p.zx;
+    if(p.y < p.z)p.yz=p.zy;
+    p.xy-=.2; p.xy*=rot(.5); p.yz*=rot(.5);
+  }
+  float h=.5;
+  p.x-=clamp(p.x,-h,h);
+  return length(vec2(length(p.xy)-.5,p.z))-.05;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de29.png" alt="fractal_de29", height=200px></td>
+</tr>
+
+
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+#define TAUg atan(1.)*8.
+vec2 pmodg(vec2 p, float n){
+  float a=mod(atan(p.y, p.x),TAUg/n)-.5 *TAUg/n;
+  return length(p)*vec2(sin(a),cos(a));
+}
+
+float de( vec3 p ){
+    for(int i=0;i<4;i++){
+        p.xy = pmodg(p.xy,10.);  p.y-=2.;
+        p.yz = pmodg(p.yz, 12.); p.z-=10.;
+    }
+    return dot(abs(p),normalize(vec3(13,1,7)))-.7;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de30.png" alt="fractal_de30", height=200px></td>
+</tr>
+
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float de( vec3 p ){
+  p.x-=4.;
+  p=mod(p,8.)-4.;
+  for(int j=0;j<3;j++){
+     p.xy=abs(p.xy)-.3;
+     p.yz=abs(p.yz)+.7,
+     p.xz=abs(p.xz)-.2;
+  }
+  return length(cross(p,vec3(.5)))-.1;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de31.png" alt="fractal_de31", height=200px></td>
+</tr>
+
+
+  
+  
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+vec3 fold(vec3 p0){
+    vec3 p = p0;
+    if(length(p) > 2.)return p;
+    p = mod(p,2.)-1.;
+    return p;
+}
+
+float de( vec3 p0 ){
+    vec4 p = vec4(p0, 1.);
+    escape = 0.;
+    if(p.x > p.z)p.xz = p.zx;
+    if(p.z > p.y)p.zy = p.yz;
+    if(p.y > p.x)p.yx = p.xy;
+    p = abs(p);
+    for(int i = 0; i < 8; i++){
+        p.xyz = fold(p.xyz);
+        p.xyz = fract(p.xyz*0.5 - 1.)*2.-1.0;
+        p*=(1.1/clamp(dot(p.xyz,p.xyz),-0.1,1.));
+    }
+    p/=p.w;
+    return abs(p.x)*0.25;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de32.png" alt="fractal_de32", height=200px></td>
+</tr>
+
+
+    <!-- fractal_de33 crashes -->    
+    <!-- fractal_de34 crashes -->
+  
+  
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float de(vec3 p){
+    p=mod(p,2.)-1.;
+    p=abs(p)-1.;
+    if(p.x < p.z)p.xz=p.zx;
+    if(p.y < p.z)p.yz=p.zy;
+    if(p.x < p.y)p.xy=p.yx;
+    float s=1.;
+    for(int i=0;i<10;i++){
+      float r2=2./clamp(dot(p,p),.1,1.);
+      p=abs(p)*r2-vec3(.6,.6,3.5);
+      s*=r2;
+    }
+    return length(p)/s;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de35.png" alt="fractal_de35", height=200px></td>
+</tr>
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float de( vec3 p ) {
+	float itr=10.,r=0.1;
+	p=mod(p-1.5,3.)-1.5;
+	p=abs(p)-1.3;
+	if(p.x < p.z)p.xz=p.zx;
+	if(p.y < p.z)p.yz=p.zy;
+ 	if(p.x < p.y)p.xy=p.yx;
+	float s=1.;
+	p-=vec3(.5,-.3,1.5);
+	for(float i=0.;i++ < itr;) {
+		float r2=2./clamp(dot(p,p),.1,1.);
+		p=abs(p)*r2;
+		p-=vec3(.7,.3,5.5);
+		s*=r2;
+	}
+   return length(p.xy)/(s-r);
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de36.png" alt="fractal_de36", height=200px></td>
+</tr>
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float de( vec3 p ) {
+  float s=2.,r2;
+  p=abs(p);
+  for(int i=0; i<12;i++) {
+    p=1.-abs(p-1.);
+    r2=1.2/dot(p,p); 
+    p*=r2; s*=r2;
+  }
+  return length(cross(p,normalize(vec3(1))))/s-0.003;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de37.png" alt="fractal_de37", height=200px></td>
+</tr>
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float de( vec3 p ){
+  float s=2.,r2;
+  p=abs(p);
+  for(int i=0; i<12;i++) {
+    p=1.-abs(p-1.);
+    r2=(i%3==1)?1.3:1.3/dot(p,p);
+    p*=r2; s*=r2;
+  }
+  return length(cross(p,normalize(vec3(1))))/s-0.003;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de38.png" alt="fractal_de38", height=200px></td>
+</tr>
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+#define fold45(p)(p.y>p.x)?p.yx:p
+float de(vec3 p) {
+  float scale = 2.1, off0 = .8, off1 = .3, off2 = .83;
+  vec3 off =vec3(2.,.2,.1);
+  float s=1.0;
+  for(int i = 0;++i<20;) { 
+    p.xy = abs(p.xy);
+    p.xy = fold45(p.xy);
+    p.y -= off0;
+    p.y = -abs(p.y);
+    p.y += off0;
+    p.x += off1;
+    p.xz = fold45(p.xz);
+    p.x -= off2;
+    p.xz = fold45(p.xz);
+    p.x += off1;
+    p -= off;
+    p *= scale;
+    p += off;
+    s *= scale;
+  }
+  return length(p)/s;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de40.png" alt="fractal_de40", height=200px></td>
+</tr>
+
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float de( vec3 p ){
+  float s=4.;
+  p=abs(p);
+  vec3 off=p*4.6;
+  for (float i=0.; i<8.; i++){
+    p=1.-abs(abs(p-2.)-1.); 
+    float r=-13.*clamp(.38*max(1.3/dot(p,p),.7),0.,3.3);
+    s*=r; p*=r; p+=off;
+  }
+  return length(cross(p,normalize(vec3(1,3,3))))/s-.006;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de41.png" alt="fractal_de41", height=200px></td>
+</tr>
+
+
+   <!-- fractal_de42 crashes -->
+  
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+vec3 rotate(vec3 p,vec3 axis,float theta){
+  vec3 v = cross(axis,p), u = cross(v, axis);
+  return u * cos(theta) + v * sin(theta) + axis * dot(p, axis);   
+}
+
+vec2 pmod(vec2 p, float r){
+  float a = mod(atan(p.y, p.x), (M_PI*2) / r) - 0.5 * (M_PI*2) / r;
+  return length(p) * vec2(-sin(a), cos(a));
+}
+
+float fractal_de43(vec3 p){
+  for(int i=0;i<5;i++){
+    p.xy = pmod43(p.xy,12.0); p.y-=4.0;
+    p.yz = pmod43(p.yz,16.0); p.z-=6.8;
+  }
+  return dot(abs(p),rotate43(normalize(vec3(2,1,3)),
+      normalize(vec3(7,1,2)),1.8))-0.3;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de43.png" alt="fractal_de43", height=200px></td>
+</tr>
+
+
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+#define pmod(p,n)length(p)*sin(vec2(0.,M_PI/2.)\
+ +mod(atan(p.y,p.x),2.*M_PI/n)-M_PI/n)
+#define fold(p,v)p-2.*min(0.,dot(p,v))*v;
+
+float de( vec3 p ){
+  float s = 1.0;
+  p.z=fract(p.z)-.5;
+  for(int i=0;i<20;i++){ // expensive
+    p.y += .15;
+    p.xz = abs(p.xz);
+    for(int j=0;j<2;j++){
+      p.xy = pmod(p.xy,8.);
+      p.y -= .18;
+    }
+    p.xy = fold(p.xy,normalize(vec2(1,-.8)));
+    p.y = -abs(p.y);
+    p.y += .4;
+    p.yz = fold(p.yz,normalize(vec2(3,-1)));
+    p.x -= .47;
+    p.yz = fold(p.yz,normalize(vec2(2,-7)));
+    p -= vec3(1.7,.4,0);
+    float r2= 3.58/dot(p,p);
+    p *= r2;
+    p += vec3(1.8,.7,.0);
+    s *= r2;
+  }
+  return length(p)/s;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de44.png" alt="fractal_de44", height=200px></td>
+</tr>
+
+
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float de( vec3 p ){
+  p.z-=2.5;
+  float s = 3.;
+  float e = 0.;
+  for(int j=0;j++<8;)
+    s*=e=3.8/clamp(dot(p,p),0.,2.),
+    p=abs(p)*e-vec3(1,15,1);
+  return length(cross(p,vec3(1,1,-1)*.577))/s;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de45.png" alt="fractal_de45", height=200px></td>
+</tr>
+
+
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float de( vec3 p ){
+  float s = 2.;
+  float e = 0.;
+  for(int j=0;++j<7;)
+    p.xz=abs(p.xz)-2.3,
+    p.z>p.x?p=p.zyx:p,
+    p.z=1.5-abs(p.z-1.3+sin(p.z)*.2),
+    p.y>p.x?p=p.yxz:p,
+    p.x=3.-abs(p.x-5.+sin(p.x*3.)*.2),
+    p.y>p.x?p=p.yxz:p,
+    p.y=.9-abs(p.y-.4),
+    e=12.*clamp(.3/min(dot(p,p),1.),.0,1.)+
+    2.*clamp(.1/min(dot(p,p),1.),.0,1.),
+    p=e*p-vec3(7,1,1),
+    s*=e;
+  return length(p)/s;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de46.png" alt="fractal_de46", height=200px></td>
+</tr>
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float de( vec3 p ){
+  float s = 4.;
+  for(int i = 0; i < 8; i++) {
+    p=mod(p-1.,2.)-1.;
+    float r2=(i%3==0)?1.5:1.2/dot(p,p);
+    p*=r2; s*=r2;
+  }
+  vec3 q=p/s;
+  q.xz=mod(q.xz-.002,.004)-.002;
+  return min(length(q.yx)-.0003,length(q.yz)-.0003);
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de47.png" alt="fractal_de47", height=200px></td>
+</tr>
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float de( vec3 p ){
+  p.z-=-1.;
+#define fold(p,v)p-2.*min(0.,dot(p,v))*v;
+  float s=3., l=0.;
+  for(int i = 0;++i<15;){
+    p.xy=fold(p.xy,normalize(vec2(1,-1.3)));
+    p.y=-abs(p.y);
+    p.y+=.5;
+    p.xz=abs(p.xz);
+    p.yz=fold(p.yz,normalize(vec2(8,-1)));
+    p.x-=.5;
+    p.yz=fold(p.yz,normalize(vec2(1,-2)));
+    p-=vec3(1.8,.4,.1);
+    l = 2.6/dot(p,p);    p*=l;
+    p+=vec3(1.8,.7,.2);  s*=l;
+  }
+  return length(p.xy)/s;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de48.png" alt="fractal_de48", height=200px></td>
+</tr>
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float lpNorm(vec3 p, float n){
+  p = pow(abs(p), vec3(n));
+  return pow(p.x+p.y+p.z, 1.0/n);
+}
+
+float de(vec3 p){
+  float s = 1.;
+  for(int i = 0; i < 9; i++) {
+    p=p-2.*round(p/2.);
+    float r2=1.1/max(pow(lpNorm(p.xyz, 4.5),1.6),.15);
+    p*=r2; s*=r2;
+  }
+  return length(p)/s-.001;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de49.png" alt="fractal_de49", height=200px></td>
+</tr>
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+#define rot(a) mat2(cos(a),sin(a),-sin(a),cos(a))
+float hash(float x){
+  return fract(sin(x*234.123+156.2));
+}
+float lpNorm(vec3 p, float n){
+  p = pow(abs(p), vec3(n));
+  return pow(p.x+p.y+p.z, 1.0/n);
+}
+float de(vec3 p){
+  vec2 id=floor(p.xz);
+  p.xz=mod(p.xz,1.)-.5;
+  p.y=abs(p.y)-.5;
+  p.y=abs(p.y)-.5;
+  p.xy*=rot(hash(dot(id,vec2(12.3,46.7))));
+  p.yz*=rot(hash(dot(id,vec2(32.9,76.2))));
+  float s = 1.;
+  for(int i = 0; i < 6; i++) {
+    float r2=1.2/pow(lpNorm(p.xyz, 5.0),1.5);
+    p-=.1; p*=r2; s*=r2; p=p-2.*round(p/2.);
+  }
+  return .6*dot(abs(p),normalize(vec3(1,2,3)))/s-.002;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de50.png" alt="fractal_de50", height=200px></td>
+</tr>
+
+
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float de(vec3 p){
+  for(int j=0;++j<8;)
+    p.z-=.3,
+    p.xz=abs(p.xz),
+    p.xz=(p.z>p.x)?p.zx:p.xz,
+    p.xy=(p.y>p.x)?p.yx:p.xy,
+    p.z=1.-abs(p.z-1.),
+    p=p*3.-vec3(10,4,2);
+
+  return length(p)/6e3-.001;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de51.png" alt="fractal_de51", height=200px></td>
+</tr>
+
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float lpNorm(vec3 p, float n){
+  p = pow(abs(p),vec3(n));
+  return pow(p.x+p.y+p.z,1./n);
+}
+float de( vec3 p ){
+  float scale=4.5;
+  float mr2=.5;
+  float off=.5;
+  float s=1.;
+  vec3 p0 = p;
+  for (int i=0; i<16; i++) {
+    if(i%3==0)p=p.yzx;
+    if(i%2==1)p=p.yxz;
+    p -= clamp(p,-1.,1.)*2.;
+    float r2=pow(lpNorm(p.xyz,5.),2.);
+    float g=clamp(mr2*max(1./r2,1.),0.,1.);
+    p=p*scale*g+p0*off;
+    s=s*scale*g+off;
+  }
+  return length(p)/s-.01;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de52.png" alt="fractal_de52", height=200px></td>
+</tr>
+
+  <!-- fractal_de53 crashes -->
+  <!-- fractal_de54 crashes -->
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float fractal_de55(vec3 p){
+  float s=2.;
+  float e=0.;
+  vec3 q=vec3(3,3,.0);
+  for(int i=0; i++<7; p=q-abs(p-q*.4))
+    s*=e=15./min(dot(p,p),15.),
+    p=abs(p)*e-2.;
+  return (length(p.xz)-.5)/s;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de55.png" alt="fractal_de55", height=200px></td>
+</tr>
+
+
+
+
+
+</table>
+<br>
+
+
+
+<a id="composed"></a><h2>Composed Shapes</h2>
+<table style="width:100%">
+  <tr>
+    <th>Author</th>
+    <th>Code</th> 
+    <th>Example</th>
+  </tr>
+  <tr>
+<tr><td><code>gaziya5 aka gaz<code></td>   
+<td><pre> 
+#define sabs(a) sqrt(a * a + 0.005)
+#define smin(a,b) SMin1(a,b,0.0003)
+#define rot(a) mat2(cos(a),sin(a),-sin(a),cos(a))
+float SMin1(float a, float b, float k){
+  return a + 0.5 * ((b-a) - sqrt((b-a) * (b-a) + k));
+}
+vec2 fold(vec2 p, int n){
+  p.x=sabs(p.x);
+  vec2 v=vec2(0,1);
+  for(int i=0;i < n;i++){
+    p-=2.0*smin(0.0,dot(p,v))*v;
+    v=normalize(vec2(v.x-1.0,v.y));
+  }
+  return p;    
+}
+float sdTorus( vec3 p, vec2 t ){
+  vec2 q = vec2(length(p.xz)-t.x,p.y);
+  return length(q)-t.y;
+}
+float de(vec3 p){
+  float A=5.566;
+  float c=7.0;
+  p=mod(p,c)-c*0.5;
+  p.xz=fold(p.xz,5);
+  for(int i=0;i<5;i++){
+    p.xy=abs(p.xy)-2.0;
+    p.yz=abs(p.yz)-2.5;
+    p.xy*=rot(A);
+    p.yz*=rot(A*0.5);
+    p=abs(p)-2.0;
+  }
+  vec2 s=vec2(0.05,0.02);
+  float h=0.08;
+  float de=1.0;
+  vec3 q=p;
+  q.xy=fold(q.xy,5);
+  q.y-=2.;
+  q.x-=clamp(q.x,-h,h);
+  de=min(de,sdTorus(q,s));
+  q=p;
+  q.xy*=rot(M_PI/exp2(5.0));
+  q.xy=fold(q.xy,5);
+  q.y-=2.0;
+  q.x-=clamp(q.x,-h,h);
+  de=min(de,sdTorus(q.xzy,s));
+  return de;
+}</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de39.png" alt="fractal_de39", height=200px></td>
+  </tr>
+</table>
+<br>
+
+
+
+<a id="licensing"></a><h2>Licensing</h2>
 <p>
-&nbsp; I am releasing this resource under the <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/legalcode"> CC Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>. This is the default Shadertoy license unless otherwise specified by the shader author, and the same license provided with the hg_sdf header, and which seems similarly appropriate for this resource. There are some utility functions which are provided by the <a href="../resources/noise.glsl">Twigl noise header</a>, available under the MIT license, and the <a href="../resources/hg_sdf.glsl">hg_sdf header</a>.
+&nbsp; I am releasing this resource under the <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/legalcode"> CC Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>. This is the default Shadertoy license unless otherwise specified by the shader author, the same license provided with the hg_sdf header, and which seems similarly appropriate for this resource. There are some utility functions which are provided by the <a href="../resources/noise.glsl">Twigl noise header</a>, available under the MIT license, and the <a href="../resources/hg_sdf.glsl">hg_sdf header</a>.
 </p>
 
 <p>
