@@ -63,7 +63,7 @@ td.fitwidth {
 
 <a id="introduction"></a><h2>Introduction</h2>
 <p>
-&nbsp; My goal here is to provide a collected resource of these signed distance functions (SDFs) in a standardized format given by <code>float de( vec3 p ){...}</code>. SDFs are an interesting method for representing geometry as an implicit functional representation, which produces a result by querying with a given point in space and returning an estimate of the distance to the surface - positive outside, and negative inside. I emphasize that this result is an estimate, especially for some of the fractal SDFs which produce a result by distorting the space in a highly nonlinear fashion. This representation is often used in realtime raymarching, but I have also seen other uses like pathtracing and production of meshes. 
+&nbsp; My goal here is to provide a collected resource of these signed distance functions (SDFs) in a standardized format given by <code>float de( vec3 p ){...}</code>. SDFs are an interesting method for representing geometry as an implicit functional representation, which produces a result by querying with a given point in space and returning an estimate of the distance to the surface - positive outside, and negative inside. I emphasize that this result is an estimate, especially for some of the fractal SDFs which produce a result by distorting the space in a highly nonlinear fashion. This representation is often used in realtime raymarching, but they come up in applications such as pathtracing and producing of meshes. I have seen several resources made available but I hope to gather much of what I've seen on this page.
 </p>
 
 
@@ -102,6 +102,8 @@ td.fitwidth {
 
 
 <a id="fractals"></a><h2>Fractals</h2>
+<p>&nbsp; These are very concise expressions of complex geometry, with operations condensed to their simplest expressions. Many of these have been deobfuscated from minimized #つぶやきGLSL examples. The forms are highly complex and often use magic numbers to control geometry - these provide opportunities to manipulate the forms, and may provide insight for those with the motivation to in dig into it. </p>
+
 <table style="width:100%">
   <tr>
     <th>Author</th>
@@ -1170,7 +1172,7 @@ float de( vec3 p ){
 
 <tr><td><code>gaziya5 aka gaz<code></td>    
 <td><pre> 
-float fractal_de55(vec3 p){
+float de(vec3 p){
   float s=2.;
   float e=0.;
   vec3 q=vec3(3,3,.0);
@@ -1184,6 +1186,248 @@ float fractal_de55(vec3 p){
 </tr>
 
 
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float de(vec3 p){
+  vec3 q;
+  p-=vec3(1.,.1,.1);
+  q=p;
+  float s=1.5;
+  float e=0.;
+  for(int j=0;j++<15;s*=e)
+    p=sign(p)*(1.2-abs(p-1.2)),
+    p=p*(e=8./clamp(dot(p,p),.3,5.5))+q*2.;
+  return length(p)/s;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de56.png" alt="fractal_de56", height=200px></td>
+</tr>
+
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float fractal_de57(vec3 p){
+  p.xz=fract(p.xz)-.5;
+  float k=1.;
+  float s=0.;
+  for(int i=0;i++<9;)
+    s=2./clamp(dot(p,p),.1,1.),
+    p=abs(p)*s-vec3(.5,3,.5),
+    k*=s;
+  return length(p)/k-.001;
+}
+
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de57.png" alt="fractal_de57", height=200px></td>
+</tr>
+
+  <!-- fractal_de58 crashes -->
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float de(vec3 p){
+  p.xz=fract(p.xz)-.5;
+  float k=1.;
+  float s=0.;
+  for(int i=0;i++<9;)
+    s=2./clamp(dot(p,p),.1,1.),
+    p=abs(p)*s-vec3(.5,3,.5),
+    k*=s;
+  return length(p)/k-.001;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de59.png" alt="fractal_de59", height=200px></td>
+</tr>
+
+
+
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+#define rot(a) mat2(cos(a),sin(a),-sin(a),cos(a))
+float de(vec3 p){
+  p=abs(p)-3.;
+  if(p.x < p.z)p.xz=p.zx;
+  if(p.y < p.z)p.yz=p.zy;
+  if(p.x < p.y)p.xy=p.yx;
+  float s=2.; vec3 off=p*.5;
+  for(int i=0;i<12;i++){
+    p=1.-abs(p-1.);
+    float k=-1.1*max(1.5/dot(p,p),1.5);
+    s*=abs(k); p*=k; p+=off;
+    p.zx*=rot(-1.2);
+  }
+  float a=2.5;
+  p-=clamp(p,-a,a);
+  return length(p)/s;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de61.png" alt="fractal_de61", height=200px></td>
+</tr>
+
+  <!-- fractal_de63 crashes -->
+
+<tr><td><code>xem<code></td>    
+<td><pre> 
+float de(vec3 p){
+  vec4 o=vec4(p,1);
+  vec4 q=o;
+  for(float i=0.;i<9.;i++){
+    o.xyz=clamp(o.xyz,-1.,1.)*2.-o.xyz;
+    o=o*clamp(max(.25/dot(o.xyz,o.xyz),.25),0.,1.)*vec4(11.2)+q;
+  }
+  return (length(o.xyz)-1.)/o.w-5e-4;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de66.png" alt="fractal_de66", height=200px></td>
+</tr>
+
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float de(vec3 p){
+  float g=1.;
+  float e=0.;
+  vec3 q=vec3(0);
+  p.z-=1.;
+  q=p;
+  float s=2.;
+  for(int j=0;j++<8;)
+    p-=clamp(p,-.9,.9)*2.,
+    p=p*(e=3./min(dot(p,p),1.))+q,
+    s*=e;
+  return length(p)/s;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de72.png" alt="fractal_de72", height=200px></td>
+</tr>
+
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float de(vec3 p){
+  vec3 q;
+  p.z-=1.5;
+  q=p;
+  float e=0.;
+  float s=3.;
+  for(int j=0;j++<8;s*=e)
+    p=sign(p)*(1.-abs(abs(p-2.)-1.)),
+    p=p*(e=6./clamp(dot(p,p),.3,3.))+q-vec3(8,.2,8);
+  return length(p)/s;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de75.png" alt="fractal_de75", height=200px></td>
+</tr>
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+float de(vec3 p){
+    vec3 q;
+    p.z-=1.5;
+    q=p;
+    float e=0.;
+    float s=3.;
+    for(int j=0;j++<8;s*=e)
+        p=sign(p)*(1.-abs(abs(p-2.)-1.)),
+        p=p*(e=6./clamp(dot(p,p),.3,3.))+q-vec3(8,.2,8);
+    return length(p)/s;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de76.png" alt="fractal_de76", height=200px></td>
+</tr>
+
+<tr><td><code>gaziya5 aka gaz<code></td>
+<td><pre> 
+float de(vec3 p){
+    float s=2.;
+    float l=dot(p,p);
+    float e=0.;
+    escape=0.;
+    p=abs(abs(p)-.7)-.5;
+    p.x < p.y?p=p.yxz:p;
+    p.y < p.z?p=p.xzy:p;
+    for(int i=0;i++<8;){
+        s*=e=2./clamp(dot(p,p),.004+tan(12.)*.002,1.35);
+        p=abs(p)*e-vec2(.5*l,12.).xxy;
+    }
+    return length(p-clamp(p,-1.,1.))/s;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de78.png" alt="fractal_de78", height=200px></td>
+</tr>
+
+
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>
+<td><pre> 
+float de(vec3 p){
+    p.z-=1.5;
+    vec3 q=p;
+    float s=1.5;
+    float e=0.;
+    for(int j=0;j++<8;s*=e)
+        p=sign(p)*(1.2-abs(p-1.2)),
+        p=p*(e=8./clamp(dot(p,p),.6,5.5))+q-vec3(.3,8,.3);
+    return length(p)/s;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de79.png" alt="fractal_de79", height=200px></td>
+</tr>
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>
+<td><pre> 
+float de(vec3 p){
+    float e=1.,B=2.95,H=.9, s=2.;
+    p.z=mod(p.z-2.,4.)-2.;
+    for(int j=0;j++<8;)
+    {
+        p=abs(p);
+        p.x < p.z?p=p.zyx:p;
+        p.x=H-abs(p.x-H);
+        p.y < p.z?p=p.xzy:p;
+        p.xz+=.1;
+        p.y < p.x?p=p.yxz:p;
+        p.y-=.1;
+    }
+    p*=B; p-=2.5; s*=B;
+    return length(p.xy)/s-.007;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de80.png" alt="fractal_de80", height=200px></td>
+</tr>
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>
+<td><pre> 
+float de(vec3 p){
+#define hash(n) fract(sin(n*234.567+123.34))
+  float seed=dot(floor((p+3.5)/7.)+3.,vec3(123.12,234.56,678.22));   
+  p-=clamp(p,-3.5,3.5)*2.;
+  float scale=-5.;
+  float mr2=.38;
+  float off=1.2;
+  float s=3.;
+  p=abs(p);
+  vec3  p0 = p;
+  for (float i=0.; i<4.+hash(seed)*6.; i++){
+    p=1.-abs(p-1.);
+    float g=clamp(mr2*max(1.2/dot(p,p),1.),0.,1.);
+    p=p*scale*g+p0*off;
+    s=s*abs(scale)*g+off;
+  }
+  return length(cross(p,normalize(vec3(1))))/s-.005;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de81.png" alt="fractal_de81", height=200px></td>
+</tr>
 
 
 
@@ -1193,6 +1437,10 @@ float fractal_de55(vec3 p){
 
 
 <a id="composed"></a><h2>Composed Shapes</h2>
+<p>&nbsp; This section is home to more complex expressions of geometry, showing some different methods of composition. Folds and operators are broken out into separate functions, and may be easier to understand.</p>
+
+
+
 <table style="width:100%">
   <tr>
     <th>Author</th>
@@ -1251,6 +1499,632 @@ float de(vec3 p){
 }</pre></td>
 <td class="fitwidth"><img src="images/DEC/fractal_de39.png" alt="fractal_de39", height=200px></td>
   </tr>
+  
+  
+<tr><td><code>gaziya5 aka gaz<code></td>    
+<td><pre> 
+vec4 sphere (vec4 z) {
+  float r2 = dot (z.xyz, z.xyz);
+  if (r2 < 2.0)
+    z *= (1.0 / r2);
+  else z *= 0.5;
+  return z;
+}
+vec3 box (vec3 z) {
+  return clamp (z, -1.0, 1.0) * 2.0 - z;
+}
+float DE0 (vec3 pos) {
+  vec3 from = vec3 (0.0);
+  vec3 z = pos - from;
+  float r = dot (pos - from, pos - from) * pow (length (z), 2.0);
+  return (1.0 - smoothstep (0.0, 0.01, r)) * 0.01;
+}
+float DE2 (vec3 pos) {
+  vec3 params = vec3 (0.5, 0.5, 0.5);
+  vec4 scale = vec4 (-20.0 * 0.272321);
+  vec4 p = vec4 (pos, 1.0), p0 = p;
+  vec4 c = vec4 (params, 0.5) - 0.5; // param = 0..1
+
+  for (float i = 0.0; i < 10.0; i++) {
+    p.xyz = box(p.xyz);
+    p = sphere(p);
+    p = p * scale + c;
+  }
+  return length(p.xyz) / p.w;
+}
+float fractal_de (vec3 pos) {
+  return max (DE0(pos), DE2(pos));
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de59.png" alt="fractal_de59", height=200px></td>
+</tr>
+
+
+<tr><td><code>jorge2017a1<code></td>    
+<td><pre> 
+float de2(vec3 p) {
+  vec3 op = p;
+  p = abs(1.0 - mod(p, 2.));
+  float r = 0., power = 8., dr = 1.;
+  vec3 z = p;
+  for (int i = 0; i < 7; i++) {
+    op = -1.0 + 2.0 * fract(0.5 * op + 0.5);
+    float r2 = dot(op, op);
+    r = length(z);
+    if (r > 1.616) break;
+    float theta = acos(z.z / r);
+    float phi = atan(z.y, z.x);
+    dr = pow(r, power - 1.) * power * dr + 1.;
+    float zr = pow(r, power);
+    theta = theta * power;
+    phi = phi * power;
+    z = zr * vec3(sin(theta) * cos(phi), sin(phi) * sin(theta), cos(theta));
+    z += p;
+  }
+  return (.5 * log(r) * r / dr);
+}
+
+float de1(vec3 p) {
+  float s = 1.;
+  float d = 0.;
+  vec3 r,q;
+  r = p;
+  q = r;
+  for (int j = 0; j < 6; j++) {
+    r = abs(mod(q * s + 1.5, 2.) - 1.);	
+    r = max(r, r.yzx);
+    d = max(d, (.3 - length(r *0.985) * .3) / s);
+    s *= 2.1;
+  }
+  return d;
+}
+float fractal_de60(vec3 p) {
+  return min(de1(p), de2(p));
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de60.png" alt="fractal_de60", height=200px></td>
+</tr>
+  
+  
+<tr><td><code>mrange<code></td>    
+<td><pre>
+void sphere_fold(inout vec3 z, inout float dz) {
+const float fixed_radius2 = 1.9;
+const float min_radius2   = 0.5;
+    float r2 = dot(z, z);
+    if(r2 < min_radius2) {
+        float temp = (fixed_radius2 / min_radius2);
+        z *= temp;
+        dz *= temp;
+    } else if(r2 < fixed_radius2) {
+        float temp = (fixed_radius2 / r2);
+        z *= temp;
+        dz *= temp;
+    }
+}
+vec3 pmin(vec3 a, vec3 b, vec3 k) {
+  vec3 h = clamp( 0.5+0.5*(b-a)/k, 0.0, 1.0);
+  return mix(b, a, h) - k*h*(1.0-h);
+}
+void box_fold(float k, inout vec3 z, inout float dz) {
+  // soft clamp after suggestion from ollij
+  const vec3  folding_limit = vec3(1.0);
+  vec3 zz = sign(z)*pmin(abs(z), folding_limit, vec3(k));
+  z = zz * 2.0 - z;
+}
+float sphere(vec3 p, float t) {
+  return length(p)-t;
+}
+float torus(vec3 p, vec2 t) {
+  vec2 q = vec2(length(p.xz)-t.x,p.y);
+  return length(q)-t.y;
+}
+float fractal_de(vec3 z) {
+    const float scale = -2.8;
+    vec3 offset = z;
+    float dr = 1.0;
+    float fd = 0.0;
+    const float k = 0.05;
+    for(int n = 0; n < 5; ++n) {
+        box_fold(k/dr, z, dr);
+        sphere_fold(z, dr);
+        z = scale * z + offset;
+        dr = dr * abs(scale) + 1.0;        
+        float r1 = sphere(z, 5.0);
+        float r2 = torus(z, vec2(8.0, 1));        
+        float r = n < 4 ? r2 : r1;        
+        float dd = r / abs(dr);
+        if (n < 3 || dd < fd) {
+          fd = dd;
+        }
+    }
+    return fd;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de62.png" alt="fractal_de62", height=200px></td>
+</tr>
+  
+  
+<tr><td><code>evilryu<code></td>    
+<td><pre>
+void sphere_fold(inout vec3 z, inout float dz) {
+  float fixed_radius2 = 1.9;
+  float min_radius2 = 0.1;
+  float r2 = dot(z, z);
+  if(r2 < min_radius2) {
+    float temp = (fixed_radius2 / min_radius2);
+    z *= temp; dz *= temp;
+  }else if(r2 < fixed_radius2) {
+    float temp = (fixed_radius2 / r2);
+    z *= temp; dz *= temp;
+  }
+}
+void box_fold(inout vec3 z, inout float dz) {
+  float folding_limit = 1.0;
+  z = clamp(z, -folding_limit, folding_limit) * 2.0 - z;
+}
+float de(vec3 z) {
+  vec3 offset = z;
+  float scale = -2.8;
+  float dr = 1.0;
+  for(int n = 0; n < 15; ++n) {
+    box_fold(z, dr);
+    sphere_fold(z, dr);
+    z = scale * z + offset;
+    dr = dr * abs(scale) + 1.0;
+  }
+  float r = length(z);
+  return r / abs(dr);
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de64.png" alt="fractal_de64", height=200px></td>
+</tr>
+  
+  
+
+
+
+<tr><td><code>mrange<code></td>    
+<td><pre>
+vec3 mod3(inout vec3 p, vec3 size) {
+  vec3 c = floor((p + size*0.5)/size);
+  p = mod(p + size*0.5, size) - size*0.5;
+  return c;
+}
+void sphere_fold(float fr, inout vec3 z, inout float dz) {
+const float fixed_radius2 = 4.5;
+const float min_radius2   = 0.5;
+  float r2 = dot(z, z);
+  if(r2 < min_radius2) {
+    float temp = (fr / min_radius2);
+    z *= temp;
+    dz *= temp;
+  } else if(r2 < fr) {
+    float temp = (fr / r2);
+    z *= temp;
+    dz *= temp;
+  }
+}
+void box_fold(float fl, inout vec3 z, inout float dz) {
+  z = clamp(z, -fl, fl) * 2.0 - z;
+}
+float sphere(vec3 p, float t) {
+  return length(p)-t;
+}
+float torus(vec3 p, vec2 t) {
+  vec2 q = vec2(length(p.xz)-t.x,p.y);
+  return length(q)-t.y;
+}
+float mb(float fl, float fr, vec3 z) {
+  vec3 offset = z;
+  const float scale = -3.0;
+  float dr = 1.0;
+  float fd = 0.0;
+  for(int n = 0; n < 5; ++n) {
+    box_fold65(fl, z, dr);
+    sphere_fold65(fr, z, dr);
+    z = scale * z + offset;
+    dr = dr * abs(scale) + 1.0;        
+    float r1 = sphere65(z, 5.0);
+    float r2 = torus65(z, vec2(8.0, 1));        
+    float r = n < 4 ? r2 : r1;        
+    float dd = r / abs(dr);
+    if (n < 3 || dd < fd) {
+      fd = dd;
+    }
+  }
+  return fd;
+}
+#define PATHA 0.4*vec2(0.11, 0.21)
+#define PATHB 0.7*vec2(13.0, 3.0)
+float de(vec3 p) { 
+  float tm = p.z;
+  const float folding_limit = 2.3;
+  const vec3  rep = vec3(10.0);
+  
+  vec3 wrap = vec3(sin(tm*PATHA)*PATHB, tm);
+  vec3 wrapDeriv = normalize(vec3(PATHA*PATHB*cos(PATHA*tm), 1.0));
+  p.xy -= wrap.xy;
+  p -= wrapDeriv*dot(vec3(p.xy, 0), wrapDeriv)*0.5*vec3(1,1,-1);
+
+  p -= rep*vec3(0.5, 0.0, 0.0);
+  p.y *= (1.0 + 0.1*abs(p.y));
+  vec3 i = mod3(p, rep);
+  
+  const float fixed_radius2 = 4.5;
+  float fl = folding_limit + 0.3*sin(0.025*p.z+1.0)- 0.3; 
+  float fr = fixed_radius2 - 3.0*cos(0.025*sqrt(0.5)*p.z-1.0);
+
+  return mb(fl, fr, p);
+} 
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de65.png" alt="fractal_de65", height=200px></td>
+</tr>
+  
+  
+  
+<tr><td><code>WAHa_06x36<code></td>    
+<td><pre>
+float periodic(float x,float period,float dutycycle){
+  x/=period;
+  x=abs(x-floor(x)-0.5)-dutycycle*0.5;
+  return x*period;
+}
+float fractal_de(vec3 pos){
+  vec3 gridpos=pos-floor(pos)-0.5;
+  float r=length(pos.xy);
+  float a=atan(pos.y,pos.x);
+  a+=12.*0.3*sin(floor(r/3.0)+1.0)*sin(floor(pos.z)*13.73);
+  return min(max(max(
+  periodic(r,3.0,0.2),
+  periodic(pos.z,1.0,0.7+0.3*cos(4.))),
+  periodic(a*r,3.141592*2.0/6.0*r,0.7+0.3*cos(4.))),0.25);
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de67.png" alt="fractal_de67", height=200px></td>
+</tr>
+  
+  
+
+
+
+  
+<tr><td><code>dr2<code></td>    
+<td><pre>
+vec2 Rot2D (vec2 q, float a)
+{
+  vec2 cs;
+  cs = sin (a + vec2 (0.5 * M_PI, 0.));
+  return vec2 (dot (q, vec2 (cs.x, - cs.y)), dot (q.yx, cs));
+}
+float PrBoxDf (vec3 p, vec3 b)
+{
+  vec3 d;
+  d = abs (p) - b;
+  return min (max (d.x, max (d.y, d.z)), 0.) + length (max (d, 0.));
+}
+float de(vec3 p)
+{
+  vec3 b;
+  float r, a;
+  const float nIt = 5., sclFac = 2.4;
+  b = (sclFac - 1.) * vec3 (1., 1.125, 0.625);
+  r = length (p.xz);
+  a = (r > 0.) ? atan (p.z, - p.x) / (2. * M_PI) : 0.;
+  p.y = mod (p.y - 4. * a + 2., 4.) - 2.;
+  p.x = mod (16. * a + 1., 2.) - 1.;
+  p.z = r - 32. / (2. * M_PI);
+  p.yz = Rot2D (p.yz, 2. * M_PI * a);
+  for (float n = 0.; n < nIt; n ++) {
+    p = abs (p);
+    p.xy = (p.x > p.y) ? p.xy : p.yx;
+    p.xz = (p.x > p.z) ? p.xz : p.zx;
+    p.yz = (p.y > p.z) ? p.yz : p.zy;
+    p = sclFac * p - b;
+    p.z += b.z * step (p.z, -0.5 * b.z);
+  }
+  return 0.8 * PrBoxDf (p, vec3 (1.)) / pow (sclFac, nIt);
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de68.png" alt="fractal_de68", height=200px></td>
+</tr>
+ 
+  
+<tr><td><code>dr2<code></td>    
+<td><pre>
+vec2 Rot2D(vec2 q, float a)
+{
+  vec2 cs;
+  cs = sin (a + vec2 (0.5 * M_PI, 0.));
+  return vec2 (dot (q, vec2 (cs.x, - cs.y)), dot (q.yx, cs));
+}
+float PrBoxDf(vec3 p, vec3 b)
+{
+  vec3 d;
+  d = abs (p) - b;
+  return min (max (d.x, max (d.y, d.z)), 0.) + length (max (d, 0.));
+}
+float de(vec3 p)
+{
+  vec3 b;
+  float r, a;
+  const float nIt = 5., sclFac = 2.4;
+  b = (sclFac - 1.) * vec3 (1., 1.125, 0.625);
+  r = length (p.xz);
+  a = (r > 0.) ? atan (p.z, - p.x) / (2. * M_PI) : 0.;
+  p.x = mod (16. * a + 1., 2.) - 1.;
+  p.z = r - 32. / (2. * M_PI);
+  p.yz = Rot2D (p.yz, M_PI * a);
+  for (float n = 0.; n < nIt; n ++) {
+    p = abs (p);
+    p.xy = (p.x > p.y) ? p.xy : p.yx;
+    p.xz = (p.x > p.z) ? p.xz : p.zx;
+    p.yz = (p.y > p.z) ? p.yz : p.zy;
+    p = sclFac * p - b;
+    p.z += b.z * step (p.z, -0.5 * b.z);
+  }
+  return 0.8 * PrBoxDf (p, vec3 (1.)) / pow (sclFac, nIt);
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de69.png" alt="fractal_de69", height=200px></td>
+</tr>
+
+
+
+
+<tr><td><code>Kali<code></td>    
+<td><pre>
+mat2 rot(float a) {
+    return mat2(cos(a),sin(a),-sin(a),cos(a));	
+}
+vec4 formula(vec4 p) {
+    p.xz = abs(p.xz+1.)-abs(p.xz-1.)-p.xz;
+    p=p*2./clamp(dot(p.xyz,p.xyz),.15,1.)-vec4(0.5,0.5,0.8,0.);
+    p.xy*=rot(.5);
+    return p;
+}
+float screen(vec3 p) {
+    float d1=length(p.yz-vec2(.25,0.))-.5;	
+    float d2=length(p.yz-vec2(.25,2.))-.5;	
+    return min(max(d1,abs(p.x-.3)-.01),max(d2,abs(p.x+2.3)-.01));
+}
+float de(vec3 pos) {
+    vec3 tpos=pos;
+    tpos.z=abs(2.-mod(tpos.z,4.));
+    vec4 p=vec4(tpos,1.5);
+    float y=max(0.,.35-abs(pos.y-3.35))/.35;
+
+    for (int i=0; i<8; i++) {p=formula(p);}
+    float fr=max(-tpos.x-4.,(length(max(vec2(0.),p.yz-3.)))/p.w);
+
+    float sc=screen(tpos);
+    return min(sc,fr);	
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de70.png" alt="fractal_de70", height=200px></td>
+</tr>
+
+
+
+
+<tr><td><code>glkt<code></td>    
+<td><pre>
+float smin( float a, float b, float k ){
+    float h = clamp( 0.5+0.5*(b-a)/k, 0.0, 1.0 );
+    return mix( b, a, h ) - k*h*(1.0-h);
+}
+float noise(vec3 p){
+    vec3 np = normalize(p);
+    
+    float a = 0.1*snoise2D(np.xy*10.);
+    float b = 0.1*snoise2D(0.77+np.yz*10.);
+    
+    a = mix(a,.5,abs(np.x));
+    b = mix(b,.5,abs(np.z));
+    return mix(a+b-.4,.5,abs(np.y)/2.);
+}
+float fractal_de(vec3 p){
+    float d = (-1.*length(p)+3.)+1.5*noise71(p);    
+    d = min(d, (length(p)-1.5)+1.5*noise71(p) );  
+    float m = 1.5; float s = .03;    
+    d = smin(d, max( abs(p.x)-s, abs(p.y+p.z*.2)-.07 ) , m);          
+    d = smin(d, max( abs(p.z)-s, abs(p.x+p.y/2.)-.07 ), m );    
+    d = smin(d, max( abs(p.z-p.y*.4)-s, abs(p.x-p.y*.2)-.07 ), m );    
+    d = smin(d, max( abs(p.z*.2-p.y)-s, abs(p.x+p.z)-.07 ), m );    
+    d = smin(d, max( abs(p.z*-.2+p.y)-s, abs(-p.x+p.z)-.07 ), m );
+    return d;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de71.png" alt="fractal_de71", height=200px></td>
+</tr>
+
+<tr><td><code>unconed<code></td>    
+<td><pre>
+vec4 fold1(vec4 z) {
+    vec3 p = z.xyz;
+    p = p - 2.0 * clamp(p, -1.0, 1.0);
+    return vec4(p, z.w);
+}
+vec4 fold2(vec4 z) {
+    vec3 p = z.xyz;
+    p = p - 2.0 * clamp(p, -1.0, 1.0);
+    return vec4(p * 2.0, 2.0 * z.w);
+}
+vec4 invertRadius(vec4 z, float radius2, float limit) {
+  float r2 = dot(z.xyz, z.xyz);
+  float f = clamp(radius2 / r2, 1., limit);
+  return z * f;
+}
+vec4 affine(vec4 z, float factor, vec3 offset) {
+  z.xyz *= factor;
+  z.xyz += offset;
+  z.w *= abs(factor);
+  return z;
+}
+vec4 mandel(vec4 z, vec3 offset) {
+  float x = z.x;
+  float y = z.y;
+  z.w = 2. * length(z.xy) * z.w + 1.;
+  z.x = x*x - y*y + offset.x;
+  z.y = 2.*x*y + offset.y;
+  return z;
+}
+vec4 invert(vec4 z, float factor) {
+  float r2 = dot(z.xyz, z.xyz);
+  float f = factor / r2;
+  return z * f;
+}
+vec4 rotateXY(vec4 z, float angle) {
+  float c = cos(angle);
+  float s = sin(angle);
+  mat2 m = mat2(c, s, -s, c);
+  return vec4(m * z.xy, z.zw);
+}
+vec4 rotateXZ(vec4 z, float angle) {
+  float c = cos(angle);
+  float s = sin(angle);
+  mat2 m = mat2(c, s, -s, c);
+  vec2 r = m * z.xz;
+  return vec4(r.x, z.y, r.y, z.w);
+}
+vec4 shiftXY(vec4 z, float angle, float radius) {
+  float c = cos(angle);
+  float s = sin(angle);
+  return vec4(vec2(c, s) * radius + z.xy, z.zw);
+}
+float de(vec3 p) {
+    vec4 z = vec4(p, 1.0);
+    float t = 344. * .2; // change this number for different shapes
+    vec3 vo1 = vec3(sin(t * .1), cos(t * .0961), sin(t * .017)) * 1.1;
+    vec3 vo2 = vec3(cos(t * .07), sin(t * .0533), sin(t * .138)) * 1.1;
+    vec3 vo3 = vec3(sin(t * .031), sin(t * .0449), cos(t * .201)) * 1.1;
+
+    z = invertRadius_73(z, 10.0, 1.5);
+    z = invertRadius_73(z, 10.0*10.0, 2.0);
+    z = rotateXY(z, t);
+    z = fold1(z);
+    z = rotateXZ(z, t * 1.112);
+    z.xyz += vo3;
+    z = fold2(z);
+    z.xyz += vo1;
+    z = affine(z, -1.5, p);
+    z = invertRadius(z, 4.0*4.0, 2.0);
+    z = affine(z, -1.5, p);
+    z = rotateXY(z, t * .881);
+    z = fold1(z);
+    z = rotateXZ(z, t * .783);
+    z = fold1(z);
+    z = affine_73(z, -1.5, p);
+    z = invertRadius(z, 10.0*10.0, 3.0);
+    z = fold1(z);
+    z = fold1(z);
+    z = affine(z, -1.5, p);
+    z = invertRadius(z, 10.0*10.0, 2.0);
+
+    vec3 po = vec3(0.0, 0.0, 0.0);
+    vec3 box = abs(z.xyz);
+    float d1 = (max(box.x - 2.0, max(box.y - 2.0, box.z - 10.0))) / z.w;
+    float d2 = (max(box.x - 20.0, max(box.y - .5, box.z - .5))) / z.w;
+    float d3 = min(d1, d2);
+    return d3;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de73.png" alt="fractal_de73", height=200px></td>
+</tr>
+
+
+
+
+<tr><td><code>lewiz<code></td>    
+<td><pre>
+void sphereFold(inout vec3 z, inout float dz){
+  float r2 = dot(z,z);
+  if (r2 < 0.5){ 
+    float temp = 2.0;
+    z *= temp;
+    dz*= temp;
+  }else if (r2 < 1.0){ 
+    float temp = 1.0 / r2;
+    z *= temp; dz*= temp;
+  }
+}
+void boxFold(inout vec3 z, inout float dz){
+  z = clamp(z, -1.0, 1.0) * 2.0 - z;
+}
+float de(vec3 z){
+  float scale = 2.0;
+  vec3 offset = z;
+  float dr = 1.0;
+  for (int n = 0; n < 10; n++){
+    boxFold(z,dr);
+    sphereFold(z,dr);
+    z = scale * z + offset;
+    dr = dr * abs(scale) + 1.0;
+  }
+  float r = length(z);
+  return r / abs(dr);
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de74.png" alt="fractal_de74", height=200px></td>
+</tr>
+  
+  
+  
+<tr><td><code>raziel<code></td>    
+<td><pre>
+float op_u(float d1, float d2){
+	return (d1 < d2) ? d1 : d2;
+}
+void sphere_fold(inout vec3 p, inout float dr, float m_rad_sq, float f_rad_sq, float m_rad_sq_inv){
+    float r_sq = dot(p, p);
+    if (r_sq < m_rad_sq){
+        float t = f_rad_sq * m_rad_sq_inv;
+        p *= t;
+        dr *= t;
+    }
+    else if (r_sq < f_rad_sq){
+        float t = f_rad_sq / r_sq;
+        p *= t;
+        dr *= t;
+    }
+}
+void box_fold(inout vec3 p, float fold_limit){
+    p = clamp(p, -fold_limit, fold_limit) * 2.0 - p;
+}
+// estimators return (dist, mat_id, custom_value)
+float estimator_mandelbox(vec3 p, float scale, float m_rad_sq, float f_rad_sq, float fold_limit){
+    vec3 off = p;
+    float dr = 1.0;
+    float mrs_inv = 1.0 / m_rad_sq;
+    for (int i = 0; i < 10; ++i){
+        box_fold(p, fold_limit);
+        sphere_fold(p, dr, m_rad_sq, f_rad_sq, mrs_inv);
+
+        p = scale * p + off;
+        dr = dr * abs(scale) + 1.0;
+        vec3 ot = p - vec3(0.5);
+    }
+    return length(p) / abs(dr);
+}
+vec3 mod_pos(vec3 p, float a, float b){
+    p.zx = mod(p.zx, a) - b;  
+    return p;
+}
+float de(vec3 p){
+    vec3 p_mb = mod_pos_77(p, 4.4, 2.2);
+    float res_mb = estimator_mandelbox(p, -2.5, 0.1, 2.5, 1.0);
+    vec3 p_pl = p;
+    p_pl.y += 4.0;
+    p_pl = mod_pos(p_pl, 2.0, 1.0);
+    float res_pl = estimator_mandelbox(p_pl, -1.5, 0.3, 2.9, 1.0);
+
+    return op_u(res_mb, res_pl);
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de77.png" alt="fractal_de77", height=200px></td>
+</tr>
+  
+  
 </table>
 <br>
 
