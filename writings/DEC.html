@@ -3081,6 +3081,374 @@ float de(vec3 p){
 
 
 
+<tr><td><code>gaziya5 aka gaz<code></td>
+<td><pre> 
+float de(vec3 p){
+    float s=2., e;
+    for(int j=0;++j<8;s*=e=2./clamp(dot(p,p),.4,1.),p=abs(p)*e-vec3(2,1,.7));
+    return length(p)/s;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de185.png" alt="fractal_de185", height=200px></td>
+</tr>
+
+
+<tr><td><code>gaziya5 aka gaz<code></td>
+<td><pre> 
+float de(vec3 p){
+    float s=2., e;
+    for(int j=0;++j<8;s*=e=2./clamp(dot(p,p),.4,1.),p=abs(p)*e-vec3(2,1,.7));
+    return length(p-clamp(p,-2.,2.))/s;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de186.png" alt="fractal_de186", height=200px></td>
+</tr>
+
+<tr><td><code>gaziya5 aka gaz<code></td>
+<td><pre> 
+float de(vec3 p){
+    float s=2., e;
+    for(int j=0;++j<18;s*=e=2./clamp(dot(p,p),.4,1.),p=abs(p)*e-vec3(2,1,.7));
+    return length(p)/s;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de187.png" alt="fractal_de187", height=200px></td>
+</tr>
+
+<tr><td><code>amini<code></td>
+<td><pre> 
+float de(vec3 p){
+    float s=3., e;
+    s*=e=3./min(dot(p,p),50.);
+    p=abs(p)*e;
+    for(int i=0;i++<5;)
+        p=vec3(8,4,2)-abs(p-vec3(8,4,2)),
+        s*=e=8./min(dot(p,p),9.),
+        p=abs(p)*e;
+    return min(length(p.xz)-.1,p.y)/s;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de188.png" alt="fractal_de188", height=200px></td>
+</tr>
+
+<!-- fractal_de190 isn't a valid distance bound -->
+
+<tr><td><code>kali<code></td>
+<td><pre> 
+float de(vec3 p){
+    p.x = abs(p.x) - 3.3;
+    p.z = mod(p.z + 2.0, 4.0) -  2.0;
+    vec4 q = vec4(p, 1);
+    q.xyz -= 1.0;
+    q.xyz = q.zxy;
+    for(int i = 0; i < 6; i++) {
+        q.xyz = abs(q.xyz + 1.0) - 1.0;
+        q /= clamp(dot(q.xyz, q.xyz), 0.25, 1.0);
+        q *= 1.1;
+        float s = sin(-0.35);
+        float c = cos(-0.35);
+        q.xy = mat2(c,s,-s,c)*q.xy;
+    }
+    return (length(q.xyz) - 1.5)/q.w;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de191.png" alt="fractal_de191", height=200px></td>
+</tr>
+
+<tr><td><code>kali<code></td>
+<td><pre> 
+float de(vec3 p){
+    p.xz=abs(.5-mod(p.xz,1.))+.01;
+    float DEfactor=1.;
+    for (int i=0; i<14; i++) {
+        p = abs(p)-vec3(0.,2.,0.);  
+        float r2 = dot(p, p);
+        float sc=2./clamp(r2,0.4,1.);
+        p*=sc; 
+        DEfactor*=sc;
+        p = p - vec3(0.5,1.,0.5);
+    }
+    return length(p)/DEfactor-.0005;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de192.png" alt="fractal_de192", height=200px></td>
+</tr>
+
+<tr><td><code>kali<code></td>
+<td><pre> 
+float de(vec3 pos){
+    vec3 tpos=pos;
+    tpos.xz=abs(.5-mod(tpos.xz,1.));
+    vec4 p=vec4(tpos,1.);
+    float y=max(0.,.35-abs(pos.y-3.35))/.35;
+    for (int i=0; i<7; i++) {
+        p.xyz = abs(p.xyz)-vec3(-0.02,1.98,-0.02);
+        p=p*(2.0+0.*y)/clamp(dot(p.xyz,p.xyz),.4,1.)-vec4(0.5,1.,0.4,0.);
+        p.xz*=mat2(-0.416,-0.91,0.91,-0.416);
+    }
+    return (length(max(abs(p.xyz)-vec3(0.1,5.0,0.1),vec3(0.0)))-0.05)/p.w;
+}
+
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de193.png" alt="fractal_de193", height=200px></td>
+</tr>
+
+<tr><td><code>shane<code></td>
+<td><pre> 
+float de(vec3 p){
+    const vec3 offs = vec3(1, .75, .5); // Offset point.
+    const vec2 a = sin(vec2(0, 1.57079632) + 1.57/2.);
+    const mat2 m = mat2(a.y, -a.x, a);
+    const vec2 a2 = sin(vec2(0, 1.57079632) + 1.57/4.);
+    const mat2 m2 = mat2(a2.y, -a2.x, a2);
+    const float s = 5.; // Scale factor.
+    float d = 1e5; // Distance.
+    p  = abs(fract(p*.5)*2. - 1.);
+    float amp = 1./s;
+    for(int i=0; i<2; i++){
+        p.xy = m*p.xy;
+        p.yz = m2*p.yz;
+        p = abs(p);
+        p.xy += step(p.x, p.y)*(p.yx - p.xy);
+        p.xz += step(p.x, p.z)*(p.zx - p.xz);
+        p.yz += step(p.y, p.z)*(p.zy - p.yz);
+        p = p*s + offs*(1. - s);
+        p.z -= step(p.z, offs.z*(1. - s)*.5)*offs.z*(1. - s);
+        p=abs(p);
+        d = min(d, max(max(p.x, p.y), p.z)*amp);
+        amp /= s;
+    }
+    return d - .035;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de194.png" alt="fractal_de194", height=200px></td>
+</tr>
+
+<tr><td><code>avi<code></td>
+<td><pre> 
+float fractal_de195(vec3 p) {
+    const vec3 va = vec3(  0.0,  0.57735,  0.0 );
+    const vec3 vb = vec3(  0.0, -1.0,  1.15470 );
+    const vec3 vc = vec3(  1.0, -1.0, -0.57735 );
+    const vec3 vd = vec3( -1.0, -1.0, -0.57735 );
+    float a = 0.0;
+    float s = 1.0;
+    float r = 1.0;
+    float dm;
+    vec3 v;
+    for(int i=0; i<16; i++) {
+        float d, t;
+        d = dot(p-va,p-va);              v=va; dm=d; t=0.0;
+        d = dot(p-vb,p-vb); if( d < dm ) { v=vb; dm=d; t=1.0; }
+        d = dot(p-vc,p-vc); if( d < dm ) { v=vc; dm=d; t=2.0; }
+        d = dot(p-vd,p-vd); if( d < dm ) { v=vd; dm=d; t=3.0; }
+        p = v + 2.0*(p - v); r*= 2.0;
+        a = t + 4.0*a; s*= 4.0;
+    }
+    return (sqrt(dm)-1.0)/r;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de195.png" alt="fractal_de195", height=200px></td>
+</tr>
+
+<tr><td><code>guil<code></td>
+<td><pre> 
+vec3 foldY(vec3 P, float c){
+  float r = length(P.xz);
+  float a = atan(P.z, P.x);
+  a = mod(a, 2.0 * c) - c; 
+  P.x = r * cos(a);
+  P.z = r * sin(a);
+  return P;
+}
+
+float de(vec3 p){ 
+  float l= length(p)-1.;
+  float dr = 1.0, g = 1.25;
+  vec4 ot=vec4(.3,.5,0.21,1.);
+  ot = vec4(1.);
+  mat3 tr = rotate3D(-0.55, normalize(vec3(-1., -1., -0.5)));
+
+  for(int i=0;i<15;i++) {
+    if(i-(i/3)*5==0)
+    p = foldY(p, .95);
+    p.yz = abs(p.yz);				
+    p = tr * p * g -1.;		
+    dr *= g;
+    ot=min(ot,vec4(abs(p),dot(p,p)));
+    l = min (l ,(length(p)-1.) / dr);
+  }
+  return l;    
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de196.png" alt="fractal_de196", height=200px></td>
+</tr>
+
+
+<tr><td><code>marvelousbilly<code></td>
+<td><pre> 
+mat3 rotmat(float angle, vec3 axis){
+	axis = normalize(axis);
+	float s = sin(angle);
+	float c = cos(angle);
+	float oc = 1.0 - c;
+	return mat3(oc * axis.x * axis.x + c,  oc * axis.x * axis.y - axis.z * s,
+	  oc * axis.z * axis.x + axis.y * s,  oc * axis.x * axis.y + axis.z * s,  
+	  oc * axis.y * axis.y + c, oc * axis.y * axis.z - axis.x * s, 
+	  oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  
+	  oc * axis.z * axis.z + c);
+}
+float de(vec3 p){    
+    mat3 r = rotmat(3.14159, vec3(0.,1.,0.)); //rotation matrix
+    float scale= 2.;
+    int Iterations = 10;
+    int i;
+    vec3 C = vec3(1.,5.4,10.+10.*sin(0.5));
+    for(i = 0; i < Iterations; i++){ 
+        p = r * (p);
+        float x = p.x; float y = p.y; float z = p.z; float x1 = x; float y1 = y;
+        x=abs(x);y = abs(y);
+        if(x-y<0.){x1=y;y=x;x=x1;}
+        if(x-z<0.){x1=z;z=x;x=x1;}
+        if(y-z<0.){y1=z;z=y;y=y1;}
+
+        z-=0.5*C.z*(scale-1.)/scale;
+        z=-abs(-z);
+        z+=0.5*C.z*(scale-1.)/scale;
+        
+        p = vec3(x,y,z);
+        r = rotmat(31.4159/4.+5.60,vec3(1.,0.5,0.6));
+        p = r * (p);
+        x = p.x; y = p.y; z = p.z;
+        
+        x=scale*x-C.y*(scale-1.);
+        y=scale*y-C.y*(scale-1.);
+        z=scale*z;
+
+        p = vec3(x,y,z);
+    }
+    return (length(p) - 2.) * pow(scale,float(-i)); 
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de197.png" alt="fractal_de197", height=200px></td>
+</tr>
+
+
+
+<tr><td><code>adapted from code by marvelousbilly<code></td>
+<td><pre> 
+float de(vec3 p){    
+    mat3 r = rotate3D(3.14159, vec3(0.,1.,0.));
+    float scale= 2.;
+    int Iterations = 10;
+    int i;
+    vec3 C = vec3(1.,5.4,10.+10.*sin(0.5));
+    for(i = 0; i < Iterations; i++){ 
+        p = r * (p);
+        float x = p.x; float y = p.y; float z = p.z; float x1 = x; float y1 = y;
+
+        x=abs(x);y = abs(y);
+        if(x-y<0.){x1=y;y=x;x=x1;}
+        if(x-z<0.){x1=z;z=x;x=x1;}
+        if(y-z<0.){y1=z;z=y;y=y1;}
+
+        z-=0.5*C.z*(scale-1.)/scale;
+        z=-abs(-z);
+        z+=0.5*C.z*(scale-1.)/scale;
+        
+        p = vec3(x,y,z);
+        r = rotate3D(31.4159/4.+5.60,vec3(1.,0.5,0.6));
+        p = r * (p);
+        x = p.x; y = p.y; z = p.z;
+        
+        x=scale*x-C.y*(scale-1.);
+        y=scale*y-C.y*(scale-1.);
+        z=scale*z;
+
+        p = vec3(x,y,z);
+    }
+    return (length(p) - 2.) * pow(scale,float(-i)); 
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de198.png" alt="fractal_de198", height=200px></td>
+</tr>
+
+
+<tr><td><code>nameless<code></td>
+<td><pre> 
+float de(vec3 p0){
+  vec4 p = vec4(p0, 1.);
+  p.xyz=abs(p.xyz);
+  if(p.x > p.z)p.xz = p.zx;
+  if(p.z < p.y)p.zy = p.yz;
+  if(p.y > p.x)p.yx = p.xy;
+  for(int i = 0; i < 8; i++){
+    if(p.x > p.z)p.xz = p.zx;
+    if(p.z < p.y)p.zy = p.yz;
+    if(p.y > p.x)p.yx = p.xy;
+    p.xyz = abs(p.xyz);
+    p*=(2.15/clamp(dot(p.xyz,p.xyz),.4,1.));
+    p.xyz-=vec3(0.3,0.2,1.6);
+  }
+  float m = 1.5;
+  p.xyz-=clamp(p.xyz,-m,m);
+  return length(p.xyz)/p.w;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de199.png" alt="fractal_de199", height=200px></td>
+</tr>
+
+
+
+<tr><td><code>evilryu<code></td>
+<td><pre> 
+void ry(inout vec3 p, float a){  
+    float c,s;vec3 q=p;  
+    c = cos(a); s = sin(a);  
+    p.x = c * q.x + s * q.z;  
+    p.z = -s * q.x + c * q.z; 
+}  
+float plane(vec3 p, float y) {
+    return length(vec3(p.x, y, p.z) - p);
+}
+float menger_spone(in vec3 z0){
+    z0=z0.yzx;
+    vec4 z=vec4(z0,1.0);
+    vec3 offset =0.83*normalize(vec3(3.4,2., .2));
+    float scale = 2.;
+    for (int n = 0; n < 8; n++) {
+        z = abs(z);
+        ry(z.xyz, 1.5);
+        if (z.x < z.y)z.xy = z.yx;
+        if (z.x < z.z)z.xz = z.zx;
+        if (z.y < z.z)z.yz = z.zy;
+        ry(z.xyz, -1.21);
+        z = z*scale;
+        z.xyz -= offset*(scale-1.0);
+    }
+    return (length(max(abs(z.xyz)-vec3(1.0),0.0))-0.01)/z.w;
+}
+float fractal_de200(vec3 p){ 
+    float d1 = plane(p, -0.5);
+    float d2 = menger_spone(p+vec3(0.,-0.1,0.));
+    float d = d1;
+    vec3 res = vec3(d1, 0., 0.);
+    if(d > d2){
+        d = d2;
+        res = vec3(d2, 1., 0.0);
+    }
+    return res.x;
+} 
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de200.png" alt="fractal_de200", height=200px></td>
+</tr>
+
+
+
+
+
+
+
 </table>
 <br>
 
@@ -3983,8 +4351,41 @@ float de(vec3 p){
 <td class="fitwidth"><img src="images/DEC/fractal_de132.png" alt="fractal_de132", height=200px></td>
 </tr>
   
-  
-  
+<tr><td><code>adapted from code by sdfgeoff<code></td>
+<td><pre> 
+float sdRoundBox( vec3 p, vec3 b, float r ){
+  vec3 q = abs(p) - b;
+  return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0) - r;
+}
+
+float df(vec3 co) {
+    float rad = clamp(co.z * 0.05 + 0.45, 0.1, 0.3);
+    co = mod(co, vec3(1.0)) - 0.5;
+    return sdRoundBox(co, vec3(rad, rad, 0.3), 0.1);
+}
+
+float de(vec3 p){
+    float body = 999.0;
+    float scale = 0.2;
+    vec3 co = p;
+    mat4 m = mat4(
+		vec4(0.6373087, -0.0796581,  0.7664804, 0.0),
+  		vec4(0.2670984,  0.9558195, -0.1227499, 0.0),
+  		vec4(-0.7228389,  0.2829553,  0.6304286, 0.0),
+        vec4(0.1, 0.6, 0.2, 0.0));
+    for (int i=0; i<3; i++) {
+        co = (m * vec4(co, float(i))).xyz;
+        scale *= (3.0);   
+        float field = df(co * scale) / scale;
+        body = smin_op(body, field, 0.05);
+    }
+    return -body;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de189.png" alt="fractal_de189", height=200px></td>
+</tr>
+
+
   
   
   
