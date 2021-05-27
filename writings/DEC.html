@@ -67,7 +67,17 @@ td.fitwidth:hover img {
 
 <a id="introduction"></a><h2>Introduction</h2>
 <p>
-&nbsp; My goal here is to provide a collected resource of these signed distance functions (SDFs) in a standardized format given by <code>float de( vec3 p ){...}</code>. SDFs are an interesting method for representing geometry as an implicit functional representation, which produces a result by querying with a given point in space and returning an estimate of the distance to the surface - positive outside, and negative inside. I emphasize that this result is an estimate, especially for some of the fractal SDFs which produce a result by distorting the space in a highly nonlinear fashion. This representation is often used in realtime raymarching, but they come up in applications such as pathtracing and producing of meshes. I have seen several resources made available but I hope to gather much of what I've seen on this page.
+&nbsp;My goal here is to provide a collected resource of these signed distance functions (SDFs) in a standardized format given by <code>float de( vec3 p ){...}</code>. 
+</p>
+<p>
+&nbsp;SDFs are an interesting method for representing geometry as an implicit functional representation, which produces a result by querying with a given point in space and returning an estimate of the distance to the surface - positive outside, and negative inside. I emphasize that this result is an estimate, especially for some of the fractal SDFs which produce a result by distorting the space in a highly nonlinear fashion.
+</p>
+<p>
+&nbsp;This representation is often used in realtime raymarching, but they come up in applications such as pathtracing and producing of meshes. I have seen several resources on this topic but I hope to gather as much as I can in one place on this page.
+</p>
+
+<p>
+&nbsp;Mouse over each of the images to view it larger.
 </p>
 
 
@@ -936,7 +946,7 @@ vec2 pmod(vec2 p, float r){
   return length(p) * vec2(-sin(a), cos(a));
 }
 
-float fractal_de43(vec3 p){
+float de(vec3 p){
   for(int i=0;i<5;i++){
     p.xy = pmod43(p.xy,12.0); p.y-=4.0;
     p.yz = pmod43(p.yz,16.0); p.z-=6.8;
@@ -1211,7 +1221,7 @@ float de(vec3 p){
 
 <tr><td><code>gaziya5 aka gaz<code></td>    
 <td><pre> 
-float fractal_de57(vec3 p){
+float de(vec3 p){
   p.xz=fract(p.xz)-.5;
   float k=1.;
   float s=0.;
@@ -2458,7 +2468,7 @@ float de(vec3 p){
 
 <tr><td><code> adapted from code by wrighter - aliasing issues<code></td>
 <td><pre> 
-float fractal_de144(vec3 p){
+float de(vec3 p){
    vec3 a = sin(p/dot(p,p)*4);
    return 0.95*min(length(a.yx),length(a.yz))-0.52+0.2;
 }
@@ -2806,7 +2816,7 @@ float de(vec3 p){
 
 <tr><td><code>gaziya5 aka gaz<code></td>
 <td><pre> 
-float fractal_de166(vec3 p){
+float de(vec3 p){
     float s=3., e, offset = 1.; //offset can be adjusted 
     for(int i=0;i++<8;p*=e)
         p=abs(p-vec3(1,3,1.5+offset*.3))-vec3(1,3.+offset*.3,2),
@@ -2868,7 +2878,7 @@ float de(vec3 p){
 
 <tr><td><code>gaziya5 aka gaz<code></td>
 <td><pre> 
-float fractal_de170(vec3 p){
+float de(vec3 p){
     float s=3., e;
     for(int j=0;++j<5;)
         s*=e=1./min(dot(p,p),1.),
@@ -3230,7 +3240,7 @@ float de(vec3 p){
 
 <tr><td><code>avi<code></td>
 <td><pre> 
-float fractal_de195(vec3 p) {
+float de(vec3 p) {
     const vec3 va = vec3(  0.0,  0.57735,  0.0 );
     const vec3 vb = vec3(  0.0, -1.0,  1.15470 );
     const vec3 vc = vec3(  1.0, -1.0, -0.57735 );
@@ -3432,7 +3442,7 @@ float menger_spone(in vec3 z0){
     }
     return (length(max(abs(z.xyz)-vec3(1.0),0.0))-0.01)/z.w;
 }
-float fractal_de200(vec3 p){ 
+float de(vec3 p){ 
     float d1 = plane(p, -0.5);
     float d2 = menger_spone(p+vec3(0.,-0.1,0.));
     float d = d1;
@@ -3554,7 +3564,7 @@ float DE2 (vec3 pos) {
   }
   return length(p.xyz) / p.w;
 }
-float fractal_de (vec3 pos) {
+float de (vec3 pos) {
   return max (DE0(pos), DE2(pos));
 }
 </pre></td>
@@ -3600,7 +3610,7 @@ float de1(vec3 p) {
   }
   return d;
 }
-float fractal_de60(vec3 p) {
+float de(vec3 p) {
   return min(de1(p), de2(p));
 }
 </pre></td>
@@ -3641,7 +3651,7 @@ float torus(vec3 p, vec2 t) {
   vec2 q = vec2(length(p.xz)-t.x,p.y);
   return length(q)-t.y;
 }
-float fractal_de(vec3 z) {
+float de(vec3 z) {
     const float scale = -2.8;
     vec3 offset = z;
     float dr = 1.0;
@@ -3792,7 +3802,7 @@ float periodic(float x,float period,float dutycycle){
   x=abs(x-floor(x)-0.5)-dutycycle*0.5;
   return x*period;
 }
-float fractal_de(vec3 pos){
+float de(vec3 pos){
   vec3 gridpos=pos-floor(pos)-0.5;
   float r=length(pos.xy);
   float a=atan(pos.y,pos.x);
@@ -3945,7 +3955,7 @@ float noise(vec3 p){
     b = mix(b,.5,abs(np.z));
     return mix(a+b-.4,.5,abs(np.y)/2.);
 }
-float fractal_de(vec3 p){
+float de(vec3 p){
     float d = (-1.*length(p)+3.)+1.5*noise71(p);    
     d = min(d, (length(p)-1.5)+1.5*noise71(p) );  
     float m = 1.5; float s = .03;    
@@ -4188,7 +4198,7 @@ float sdRoundBox_83( vec3 p, vec3 b, float r ){
 float deObj_83(vec3 p){   
     return min(sdRoundBox_83(p,vec3(0.3),0.05),frameBox_83(p,vec3(0.8),0.1));
 }
-float fractal_de83(vec3 p){
+float de(vec3 p){
     float de=1.0;
     // p.z-=iTime*1.1;
     vec3 q= p;
