@@ -121,23 +121,14 @@ float de(vec3 p){
 
 <tr><td><code>hg_sdf<code></td>    
 <td><pre>
-Cheap Box
+Box
 
-float de(vec3 p){
+float de(vec3 p){ // cheap version
   vec3 size = vec3(1.); //dimensions on each axis 
   vec3 d = abs(p) - size;
 
   return max(max(d.x, d.y), d.z);
 }
-</pre></td>
-<td class="fitwidth"><img src="images/DEC/primitives/box.png" alt="boxcheap", height=200px></td>
-</tr>
-
-
-
-<tr><td><code>hg_sdf<code></td>    
-<td><pre>
-Box
 
 float de(vec3 p){
   vec3 size = vec3(1.) // dimensions on each axis
@@ -153,23 +144,15 @@ float de(vec3 p){
 
 <tr><td><code>hg_sdf<code></td>    
 <td><pre>
-2d Cheap Infinite Box
+2d Infinite Box
 
-float de(vec3 p){
+float de(vec3 p){  // cheap version
   vec2 p0 = p.xy;    // the plane the box is in (xy, yz, xz)
   vec2 bd = vec2(1.) // the dimensions of the box
   vec2 d = abs(p0) - bd;
   
   return max(d.x, d.y);
 }
-</pre></td>
-<td class="fitwidth"><img src="images/DEC/primitives/box2d.png" alt="box", height=200px></td>
-</tr>
-
-
-<tr><td><code>hg_sdf<code></td>    
-<td><pre>
-2d Infinite Box
 
 float de(vec3 p){
   vec2 p0 = p.xy;    // the plane the box is in (xy, yz, xz)
@@ -249,14 +232,8 @@ float de(vec3 p)
   float c = 1.; // length
   return mix(length(p.xz) - r, length(vec3(p.x, abs(p.y) - c, p.z)) - r, step(c, abs(p.y)));
 }
-</pre></td>
-<td class="fitwidth"><img src="images/DEC/primitives/capsule.png" alt="capsule", height=200px></td>
-</tr>
 
-
-<tr><td><code>hg_sdf<code></td>    
-<td><pre>
-Capsule - alternate method
+Alternate method
 
 float de_line_segment(vec3 p, vec3 a, vec3 b) {
   vec3 ab = b - a;
@@ -287,14 +264,8 @@ float de(vec3 p){
 
   return length(vec2(length(p.xz) - largeRadius, p.y)) - smallRadius;
 }
-</pre></td>
-<td class="fitwidth"><img src="images/DEC/primitives/torus.png" alt="torus", height=200px></td>
-</tr>
 
-
-<tr><td><code>hg_sdf<code></td>    
-<td><pre>
-Torus - alternate method using circular line SDF - subtract minor radius from result
+Alternate method using circular line SDF - subtract minor radius from result
 
 float de(vec3 p){
   float r = 1.; // major radius
@@ -325,7 +296,9 @@ float de(vec3 p){
 
 <tr><td><code>hg_sdf<code></td>    
 <td><pre>
-Hexagonal Prism - Circumcircle Variant
+Hexagonal Prism
+
+Circumcircle Variant
 
 float de(vec3 p){
   float width = 1.;
@@ -333,14 +306,8 @@ float de(vec3 p){
   
   return max(q.y - height, max(q.x*sqrt(3)*0.5 + q.z*0.5, q.z) - width);
 }
-</pre></td>
-<td class="fitwidth"><img src="images/DEC/primitives/hexagon.png" alt="hexagon", height=200px></td>
-</tr>
 
-
-<tr><td><code>hg_sdf<code></td>    
-<td><pre>
-Hexagonal Prism - Incircle Variant
+Incircle Variant
 
 float de(vec3 p){
   float width = 1.;
@@ -384,36 +351,167 @@ float de(vec3 p){
 </tr>
 
 
-<tr><td><code>hg_sdf<code></td>    
+<tr><td><code>Akleman and Chen via hg_sdf<code></td>    
 <td><pre>
+Generalized Distance Functions - Support for the following Polyhedra
 
+const vec3 GDFVectors[19] = vec3[](
+  normalize(vec3(1, 0, 0)),
+  normalize(vec3(0, 1, 0)),
+  normalize(vec3(0, 0, 1)),
+
+  normalize(vec3(1, 1, 1 )),
+  normalize(vec3(-1, 1, 1)),
+  normalize(vec3(1, -1, 1)),
+  normalize(vec3(1, 1, -1)),
+
+  normalize(vec3(0, 1, PHI+1)),
+  normalize(vec3(0, -1, PHI+1)),
+  normalize(vec3(PHI+1, 0, 1)),
+  normalize(vec3(-PHI-1, 0, 1)),
+  normalize(vec3(1, PHI+1, 0)),
+  normalize(vec3(-1, PHI+1, 0)),
+
+  normalize(vec3(0, PHI, 1)),
+  normalize(vec3(0, -PHI, 1)),
+  normalize(vec3(1, 0, PHI)),
+  normalize(vec3(-1, 0, PHI)),
+  normalize(vec3(PHI, 1, 0)),
+  normalize(vec3(-PHI, 1, 0))
+);
+
+// Version with variable exponent.
+// This is slow and does not produce correct distances, but allows for bulging of objects.
+float fGDF(vec3 p, float r, float e, int begin, int end) {
+	float d = 0;
+	for (int i = begin; i <= end; ++i)
+		d += pow(abs(dot(p, GDFVectors[i])), e);
+	return pow(d, 1/e) - r;
+}
+
+// Version with without exponent, creates objects with sharp edges and flat faces
+float fGDF(vec3 p, float r, int begin, int end) {
+	float d = 0;
+	for (int i = begin; i <= end; ++i)
+		d = max(d, abs(dot(p, GDFVectors[i])));
+	return d - r;
+}
 </pre></td>
-<td class="fitwidth"><img src="images/DEC/primitives/box.png" alt="box", height=200px></td>
+<td></td>
 </tr>
 
 
-<tr><td><code>hg_sdf<code></td>    
+<tr><td></td>    
 <td><pre>
+Octahedron
 
+float de(vec3 p){
+  float r = 1.; // radius
+  
+  return fGDF(p, r, 3, 6);
+}
+
+With Exponent
+
+float de(vec3 p){
+  float r = 1.; // radius
+  float e = 1.; // exponent
+  
+  return fGDF(p, r, e, 3, 6);
+}
 </pre></td>
-<td class="fitwidth"><img src="images/DEC/primitives/box.png" alt="box", height=200px></td>
+<td class="fitwidth"><img src="images/DEC/primitives/octahedron.png" alt="octahedron", height=200px></td>
+</tr>
+
+<tr><td></td>    
+<td><pre>
+Dodecahedron
+
+float de(vec3 p){
+  float r = 1.; // radius
+  
+  return fGDF(p, r, 13, 18);
+}
+
+With Exponent
+
+float de(vec3 p){
+  float r = 1.; // radius
+  float e = 1.; // exponent
+  
+  return fGDF(p, r, e, 13, 18);
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/dodecahedron.png" alt="dodecahedron", height=200px></td>
+</tr>
+
+<tr><td></td>    
+<td><pre>
+Icosahedron
+
+float de(vec3 p){
+  float r = 1.; // radius
+  
+  return fGDF(p, r, 3, 12);
+}
+
+With Exponent
+
+float de(vec3 p){
+  float r = 1.; // radius
+  float e = 1.; // exponent
+  
+  return fGDF(p, r, e, 3, 12);
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/icosahedron.png" alt="icosahedron", height=200px></td>
+</tr>
+
+<tr><td></td>    
+<td><pre>
+Truncated Octahedron
+
+float de(vec3 p){
+  float r = 1.; // radius
+  
+  return fGDF(p, r, 0, 6);
+}
+
+With Exponent
+
+float de(vec3 p){
+  float r = 1.; // radius
+  float e = 1.; // exponent
+  
+  return fGDF(p, r, e, 0, 6);
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/truncated_octahedron.png" alt="truncated octahedron", height=200px></td>
+</tr>
+
+<tr><td></td>    
+<td><pre>
+Truncated Icosahedron
+
+float de(vec3 p){
+  float r = 1.; // radius
+  
+  return fGDF(p, r, 3, 18);
+}
+
+With Exponent
+
+float de(vec3 p){
+  float r = 1.; // radius
+  float e = 1.; // exponent
+  
+  return fGDF(p, r, e, 3, 18);
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/truncated_icosahedron.png" alt="truncated icosahedron", height=200px></td>
 </tr>
 
 
-<tr><td><code>hg_sdf<code></td>    
-<td><pre>
-
-</pre></td>
-<td class="fitwidth"><img src="images/DEC/primitives/box.png" alt="box", height=200px></td>
-</tr>
-
-
-<tr><td><code>hg_sdf<code></td>    
-<td><pre>
-
-</pre></td>
-<td class="fitwidth"><img src="images/DEC/primitives/box.png" alt="box", height=200px></td>
-</tr>
 
 
 </table>
@@ -4730,6 +4828,34 @@ float de(vec3 p){
 <td class="fitwidth"><img src="images/DEC/fractal_de189.png" alt="fractal_de189", height=200px></td>
 </tr>
 
+
+
+<tr><td><code>plento<code></td>
+<td><pre> 
+float sdBox( vec3 p, vec3 b ){
+  vec3 d = abs(p) - b;
+  return min(max(d.x,max(d.y,d.z)),0.0) + length(max(d,0.0));
+}
+
+vec2 rotate(vec2 k,float t){
+  return vec2(cos(t) * k.x - sin(t) * k.y, sin(t) * k.x + cos(t) * k.y);
+}
+
+float de(vec3 pos){
+    vec3 b = vec3(0.9 , 4.5, 0.70);
+    float p = sin(pos.z * 0.1) * 2.0;
+  
+    pos = vec3(rotate(pos.xy, p), pos.z);
+    pos.y += 1.2;
+    pos = mod(pos, b) -0.5 * b;
+    pos.x *= sin(length(pos * 1.8) * 2.0) * 1.4;
+    
+    return sdBox(pos - vec3(0.0, 0.0, 0.0), vec3(0.4));
+}
+
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de201.png" alt="fractal_de201", height=200px></td>
+</tr>
   
 </table>
 <br>
