@@ -58,12 +58,12 @@ td.fitwidth:hover img {
 <h2>The Distance Estimator Compendium (DEC)</h2>
 
 
-<a href="#introduction">&nbsp;Introduction</a><br />
-<a href="#simple"      >&nbsp;Simple Primitives</a><br />
-<a href="#operators"   >&nbsp;Operators</a><br />
-<a href="#fractals"    >&nbsp;Fractals</a><br />
-<a href="#composed"    >&nbsp;Composed Shapes</a><br />
-<a href="#licensing"   >&nbsp;Licensing</a><br />
+<a href="#introduction" style="font-size:120%;">&nbsp; > Introduction</a><br />
+<a href="#simple"       style="font-size:120%;">&nbsp; > Simple Primitives</a><br />
+<a href="#operators"    style="font-size:120%;">&nbsp; > Operators</a><br />
+<a href="#fractals"     style="font-size:120%;">&nbsp; > Fractals</a><br />
+<a href="#composed"     style="font-size:120%;">&nbsp; > Composed Shapes</a><br />
+<a href="#licensing"    style="font-size:120%;">&nbsp; > Licensing</a><br />
 
 <a id="introduction"></a><h2>Introduction</h2>
 <p>
@@ -90,11 +90,329 @@ td.fitwidth:hover img {
   </tr>
   
   
-<tr><td><code>WIP<code></td>    
+<tr><td><code>hg_sdf<code></td>    
 <td><pre>
-WIP
+Sphere
+
+float de(vec3 p){
+  float r = 1; // the radius
+  return length(p) - r;
+}
 </pre></td>
-<td class="fitwidth"><img src="images/DEC/WIP.png" alt="WIP", height=200px></td>
+<td class="fitwidth"><img src="images/DEC/primitives/sphere.png" alt="sphere", height=200px></td>
+</tr>
+
+
+<tr><td><code>hg_sdf<code></td>    
+<td><pre>
+Plane
+
+float de(vec3 p){
+  vec3 n = vec3(0.,1.,0.);       // plane's normal vector
+  float distanceFromOrigin = 0.; // position along normal
+  
+  return dot(p, n) + distanceFromOrigin;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/plane.png" alt="plane", height=200px></td>
+</tr>
+
+
+
+<tr><td><code>hg_sdf<code></td>    
+<td><pre>
+Cheap Box
+
+float de(vec3 p){
+  vec3 size = vec3(1.); //dimensions on each axis 
+  vec3 d = abs(p) - size;
+
+  return max(max(d.x, d.y), d.z);
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/box.png" alt="boxcheap", height=200px></td>
+</tr>
+
+
+
+<tr><td><code>hg_sdf<code></td>    
+<td><pre>
+Box
+
+float de(vec3 p){
+  vec3 size = vec3(1.) // dimensions on each axis
+  vec3 d = abs(p) - size;
+  float md = min(d, vec3(0));
+  
+  return length(max(d, vec3(0))) + max(max(md.x, md.y), md.z);
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/box.png" alt="box", height=200px></td>
+</tr>
+
+
+<tr><td><code>hg_sdf<code></td>    
+<td><pre>
+2d Cheap Infinite Box
+
+float de(vec3 p){
+  vec2 p0 = p.xy;    // the plane the box is in (xy, yz, xz)
+  vec2 bd = vec2(1.) // the dimensions of the box
+  vec2 d = abs(p0) - bd;
+  
+  return max(d.x, d.y);
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/box2d.png" alt="box", height=200px></td>
+</tr>
+
+
+<tr><td><code>hg_sdf<code></td>    
+<td><pre>
+2d Infinite Box
+
+float de(vec3 p){
+  vec2 p0 = p.xy;    // the plane the box is in (xy, yz, xz)
+  vec2 bd = vec2(1.) // the dimensions of the box
+  vec2 d = abs(p0) - bd;
+  vec2 md = min(d, vec2(0.));
+  
+  return length(max(d, vec2(0))) + max(max(md.x, md.y), md.z);
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/box2d.png" alt="box", height=200px></td>
+</tr>
+
+
+<tr><td><code>hg_sdf<code></td>    
+<td><pre>
+Endless Corner/Shelf
+
+float de(vec3 p){
+  vec2 p0 = p.xy; // the plane the section lies in
+  vec2 md = min(p, vec2(0));
+
+  return length(max(p0, vec2(0))) + max(max(md.x, md.y), md.z);
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/corner.png" alt="corner", height=200px></td>
+</tr>
+
+
+<tr><td><code>hg_sdf<code></td>    
+<td><pre>
+Blob - not a correct distance bound, has artifacts
+
+float de(vec3 p) {
+  p = abs(p);
+  if (p.x < max(p.y, p.z)) p = p.yzx;
+  if (p.x < max(p.y, p.z)) p = p.yzx;
+  float b = max(max(max(
+    dot(p, normalize(vec3(1, 1, 1))),
+    dot(p.xz, normalize(vec2(PHI+1, 1)))),
+    dot(p.yx, normalize(vec2(1, PHI)))),
+    dot(p.xz, normalize(vec2(1, PHI))));
+  float l = length(p);
+  return l - 1.5 - 0.2 * (1.5 / 2)* cos(min(sqrt(1.01 - b / l)*(PI / 0.25), PI));
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/blob.png" alt="blob", height=200px></td>
+</tr>
+
+
+
+<tr><td><code>hg_sdf<code></td>    
+<td><pre>
+Cylinder in the XZ plane
+
+float de(vec3 p){
+  float r = 1.;
+  float height = 1.;
+  
+  float d = length(p.xz) - r;
+  d = max(d, abs(p.y) - height);
+  
+  return d;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/cylinder.png" alt="cylinder", height=200px></td>
+</tr>
+
+
+
+<tr><td><code>hg_sdf<code></td>    
+<td><pre>
+Capsule - cylinder with round caps
+
+float de(vec3 p)
+  float r = 1.; // radius
+  float c = 1.; // length
+  return mix(length(p.xz) - r, length(vec3(p.x, abs(p.y) - c, p.z)) - r, step(c, abs(p.y)));
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/capsule.png" alt="capsule", height=200px></td>
+</tr>
+
+
+<tr><td><code>hg_sdf<code></td>    
+<td><pre>
+Capsule - alternate method
+
+float de_line_segment(vec3 p, vec3 a, vec3 b) {
+  vec3 ab = b - a;
+  float t = clamp(dot(p - a, ab) / dot(ab, ab), 0., 1.);
+  
+  return length((ab*t + a) - p);
+}
+
+float de(vec3 p){
+  vec3 a = vec3(0., -1., 0.); // location of top
+  vec3 b = vec3(0.,  1., 0.); // location of bottom
+  float r = 1.; // radius
+
+  return de_line_segment(p, a, b) - r;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/capsule.png" alt="capsule", height=200px></td>
+</tr>
+
+
+<tr><td><code>hg_sdf<code></td>    
+<td><pre>
+Torus
+
+float de(vec3 p){
+  float smallRadius = 1.; // minor radius
+  float largeRadius = 2.; // major radius
+
+  return length(vec2(length(p.xz) - largeRadius, p.y)) - smallRadius;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/torus.png" alt="torus", height=200px></td>
+</tr>
+
+
+<tr><td><code>hg_sdf<code></td>    
+<td><pre>
+Torus - alternate method using circular line SDF - subtract minor radius from result
+
+float de(vec3 p){
+  float r = 1.; // major radius
+  float l = length(p.xz) - r;
+  
+  return length(vec2(p.y, l));
+}
+
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/torus.png" alt="torus", height=200px></td>
+</tr>
+
+
+<tr><td><code>hg_sdf<code></td>    
+<td><pre>
+2D Disc - no thickness - subtract some amount from result to make a rounded disk
+
+float de(vec3 p){
+  float r = 1.; // radius of the circle
+  float l = length(p.xz) - r;
+  
+  return length(vec2(p.y, l));
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/disk.png" alt="disk", height=200px></td>
+</tr>
+
+
+<tr><td><code>hg_sdf<code></td>    
+<td><pre>
+Hexagonal Prism - Circumcircle Variant
+
+float de(vec3 p){
+  float width = 1.;
+  float height = 1.;
+  
+  return max(q.y - height, max(q.x*sqrt(3)*0.5 + q.z*0.5, q.z) - width);
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/hexagon.png" alt="hexagon", height=200px></td>
+</tr>
+
+
+<tr><td><code>hg_sdf<code></td>    
+<td><pre>
+Hexagonal Prism - Incircle Variant
+
+float de(vec3 p){
+  float width = 1.;
+  float height = 1.;
+  vec3 q = abs(p);
+
+  return max(q.y - height, max(q.x*sqrt(3)*0.5 + q.z*0.5, q.z) - (width*sqrt(3)*0.5));
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/hexagon.png" alt="hexagon", height=200px></td>
+</tr>
+
+
+<tr><td><code>hg_sdf<code></td>    
+<td><pre>
+Cone - pointing up the y axis
+
+float de(vec3 p){
+  float radius = 1.;
+  float height = 3.;
+  vec2 q = vec2(length(p.xz), p.y);
+  vec2 tip = q - vec2(0, height);
+  vec2 mantleDir = normalize(vec2(height, radius));
+  float mantle = dot(tip, mantleDir);
+  float d = max(mantle, -q.y);
+  float projected = dot(tip, vec2(mantleDir.y, -mantleDir.x));
+
+  // distance to tip
+  if ((q.y > height) && (projected < 0)) {
+    d = max(d, length(tip));
+  }
+
+  // distance to base ring
+  if ((q.x > radius) && (projected > length(vec2(height, radius)))) {
+    d = max(d, length(q - vec2(radius, 0)));
+  }
+  return d;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/cone.png" alt="cone", height=200px></td>
+</tr>
+
+
+<tr><td><code>hg_sdf<code></td>    
+<td><pre>
+
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/box.png" alt="box", height=200px></td>
+</tr>
+
+
+<tr><td><code>hg_sdf<code></td>    
+<td><pre>
+
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/box.png" alt="box", height=200px></td>
+</tr>
+
+
+<tr><td><code>hg_sdf<code></td>    
+<td><pre>
+
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/box.png" alt="box", height=200px></td>
+</tr>
+
+
+<tr><td><code>hg_sdf<code></td>    
+<td><pre>
+
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/box.png" alt="box", height=200px></td>
 </tr>
 
 
