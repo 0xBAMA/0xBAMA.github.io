@@ -181,6 +181,22 @@ float de(vec3 p){
 <td class="fitwidth"><img src="images/DEC/primitives/corner.png" alt="corner", height=200px></td>
 </tr>
 
+<tr><td><code>tholzer<code></td>    
+<td><pre>
+Infinite cross shape
+
+float de(vec3 p){
+  float s = 0.2; // size of the cross members
+  float da = max (abs(p.x), abs(p.y));
+  float db = max (abs(p.y), abs(p.z));
+  float dc = max (abs(p.z), abs(p.x));
+  return min(da,min(db,dc)) - s;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/cross.png" alt="infinite cross", height=200px></td>
+</tr>
+
+
 
 <tr><td><code>hg_sdf<code></td>    
 <td><pre>
@@ -202,6 +218,17 @@ float de(vec3 p) {
 <td class="fitwidth"><img src="images/DEC/primitives/blob.png" alt="blob", height=200px></td>
 </tr>
 
+<tr><td><code>iq<code></td>    
+<td><pre>
+Infinite Cylinder - perpendicular to xz plane
+
+float de(vec3 p){
+  float radius = 1.;
+  return length(p.xz)-radius; // xy, yz for other directions
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/infinitecylinder.png" alt="infinite cylinder", height=200px></td>
+</tr>
 
 
 <tr><td><code>hg_sdf<code></td>    
@@ -221,6 +248,22 @@ float de(vec3 p){
 <td class="fitwidth"><img src="images/DEC/primitives/cylinder.png" alt="cylinder", height=200px></td>
 </tr>
 
+
+<tr><td><code>iq<code></td>    
+<td><pre>
+Cylinder with rounded edges, also in XZ plane
+
+float de( vec3 p){
+  float ra = 0.5;  // radius of cylinder
+  float rb = 0.1;  // radius of rounding
+  float h  = 0.4;  // height of cylinder
+
+  vec2 d = vec2( length(p.xz)-2.0*ra+rb, abs(p.y) - h );
+  return min(max(d.x,d.y),0.0) + length(max(d,0.0)) - rb;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/roundcylinder.png" alt="rounded cylinder", height=200px></td>
+</tr>
 
 
 <tr><td><code>hg_sdf<code></td>    
@@ -510,6 +553,86 @@ float de(vec3 p){
 </pre></td>
 <td class="fitwidth"><img src="images/DEC/primitives/truncated_icosahedron.png" alt="truncated icosahedron", height=200px></td>
 </tr>
+
+
+
+<tr><td><code>iq<code></td>    
+<td><pre>
+Octahedron (Alternative)
+
+float de(vec3 p){
+  float s = 1.; // size
+  p = abs(p);
+  float m = p.x+p.y+p.z-s;
+  vec3 q;
+       if( 3.0*p.x < m ) q = p.xyz;
+  else if( 3.0*p.y < m ) q = p.yzx;
+  else if( 3.0*p.z < m ) q = p.zxy;
+  else return m*0.57735027;
+    
+  float k = clamp(0.5*(q.z-q.y+s),0.0,s); 
+  return length(vec3(q.x,q.y-s+k,q.z-k)); 
+}
+
+Approximate (cheaper)
+
+float de( vec3 p){
+  float s = 1.;
+  p = abs(p);
+  return (p.x+p.y+p.z-s)*0.57735027;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/octahedron.png" alt="octahedron", height=200px></td>
+</tr>
+
+
+<tr><td><code>tholzer<code></td>    
+<td><pre>
+Icosahedron (Alternative)
+
+float de(vec3 p){
+  float radius = 1.;
+  const float q = 2.61803398875;  // Golden Ratio + 1 = (sqrt(5)+3)/2;
+  const vec3 n1 = normalize(vec3(q,1,0));
+  const vec3 n2 = vec3(0.57735026919);  // = sqrt(3)/3);
+
+  p = abs(p / radius);
+  float a = dot(p, n1.xyz);
+  float b = dot(p, n1.zxy);
+  float c = dot(p, n1.yzx);
+  float d = dot(p, n2) - n1.x;
+  return max(max(max(a,b),c)-n1.x,d) * radius;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/icosahedron.png" alt="icosahedron", height=200px></td>
+</tr>
+
+
+<tr><td><code>tholzer<code></td>    
+<td><pre>
+Dodecahedron (Alternative)
+
+float de(vec3 p){
+  float radius = 1.;
+  const float phi = 1.61803398875;  // Golden Ratio = (sqrt(5)+1)/2;
+  const vec3 n = normalize(vec3(phi,1,0));
+
+  p = abs(p / radius);
+  float a = dot(p, n.xyz);
+  float b = dot(p, n.zxy);
+  float c = dot(p, n.yzx);
+  return (max(max(a,b),c)-n.x) * radius;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/dodecahedron.png" alt="dodecahedron", height=200px></td>
+</tr>
+
+
+
+
+
+
+
 
 
 
@@ -814,8 +937,8 @@ float de(vec3 p){
 Octagonal Prism
 
 float de(vec3 p){
-  float r = 2.;
-  float h = 0.2;
+  float r = 2.;   // diameter
+  float h = 0.2;  // thickness
 
   const vec3 k = vec3(-0.9238795325,   // sqrt(2+sqrt(2))/2 
                        0.3826834323,   // sqrt(2-sqrt(2))/2
@@ -834,12 +957,197 @@ float de(vec3 p){
 </tr>
 
 
-<!-- <tr><td><code>iq<code></td>    
+<tr><td><code>iq<code></td>    
 <td><pre>
+Link - elongated torus
 
+float de(vec3 p){
+    float le = 0.13;  // length
+    float r1 = 0.20;  // major radius
+    float r2 = 0.09;  // minor radius
+    
+    vec3 q = vec3( p.x, max(abs(p.y)-le,0.0), p.z );
+    return length(vec2(length(q.xy)-r1,q.z)) - r2;
+}
 </pre></td>
-<td class="fitwidth"><img src="images/DEC/primitives/ellipsoid.png" alt="ellipsoid", height=200px></td>
-</tr> -->
+<td class="fitwidth"><img src="images/DEC/primitives/link.png" alt="link", height=200px></td>
+</tr>
+
+
+<tr><td><code>iq<code></td>    
+<td><pre>
+Rounded box - unsigned
+
+float de(vec3 p){
+    vec3 b = vec3(1,2,3); // box dimensions
+    float r = 0.1;      // rounding radius
+    return length(max(abs(p)-b, 0.0))-r;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/roundbox.png" alt="round box", height=200px></td>
+</tr>
+
+
+
+
+<tr><td><code>tholzer<code></td>    
+<td><pre>
+Wavy sphere 
+
+float de(vec3 p){
+    float radius = .3;    // radius of sphere
+    int waves = 7;        // number of waves
+    float waveSize = 0.4; // displacement of waves
+    
+    //bounding Sphere
+    float d = length(p) - radius*2.2;
+    if(d > 0.0) return 0.2;
+
+    // deformation of radius
+    d = waveSize * (radius*radius-(p.y*p.y));
+    radius += d * cos(atan(p.x,p.z) * float(waves));
+    return 0.5*(length(p) - radius);
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/wavesphere.png" alt="wave sphere", height=200px></td>
+</tr>
+
+
+
+
+
+
+
+
+
+
+
+<tr><td><code>iq<code></td>    
+<td><pre>
+Torus8-2 using iq's change of distance metric (see operator section)
+
+float de( vec3 p){
+  vec2 t = vec2(1,0.2); // major and minor
+  vec2 q = vec2(length2(p.xz)-t.x, p.y);
+  return length8(q) - t.y;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/torus82.png" alt="torus 8-2", height=200px></td>
+</tr>
+
+
+
+<tr><td><code>iq<code></td>    
+<td><pre>
+Torus8-8 using iq's change of distance metric
+
+float de( vec3 p){
+  vec2 t = vec2(1,0.2); // major and minor
+  vec2 q = vec2(length2(p.xz)-t.x, p.y);
+  return length8(q) - t.y;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/torus88.png" alt="torus 8-8", height=200px></td>
+</tr>
+
+
+<tr><td><code>iq<code></td>    
+<td><pre>
+Cylinder6 using iq's change of distance metric
+
+float de(vec3 p){
+  float diameter = 0.2;
+  float height = 0.1;
+  return max( length6(p.xz) - diameter, abs(p.y) - height );
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/cylinder6.png" alt="cylinder6", height=200px></td>
+</tr>
+
+
+<tr><td><code>iq<code></td>    
+<td><pre>
+Cylinder8 using iq's change of distance metric
+
+float de(vec3 p){
+  float diameter = 0.2;
+  float height = 0.1;
+  return max( length8(p.xz) - diameter, abs(p.y) - height );
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/cylinder8.png" alt="cylinder8", height=200px></td>
+</tr>
+
+
+
+<tr><td><code>iq<code></td>    
+<td><pre>
+Unsigned distance to triangle
+
+float dot2( in vec3 v ) { return dot(v,v); }
+float de( in vec3 v1, in vec3 v2, in vec3 v3, in vec3 p )
+{
+    // prepare data    
+    vec3 v21 = v2 - v1; vec3 p1 = p - v1;
+    vec3 v32 = v3 - v2; vec3 p2 = p - v2;
+    vec3 v13 = v1 - v3; vec3 p3 = p - v3;
+    vec3 nor = cross( v21, v13 );
+
+    return sqrt( // inside/outside test    
+                 (sign(dot(cross(v21,nor),p1)) + 
+                  sign(dot(cross(v32,nor),p2)) + 
+                  sign(dot(cross(v13,nor),p3))<2.0) 
+                  ?
+                  // 3 edges    
+                  min( min( 
+                  dot2(v21*clamp(dot(v21,p1)/dot2(v21),0.0,1.0)-p1), 
+                  dot2(v32*clamp(dot(v32,p2)/dot2(v32),0.0,1.0)-p2) ), 
+                  dot2(v13*clamp(dot(v13,p3)/dot2(v13),0.0,1.0)-p3) )
+                  :
+                  // 1 face    
+                  dot(nor,p1)*dot(nor,p1)/dot2(nor) );
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/triangle.png" alt="triangle", height=200px></td>
+</tr>
+
+<tr><td><code>iq<code></td>    
+<td><pre>
+Unsigned distance to quad
+
+float dot2( in vec3 v ) { return dot(v,v); }
+float udQuad( in vec3 v1, in vec3 v2, in vec3 v3, in vec3 v4, in vec3 p )
+{
+    // handle ill formed quads
+    if( dot( cross( v2-v1, v4-v1 ), cross( v4-v3, v2-v3 )) < 0.0 )
+    {
+        vec3 tmp = v3;
+        v3 = v4;
+        v4 = tmp;
+    }
+   
+    vec3 v21 = v2 - v1; vec3 p1 = p - v1;
+    vec3 v32 = v3 - v2; vec3 p2 = p - v2;
+    vec3 v43 = v4 - v3; vec3 p3 = p - v3;
+    vec3 v14 = v1 - v4; vec3 p4 = p - v4;
+    vec3 nor = cross( v21, v14 );
+
+    return sqrt( (sign(dot(cross(v21,nor),p1)) + 
+                  sign(dot(cross(v32,nor),p2)) + 
+                  sign(dot(cross(v43,nor),p3)) + 
+                  sign(dot(cross(v14,nor),p4))<3.0) 
+                  ?
+                  min( min( dot2(v21*clamp(dot(v21,p1)/dot2(v21),0.0,1.0)-p1), 
+                            dot2(v32*clamp(dot(v32,p2)/dot2(v32),0.0,1.0)-p2) ), 
+                       min( dot2(v43*clamp(dot(v43,p3)/dot2(v43),0.0,1.0)-p3),
+                            dot2(v14*clamp(dot(v14,p4)/dot2(v14),0.0,1.0)-p4) ))
+                  :
+                  dot(nor,p1)*dot(nor,p1)/dot2(nor) );
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/quad.png" alt="quad", height=200px></td>
+</tr>
+
 
 
 
@@ -4222,6 +4530,61 @@ float de(vec3 p){
 
 
 
+<tr><td><code>adapted from code by jorge2017a1<code></td>
+<td><pre> 
+float de( vec3 p ){
+    vec3  di = abs(p) - vec3(1.);
+    float mc = max(di.x, max(di.y, di.z));
+    float d =  min(mc,length(max(di,0.0)));
+    vec4 res = vec4( d, 1.0, 0.0, 0.0 );
+
+    const mat3 ma = mat3( 0.60, 0.00,  0.80,
+                          0.00, 1.00,  0.00,
+                          -0.20, 0.00,  0.30 );
+    float off = 0.0005;
+    float s = 1.0;
+    for( int m=0; m<4; m++ ){
+        p = ma*(p+off);
+        vec3 a = mod( p*s, 2.0 )-1.0;
+        s *= 3.0;
+        vec3 r = abs(1.0 - 3.0*abs(a));
+        float da = max(r.x,r.y);
+        float db = max(r.y,r.z);
+        float dc = max(r.z,r.x);
+        float c = (min(da,min(db,dc))-1.0)/s;
+        if( c > d )
+            d = c;
+    }
+    return d;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de203.png" alt="fractal_de203", height=200px></td>
+</tr>
+
+
+<tr><td><code>unknown<code></td>
+<td><pre> 
+float de(vec3 p){
+    const float mr=0.25, mxr=1.0;
+    const vec4 scale=vec4(-3.12,-3.12,-3.12,3.12),p0=vec4(0.0,1.59,-1.0,0.0);
+    vec4 z = vec4(p,1.0);
+    for (int n = 0; n < 3; n++) {
+        z.xyz=clamp(z.xyz, -0.94, 0.94)*2.0-z.xyz;
+        z*=scale/clamp(dot(z.xyz,z.xyz),mr,mxr);
+        z+=p0;
+    }
+    z.y-=3.0*sin(3.0+floor(p.x+0.5)+floor(p.z+0.5));
+    float dS=(length(max(abs(z.xyz)-vec3(1.2,49.0,1.4),0.0))-0.06)/z.w;
+    return dS;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de204.png" alt="fractal_de204", height=200px></td>
+</tr>
+
+
+
+
+
 
 
 
@@ -5163,6 +5526,62 @@ float de(vec3 p){
 
 
 
+
+
+
+<tr><td><code>neozhaoliang<code></td>
+<td><pre> 
+float mandelbulb(vec3 p)
+{
+    p /= 1.192;
+    p.xyz = p.xzy;
+    vec3 z = p;
+    vec3 dz = vec3(0.0);
+    float dr = 1.0;
+    float power = 8.0;
+    float r, theta, phi;
+    for (int i = 0; i < 7; i++)
+    {
+        r = length(z);
+        if (r > 2.0)
+            break;
+        float theta = atan(z.y / z.x);
+        float phi = asin(z.z / r);
+        dr = pow(r, power - 1.0) * power * dr + 1.0;
+        r = pow(r, power);
+        theta = theta * power;
+        phi = phi * power;
+        z = r * vec3(cos(theta) * cos(phi), cos(phi) * sin(theta), sin(phi)) + p;
+    }
+    return 0.5 * log(r) * r / dr;
+}
+
+float sdSponge(vec3 z)
+{
+    for(int i = 0; i < 9; i++)
+    {
+        z = abs(z);
+        z.xy = (z.x < z.y) ? z.yx : z.xy;
+        z.xz = (z.x < z.z) ? z.zx : z.xz;
+        z.zy = (z.y < z.z) ? z.yz : z.zy;	 
+        z = z * 3.0 - 2.0;
+        z.z += (z.z < -1.0) ? 2.0 : 0.0;
+    }
+    z = abs(z) - vec3(1.0);
+    float dis = min(max(z.x, max(z.y, z.z)), 0.0) + length(max(z, 0.0)); 
+    return dis * 0.6 * pow(3.0, -float(9)); 
+}
+
+float de(vec3 p)
+{
+    float d1 = mandelbulb(p);
+    float d2 = sdSponge(p);
+    return max(d1, d2);
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de202.png" alt="fractal_de202", height=200px></td>
+</tr>
+
 <tr><td><code>plento<code></td>
 <td><pre> 
 float sdBox( vec3 p, vec3 b ){
@@ -5189,6 +5608,332 @@ float de(vec3 pos){
 </pre></td>
 <td class="fitwidth"><img src="images/DEC/fractal_de201.png" alt="fractal_de201", height=200px></td>
 </tr>
+
+
+
+<tr><td><code>russ<code></td>
+<td><pre> 
+float sdHexPrism( vec3 p, vec2 h ){
+  const vec3 k = vec3(-0.8660254, 0.5, 0.57735);
+  p = abs(p);
+  p.xy -= 2.0*min(dot(k.xy, p.xy), 0.0)*k.xy;
+  vec2 d = vec2(
+       length(p.xy-vec2(clamp(p.x,-k.z*h.x,k.z*h.x), h.x))*sign(p.y-h.x),
+       p.z-h.y );
+  return min(max(d.x,d.y),0.0) + length(max(d,0.0));
+}
+
+float sdCrossHex( in vec3 p ){ 
+  float sdh1= sdHexPrism(  p-vec3(0.0), vec2(1.0,1.0) );
+  float sdh2= sdHexPrism(  p-vec3(0.0), vec2(0.5,1.5) );
+  float sdh3= sdHexPrism(  p.xzy-vec3(0.0), vec2(0.5,1.1) );
+  float sdh4= sdHexPrism(  p.yzx-vec3(0.0), vec2(0.5,1.5) );
+  return max( max( max(sdh1, -sdh2), -sdh3),-sdh4);
+}
+
+float sdCrossRep(vec3 p) {
+  vec3 q = mod(p + 1.0, 2.0) - 1.0;
+  return sdCrossHex(q);
+}
+
+float sdCrossRepScale(vec3 p, float s) {
+  return sdCrossRep(p * s) / s;	
+}
+
+float de(vec3 p) {
+  float scale = 3.025;
+  float dist= sdHexPrism(p, vec2(1.0,2.0) );
+  for (int i = 0; i < 5; i++) {
+    dist = max(dist, -sdCrossRepScale(p, scale));
+    scale *= 3.0;
+  }
+  return dist;
+}
+
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de205.png" alt="fractal_de205", height=200px></td>
+</tr>
+
+
+<tr><td><code>russ<code></td>
+<td><pre> 
+float sdTriPrism( vec3 p, vec2 h ){
+    vec3 q = abs(p);
+    return max(q.z-h.y,max(q.x*0.866025+p.y*0.5,-p.y)-h.x*0.5);
+}
+
+float sdCrossHex( in vec3 p ){
+    float sdfin=1000.0;
+    float sdt1= sdTriPrism( p- vec3(0.0), vec2(1.0) );
+    float sdt2= sdTriPrism( -p.xyz- vec3(0.0), vec2(0.5,1.2) );
+    float sdt3= sdTriPrism( p.xzy- vec3(0.0), vec2(0.5,1.2) );
+    sdfin =max(sdt1, -sdt2);
+    sdfin =max(sdfin, -sdt3);
+    return sdfin;
+}
+
+float sdCrossRep(vec3 p) {
+	vec3 q = mod(p + 1.0, 2.0) - 1.0;
+	return sdCrossHex(q);
+}
+
+float sdCrossRepScale(vec3 p, float s) {
+	return sdCrossRep(p * s) / s;	
+}
+
+float de(vec3 p) {
+    float scale = 4.0;
+    float dist=sdTriPrism( p-vec3(0.0), vec2(1.0,1.0) );
+	for (int i = 0; i < 5; i++) {
+		dist = max(dist, -sdCrossRepScale(p, scale));
+		scale *= 3.0;
+	}
+	return dist;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de207.png" alt="fractal_de207", height=200px></td>
+</tr>
+
+
+<tr><td><code>russ<code></td>
+<td><pre> 
+float cylUnion(vec3 p){
+  float xy = dot(p.xy,p.xy);
+  float xz = dot(p.xz,p.xz);
+  float yz = dot(p.yz,p.yz);
+  return sqrt(min(xy,min(xz,yz))) - 1.;
+}
+
+float cylIntersection(vec3 p){
+  float xy = dot(p.xy,p.xy);
+  float xz = dot(p.xz,p.xz);
+  float yz = dot(p.yz,p.yz);
+  return sqrt(max(xy,max(xz,yz))) - 1.;
+}
+
+float DE(vec3 p){
+  float d = cylIntersection(p);
+  float s = 1.;
+  for(int i = 0;i<5;i++){
+    p *= 3.; s*=3.;
+    float d2 = cylUnion(p) / s;
+    d = max(d,-d2);
+    p = mod(p+1. , 2.) - 1.; 	
+  }
+  return d;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de208.png" alt="fractal_de208", height=200px></td>
+</tr>
+
+
+<tr><td><code>russ<code></td>
+<td><pre> 
+float cylUnion(vec3 p){
+  float xy = dot(p.xy,p.xy);
+  float xz = dot(p.xz,p.xz);
+  float yz = dot(p.yz,p.yz);
+  return sqrt(min(xy,min(xz,yz))) - 1.;
+}
+
+float cylIntersection(vec3 p){
+  float xy = dot(p.xy,p.xy);
+  float xz = dot(p.xz,p.xz);
+  float yz = dot(p.yz,p.yz);
+  return sqrt(max(xy,max(xz,yz))) - 1.;
+}
+
+float DE(vec3 p){
+  float d = cylIntersection(p);
+  float s = 1.;
+  for(int i = 0;i<5;i++){
+    p *= 3.; s*=3.;
+    float d2 = cylUnion(p) / s;
+    d = max(d,d2);
+    p = mod(p+1. , 2.) - 1.; 	
+  }
+  return d;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de209.png" alt="fractal_de209", height=200px></td>
+</tr>
+
+
+
+<tr><td><code>jorge2017a1<code></td>
+<td><pre>
+float maxcomp(in vec3 p ) { return max(p.x,max(p.y,p.z));}
+float sdBox( vec3 p, vec3 b ){
+  vec3  di = abs(p) - b;
+  float mc = maxcomp(di);
+  return min(mc,length(max(di,0.0)));
+}
+
+float cylUnion(vec3 p){
+  float xy = dot(p.xy,p.xy);
+  float xz = dot(p.xz,p.xz);
+  float yz = dot(p.yz,p.yz);
+  return sqrt(min(xy,min(xz,yz))) - 1.;
+}
+
+float cylIntersection(vec3 p){
+  float xy = dot(p.xy,p.xy);
+  float xz = dot(p.xz,p.xz);
+  float yz = dot(p.yz,p.yz);
+  return sqrt(max(xy,max(xz,yz))) - 1.;
+}
+
+float dsCapsule(vec3 point_a, vec3 point_b, float r, vec3 point_p)
+{
+  vec3 ap = point_p - point_a;
+  vec3 ab = point_b - point_a;
+  float ratio = dot(ap, ab) / dot(ab , ab);
+  ratio = clamp(ratio, 0.0, 1.0);
+  vec3 point_c = point_a + ratio * ab;
+  return length(point_c - point_p) - r;
+}
+
+float DE(vec3 p){
+  float d = dsCapsule(vec3(-0.0,0.0,0.0), vec3(2.0,1.0,0.1), 1.0, p);
+  float s = 1.;
+  for(int i = 0;i<5;i++){
+    p *= 3.; s*=3.;
+    float d2 = cylUnion(p) / s;
+    float d3=sdBox(p, vec3(2.0,1.0,2.5));
+    d = max(d,-d2);
+    p = mod(p+1. , 2.) - 1.; 	
+  }
+  return d;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de210.png" alt="fractal_de210", height=200px></td>
+</tr>
+
+
+
+
+<tr><td><code>butadiene<code></td>
+<td><pre> 
+Large Sierpinski area with cube superstructure
+
+mat2 rot(float r){
+  vec2 s = vec2(cos(r),sin(r));
+  return mat2(s.x,s.y,-s.y,s.x);
+}
+float cube(vec3 p,vec3 s){
+  vec3 q = abs(p);
+  vec3 m = max(s-q,0.);
+  return length(max(q-s,0.))-min(min(m.x,m.y),m.z);
+}
+float tetcol(vec3 p,vec3 offset,float scale,vec3 col){
+  vec4 z = vec4(p,1.);
+  for(int i = 0;i<12;i++){
+    if(z.x+z.y<0.0)z.xy = -z.yx,col.z+=1.;
+    if(z.x+z.z<0.0)z.xz = -z.zx,col.y+=1.;
+    if(z.z+z.y<0.0)z.zy = -z.yz,col.x+=1.;
+    z *= scale;
+    z.xyz += offset*(1.0-scale);
+  }
+  return (cube(z.xyz,vec3(1.5)))/z.w;
+}
+float de(vec3 p){
+  float s = 1.;
+  p = abs(p)-4.*s;
+  p = abs(p)-2.*s;
+  p = abs(p)-1.*s;
+  return tetcol(p,vec3(1),1.8,vec3(0.));
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de206.png" alt="fractal_de206", height=200px></td>
+</tr>
+
+
+
+
+
+
+
+<tr><td><code>tholzer<code></td>
+<td><pre>
+IcoDodecaStar
+
+// Dodecahedron: radius = circumsphere radius
+float sdDodecahedron(vec3 p, float radius){
+  const float phi = 1.61803398875;  // Golden Ratio = (sqrt(5)+1)/2;
+  const vec3 n = normalize(vec3(phi,1,0));
+
+  p = abs(p / radius);
+  float a = dot(p, n.xyz);
+  float b = dot(p, n.zxy);
+  float c = dot(p, n.yzx);
+  return (max(max(a,b),c)-n.x) * radius;
+}
+// Icosahedron: radius = circumsphere radius
+float sdIcosahedron(vec3 p, float radius){
+  const float q = 2.61803398875;  // Golden Ratio + 1 = (sqrt(5)+3)/2;
+  const vec3 n1 = normalize(vec3(q,1,0));
+  const vec3 n2 = vec3(0.57735026919);  // = sqrt(3)/3);
+
+  p = abs(p / radius);
+  float a = dot(p, n1.xyz);
+  float b = dot(p, n1.zxy);
+  float c = dot(p, n1.yzx);
+  float d = dot(p, n2) - n1.x;
+  return max(max(max(a,b),c)-n1.x,d) * radius;
+}
+float de(vec3 p){
+  float radius = 0.5;
+  return min(sdDodecahedron(p,radius),  sdIcosahedron(p.zyx,radius));
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/icododecastar.png" alt="icododecastar", height=200px></td>
+</tr>
+
+
+<tr><td><code>tholzer<code></td>
+<td><pre>
+Rack Wheel
+
+#define opRepeat(p,c) (mod(p,c)-0.5*c)
+#define opDifference(a,b) max(a,-b)
+
+float length2( vec2 p ) {
+  return sqrt( p.x*p.x + p.y*p.y );
+}
+
+float length8( vec2 p ) {
+  p = p*p; p = p*p; p = p*p;
+  return pow( p.x + p.y, 1.0/8.0 );
+}
+
+float sdCylinder (in vec3 p, in vec3 h){
+  return length(p.xz - h.xy) - h.z;
+}
+
+float sdTorus82( vec3 p, vec2 t ){
+  vec2 q = vec2(length2(p.xz)-t.x, p.y);
+  return length8(q) - t.y;
+}
+
+float de( in vec3 pos){
+  return opDifference(sdTorus82(pos, vec2(0.20, 0.1)),
+    sdCylinder (opRepeat (vec3 (atan(pos.x, pos.z)/6.2831
+                                ,pos.y
+                                ,0.02+0.5*length(pos))
+                          ,vec3(0.05, 1.0, 0.05))
+                ,vec2(0.02, 0.6)));
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/rackwheel.png" alt="rack wheel", height=200px></td>
+</tr>
+
+
+
+
+
+
+
+
   
 </table>
 <br>
@@ -5197,11 +5942,16 @@ float de(vec3 pos){
 
 <a id="licensing"></a><h2>Licensing</h2>
 <p>
-&nbsp; I am releasing this resource under the <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/legalcode"> CC Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>. This is the default Shadertoy license unless otherwise specified by the shader author, the same license provided with the hg_sdf header, and which seems similarly appropriate for this resource. There are some utility functions which are provided by the <a href="../resources/noise.glsl">Twigl noise header</a>, available under the MIT license, and the <a href="../resources/hg_sdf.glsl">hg_sdf header</a>. The primitives provided by Inigo Quilez are under the <a href="images/DEC/inigo.txt">MIT License</a>.
+&nbsp; This is an educational resource provided under the <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/legalcode"> CC Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>. 
+
 </p>
 
 <p>
-&nbsp; I have gathered these distance estimator functions from several sources (hg_sdf, Shadertoy, and code deobfuscated from the #つぶやきGLSL tag on Twitter). I have done my best to give credit to the authors, but I do not have a complete record - if you have information to that end, please contact me via email. If you are doing something cool with them, or would like to contribute to this resource, please contact me at jb239812@ohio.edu.
+&nbsp; This is the default Shadertoy license unless otherwise specified by the shader author, the same license provided with the hg_sdf header. There are some utility functions referenced which are provided by the <a href="../resources/noise.glsl">Twigl noise header</a>, available under the MIT license, and the <a href="../resources/hg_sdf.glsl">hg_sdf header</a>. The primitives provided by Inigo Quilez are under the <a href="images/DEC/inigo.txt">MIT License</a>.
+</p>
+
+<p>
+&nbsp; I have gathered these distance estimator functions from several sources (discussions with individuals, the hg_sdf header, Shadertoy examples, code deobfuscated from the #つぶやきGLSL tag on Twitter, among others). I have done my best to give credit to the authors, but I do not have a complete record - if you have information to that end, please contact me via email. If you are doing something cool with them, or would like to contribute to this resource, please contact me at jb239812@ohio.edu.
 </p>
 
 </div>
