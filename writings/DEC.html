@@ -629,6 +629,38 @@ float de(vec3 p){
 
 
 
+<tr><td><code>TLC123<code></td>    
+<td><pre>
+ChamferBox - generalizes sphere, cuboid, and octahedron
+
+float sdOctahedron( in vec3 p, in float s)// by Iq 2019{
+    p = abs(p);
+    float m = p.x+p.y+p.z-s;
+    vec3 q;
+         if( 3.0*p.x < m ) q = p.xyz;
+    else if( 3.0*p.y < m ) q = p.yzx;
+    else if( 3.0*p.z < m ) q = p.zxy;
+    else return m*0.57735027;
+    
+    float k = clamp(0.5*(q.z-q.y+s),0.0,s); 
+    return length(vec3(q.x,q.y-s+k,q.z-k)); 
+}
+
+float de(vec3 op){
+  vec3 b = vec3(1,2,3); // size
+  float ch = 0.25;      // chamfer amount
+  float r = 0.05;       // rounding
+
+  vec3 p = abs(op)+vec3(ch)+vec3(r);
+  p = max(vec3(0),p-b); 
+  float d =fOctahedron(p,ch);
+  return d-r ;		
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/primitives/chamferbox.png" alt="chamferbox", height=200px></td>
+</tr>
+
+
 
 
 
@@ -4579,6 +4611,31 @@ float de(vec3 p){
 }
 </pre></td>
 <td class="fitwidth"><img src="images/DEC/fractal_de204.png" alt="fractal_de204", height=200px></td>
+</tr>
+
+
+
+<tr><td><code>shane<code></td>
+<td><pre> 
+mat2 rot2(in float a){ float c = cos(a), s = sin(a); return mat2(c, s, -s, c); }
+float fractal_de211(vec3 p){
+    float d = 1e5;
+    const int n = 3;
+    const float fn = float(n);
+    for(int i = 0; i < n; i++){
+        vec3 q = p;
+        float a = float(i)*fn*2.422; //*6.283/fn
+        a *= a;
+        q.z += float(i)*float(i)*1.67; //*3./fn
+        q.xy *= rot2(a);
+        float b = (length(length(sin(q.xy) + cos(q.yz))) - .15);
+        float f = max(0., 1. - abs(b - d));
+        d = min(d, b) - .25*f*f;
+    }
+    return d;
+}
+</pre></td>
+<td class="fitwidth"><img src="images/DEC/fractal_de211.png" alt="fractal_de211", height=200px></td>
 </tr>
 
 
