@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Orbit Traps</title>
+
+<style>
+body {
+	font-family: 'Rokkitt', serif;
+	color:#481203;
+    background-color: #f7f0de;
+    margin: 50px 50px 50px 100px;
+    line-height: 15px;
+}
+a:link,
+a:visited {
+ color:blue;
+ text-decoration:none;
+ transition:.85s ease-out
+}
+a:hover {
+ color:#FF1203;
+ text-decoration:none;
+ transition:0s
+}
+</style>
+<link rel = "icon" href = "https://jbaker.graphics/resources/icon.png" type = "image/x-icon">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Rokkitt:wght@600&display=swap');
+</style>
+
+</head>
+<body>
+
+<h1 style='display:inline-block'>Jon Baker, Graphics Programming</h1>
+<p style='display:inline-block'> &nbsp; &nbsp; <a href='../index.html'>home</a></p>
+<p style='display:inline-block'> &nbsp; &nbsp; <a href='index.html'>writings</a></p>
+
+<div style='width:768px;'>
+
+<h2>Orbit Traps</h2>
+
+
+<p>
+&nbsp;You can use the orbit trap method to color these fractal distance estimators. When you are evaluating a transformed point over and over iteratively in a loop, as is the case for some of these fractal distance estimator functions, the point in question will move around the space in different ways. It is possible to use an escape counter variable, and upon evaluation of the final loop in the distance estimator, use this information to index into a palette that wraps around, in order to produce a color - I will explain a couple methods below.
+</p>
+
+<p>
+&nbsp;There are a few qualities which you might consider when updating this palette indexing variable. I have seen two metrics used, and came up with another one, which I'm sure has been used before. The form of thes fractal distance estimators often follows a pattern of repeatedly transforming the input point, p. There is a length basis, which considers the <code>length(p.xyz)</code>, a radial basis, which considers the angle about the origin, and a metric that uses the distance from the location of p during the previous iteration of the loop.
+</p>
+
+
+
+<h2>Length Basis</h2>
+<img src="images/orbit_trap/length_basis.png" alt="formula", height=450px>
+<p>
+&nbsp;Length basis is very simple - a single function call. 
+</p>
+
+<pre>
+// from Nameless
+  orbit_term = length(p.xyz);
+	 -or-
+  orbit_term = dot(p,p);	
+		
+</pre>
+
+
+<h2>Radial Basis</h2>
+<img src="images/orbit_trap/radial_basis.png" alt="formula", height=450px>
+<p>
+&nbsp;Radial basis requires the consideration of a few trigonometric functions, as shown here:
+</p>
+
+<pre>
+  vec3 norm = normalize(p.xyz);
+  float theta = acos(norm.z/length(norm.xyz));
+  float phi = atan(norm.y/norm.x);
+
+  orbit_term = max(theta,phi); // or some other operation based on these two euler angles
+</pre>
+
+
+<h2>Displacement Basis</h2>
+<img src="images/orbit_trap/displacement_basis.png" alt="formula", height=450px>
+<p>
+&nbsp;Distance from previous point location - this requires maintainence of state, updating some <code>pprev</code> at the beinning of each loop iteration with the previous value of p, before any transforms are applied.
+</p>
+
+<pre>
+  orbit_term = distance(p, pprev);
+</pre>
+
+
+
+
+
+<p>
+&nbsp;And once you have computed a result for this orbit term, there are a few ways to update the state. You might perform some transform on this variable, say <code>transformed_term = exp(-0.2*orbit_term);</code>, or get more creative with the formula there, maybe even something like the formula below. 
+</p>
+
+<img src="images/orbit_trap/formula.png" alt="formula", width=720px>
+
+<p>
+&nbsp;Once you have this transformed orbit term, you can use it in a few different ways. You may want to initially set the escape term to some large value, and each update consider <code>escape = min(escape, transformed_term);</code>. You might use a small or zero initial value for the escape term, and then consider <code>escape = max(escape, transformed_term);</code>. The most trivial method would probably be to just accumulate these values with<code>escape += transformed_term;</code> performed in each of these loop iterations.
+</p>
+
+<p>
+&nbsp;In a raymarching context, or any collision based method, it becomes important to control this variable's state's lifetime. My raymarcher, for example, uses the distance estimator function potentially many times on the way to determining the first hit, far more times while traversing to the various light locations, and again when evaluating the positions for the ambient occlusion term. As more and more of these types of evaluations are executed, the more and more skewed the resulting value of <code>escape</code> will become, with what will become strange artifacts resembling shadows, edge glows, and other strange behavior. It becomes important to reset the value for the escape index term at the beginning of each evaluation. The easiest way is to reset it to some minimum or maximum value at the beginning of each run of the distance estimator function, so that the escape variable only contains the result from one evaluation of the distance estimator function. Evaluated at the hit location, this is a good representation of what the color should be there.
+</p>
+
+<p>
+&nbsp;When you have a final result for your orbit trap term, you can use something like <a href="https://www.shadertoy.com/view/ll2GD3">Inigo Quilez's palette functions</a>, which will take your final float <code>escape</code> parameter and map it to an output color. There are many other uses, such as using it to control material parameters, such as emissive or metallic properties.
+</p>
+
+
+
+
+
+
+
+<p>
+&nbsp; Another thing to consider is to keep a vector of cantidate fragments for all triangles for a given pixel, and see if there were interesting applications for this model, perhaps treating them as points and reprojecting this point cloud, or do to interesting kinds of order-independent transparency. This is a limitation of graphics APIs which I have butted up against before, where alpha blending introduces order dependence into this otherwise massively parallel system.  
+</p>
+
+
+<br>
+
+</div>
+<br>
+<p>Last updated 6/1/2021</p>
+</body>
+</html>
