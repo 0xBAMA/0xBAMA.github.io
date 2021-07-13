@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Dithered Raymarching 3</title>
+<title>GPU SDF Pathtracing</title>
 
 <style>
 body {
@@ -38,103 +38,95 @@ a:hover {
 
 <div style='width:768px;'>
 
-<h2>Dithered Raymarching, Part 3: Fractals</h2>
-
-<img src="images/dithered3/dither3_10.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="one of my favorite distance estimators" width="768">
+<h2>GPU SDF Pathtracing</h2>
 
 <p>
-&nbsp; For this installment, I have rewritten this project basically from scratch, to make use some of the things I've recently added to <a href="https://github.com/0xBAMA/not-quite-an-engine">NQAE</a>. The general structure is still the same, with two compute shaders doing the rendering and dithering work, with output handled by a single fullscreen triangle and a very simple vertex/fragment pair that samples a render texture. One of the biggest things I've been messing with is fractal distance estimators, most of which I have found on Shadertoy and in the #つぶやきGLSL tag on Twitter. There are some that I have gotten through discussions on discord, and I do not know the original author. I am putting together a compendium of the distance estimators that I've found, which I will be putting up on this site soon, using a standardized format of <code>float de(vec3 p){...}</code>. Many of them have come from <a href="https://mobile.twitter.com/gaziya5">Gaziya5 on Twitter</a>, his work is incredible, his intuition for these shapes is very impressive. 
-
-<!-- under the <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/legalcode"> CC Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>. --!>
+&nbsp; This project is a continuation of my work with signed distance fields (SDFs). It is a relatively natural extension from what I was doing in the Dithered Raymarching project. The SDF representation is globally accessible, e.g. in every shader invocation, and plays very well with the parallel nature of the GPU. By making use of this global access to both geometry and normals, some very cool effects can be modeled. 
 </p>
 
-<h3>Rendering</h3>
-<p>
-&nbsp; I have made a number of improvements in the rendering - there is a significant line reduction in my raymarch code, and a general restructuring. I have added a lot of of features like soft shadows, depth fog, ambient occlusion, coloring via orbit traps, and the Blinn-Phong lighting model to create specular highlights. 
-</p>
-
-<img src="images/dithered3/dither3_12.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="fake soft lighting" width="768">
+<img src="images/sdf_path/sdf_path0.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="global illumination effects" width="768">
 
 <p>
-&nbsp; Soft shadows are a neat feature, but they have some serious limitations. I have found that for more complex distance estimators, or ones for which the Lipshitz bound doesn't hold, you will get severe artifacts. In my renderer I have found a solution, given the hardware capability (which is a large given for complex scenes), can be to do several point light sources with sharp shadows, separated by a small distance. Using different colors for each of these lights can even give a little bit of a fake spectral effect, like you can see above.
+&nbsp; You can see in some of the images there are significant global illumination effects, where indirect lighting has created interesting color bleed between neighboring objects. Additionally, you can see some depth of field (DoF) effects, which produce depth-dependent blurs on objects in front of or behind the focal plane. This same effect is responsible for the creation of the circular bokeh which you can see when bright lights are specularly reflected from surfaces towards the viewer.
 </p>
 
-<img src="images/dithered3/dither3_9.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="depth fog artifacts" width="768">
+<img src="images/sdf_path/sdf_path1.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="some fractals with a specular material" width="768">
+
+<h2>Overview</h2>
+<p>
+&nbsp; The basics of pathtracing are not complicated - in fact, I think this can be a much more intuitive model than the raster model, as it considers surfaces in a very physical way. The main loop in my program considers two main vec3 components: a <code>throughput_amount</code>  and an <code>accumulated_color</code>. The <code>throughput_amount</code> is initialized to 1.0 in each of the three channels, and is attenuated by one minus the surface albedo at each hit. The <code>accumulated_color</code> is initialized to 0.0 in each of the three channels and is incremented by the emissive properties of surfaces that are hit, scaled by the current <code>throughput_amount</code>.
+</p>
+
+<img src="images/sdf_path/sdf_path2.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="pure blue albedo" width="768">
 
 <p>
-&nbsp; Depth fog remains a work in progress, as I have not really found a good way to clamp the values effectively, which has created some odd artifacts like escaping rays going to black, as well as some issues on edges where the multisampled result is averaging using bad numbers and it creates some havok. You can see both of those issues here. For the most part though, I've had good luck with computing a depth term with some different falloff formulas, and then using this term as the parameter for mixing between the multisample result and the fog color. Tuning the depth term with a scale factor can make this more or less subtle.
+&nbsp; An easy way to understand what is happening here is to consider a very simple model of a diffuse red ball (albedo <code>vec3(1.,0.,0.)</code>) with a box of white emissive material (emission <code>vec3(1.,1.,1.)</code>) surrounding it in all directions. Consider a ray which originates at your eye's location, inside the box. If the ray's first hit is the box, you will simply use the initial value of <code>throughput_amount</code>, times the emission of the white material to get your output pixel of <code>vec3(1.,1.,1.)</code>. 
 </p>
-
-<img src="images/dithered3/dither3_7.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="ambient occlusion" width="768">
 
 <p>
-&nbsp; Ambient occlusion has proven to be a valuable effect to accentuate surface features - the implementation I am using takes several samples of the distance estimator, up along the normal from the hit location. By looking at whether the distance metric is increasing or decreasing along this ray, you get some estimate of what the occlusion provided by the surroundings look like.
+&nbsp; Now consider a ray which hits the diffuse red ball. You can see that the <code>throughput_amount</code> will be scaled, such that now only red light can be transmitted. Intuitively, you can start to understand that this surface only reflects red light. When the ray now bounces and hits your white emissive box, you will only ever get signal in the red channel. You can see a similar effect above, with a purely blue surface - note that when other colors are present in your scene, this can be visually confusing, as you can see there is no red or green light reflected.
 </p>
-
-<img src="images/dithered3/dither3_11.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="orbit trap coloring" width="768">
 
 <p>
-&nbsp; Orbit trap coloring is an interesting technique. Many of these fractals operate by folding up the space in different ways, and this method looks at things like the distance of the transformed point location from the origin at each of these folding steps. I have seen some interesting artifacts come up while I was implementing this - because the same distance estimator is called several times (raymarching, lighting, ambient occlusion), and the escape value is kept as a global variable, ther are some interesting shadow-like artifacts, which you can see at the top of the image here. An easy fix for this is to cache the value after your initial raymarch hit.
+&nbsp; This same behavior is propagated over several bounces, until a final color is reached. More bounces will give more chances to hit emissive materials, etc, but more than bounces can become very expensive to evaluate per sample. I am using an optimization called 'russian roulette' which introduces a stochastic chance to terminate early if it sees that the value of one of the channels of <code>throughput_amount</code> drop low enough. There is a little more to this method, which you can read about towards the bottom of the page <a href="https://blog.demofox.org/2020/06/06/casual-shadertoy-path-tracing-2-image-improvement-and-glossy-reflections/">here</a>.
 </p>
 
-<img src="images/dithered3/dither3_1.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="low bit depth" width="768">
+<h2>Depth of Field</h2>
+<p>
+&nbsp; This effect is achieved via the thin lens approximation, which you can read about <a href="https://raytracing.github.io/books/RayTracingInOneWeekend.html#defocusblur/athinlensapproximation">here</a>. When you generate your view ray, the origin position is jittered inside of a small circle around the pixel center's location. With some consideration of the distance to the focal plane, this gives a nice depth dependent blur which can add a lot to these renders.
+</p>
+
+<img src="images/sdf_path/sdf_path3.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="DoF1" width="768">
 
 <p>
-&nbsp; Blinn-Phong lighting adds a lot to the scenes, as well, by creating specular highlights where a light source would be reflected into your eye. By varying the falloff exponent, you can create different types of material appearances, from dull surfaces like plastic to much sharper reflections, like you would see from metallic surfaces.
+&nbsp; There are two parameters for this effect: the radius of the circle we jitter with, and the distance to the focal plane. By increading the radius, the blur becomes more and more intense and increases at a sharper rate as you move away from the focal plane. Correspondingly, if you decrease it, the effect becomes less intense, down to a value of 0, which cancels out the jittering effect and creates a sharp image at the entire range of depth values. 
 </p>
 
-<h3>Dithering</h3> 
-<p>
-&nbsp; There are some changes to the dithering logic, as well. I am primarily using an exponential formula for applying the dithering now, rather than the bitcrush logic. I add the noise offset in the middle of this operation, so that it gets baked into the resulting color on a per-pixel basis. There are quite a few more colorspaces in use, and now I have a lot more different dither patterns, which each have their own character. 
-</p>
-
-<img src="images/dithered3/dither3_4.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="low bit depth" width="768">
+<img src="images/sdf_path/sdf_path4.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="DoF2" width="768">
 
 <p>
-&nbsp; The colorspace list now includes RGB, sRGB, XYZ, XYY, HSV, HSL, HCY, YPBPR, YCBCR, YCCBCCRC, YCOCG, BCH, OKLAB and ChromaMax. Each one scales differently when reducing to different bit depths, and you can find some very interesting effects by looking at the different options. I think the ChromaMax at a bit depth of 4 is my favorite, it creates a look very reminiscent to a VGA-palette. A lot of the pictures on this page are done with that setting.
+&nbsp;You can see below some interesting interplay between specular materials and the DoF effects - a curved, perfectly mirrored surface towards the back on the right hand side reflects all the scene objects in an interestingly distorted fashion.
 </p>
 
-<img src="images/dithered3/dither3_2.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="low bit depth, blue noise" width="768">
+<img src="images/sdf_path/sdf_path5.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="DoF3" width="768">
+
+<h2>Renderer Architecture</h2>
 
 <p>
-&nbsp; The different dither patterns can also create some different looks, too. I find that I really like the Bayer pattern, but there are some other patterns - the ones I have implemented are Bayer, RGB blue noise, monochrome blue noise, uniform random noise, interleaved gradient noise, Vlachos, and some triangularly distributed variants of these. The picture above makes use of the monochrome blue noise pattern, which uses a single blue noise sample to offset each of the three color channels.
+&nbsp; This is very similar to the tile based renderer used in the later versions of the Dithered Raymarching project, with a few major changes. Rather than doing a full pass across the screen every frame, a vector of tiles is maintained on the CPU, which acts as a work queue for the GPU. By processing some number of tiles off of this queue, until a time threshold (a few tens of milliseconds) has passed, I can maintain interactivity with ImGUI, even at very high resolutions (4K+, arbitrary up to maximum GPU texture size - this is ~16k pixels square on the driver I'm using). Just for kicks, this vector of tile offsets is shuffled each time it is completed. 
 </p>
-
-
-<h3>Geometry</h3> 
-<img src="images/dithered3/dither3_8.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="a cool fractal" width="768">
 
 <p>
-&nbsp; I think this is the most interesting part of this project. Experimenting with the different distance estimators has provided a very interesting testbed for the various rendering features that I have implemented. The code for these is often very concise, but also can become very expensive, when considering that they will be evaluated potentially many times per pixel.
+&nbsp; On the GPU, the model is very simple. There is a very deep bit depth image (32 bit floating point per channel, RGBA) which is the only state maintained on the GPU. This is done by maintaining a sample count in the alpha channel of this texture. Note that it is neccesary to do it this way rather than maintaining a global counter due to the way that tiles are processed. This sample count is incremented each time a sample is completed, and is used to average the current color sample with the running sample average, using some very simple logic - <code>mix(old, new, 1/count)</code>. You can zero out state by writing a 1 to the alpha channel - the third parameter, which controls the mix between the first two terms, will be 1/1=1 and you will be writing only the new value back. Alternatively, you can zero the entire texture buffer from the CPU, but this ends up being a lot more work than you have to.
 </p>
 
-<img src="images/dithered3/dither3_3.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="in engine editor" width="768">
+<h2>Materials</h2>
 
 <p>
-&nbsp; Experimentation is a lot easier with an in-engine editor for the raymarch shader, which allows runtime editing and recompilation of the shader. I have been having some stability issues with the project recently, so validating further distance estimators may have to be done via the Voraldo 1.2 User Shader. By using this standard format, <code>float de(vec3 p){...}</code>, it becomes very easy to drop these in and try different ones.
+&nbsp; Diffuse materials are the simplest to implement - they only need to know the surface normal in order to be calculated. The outgoing ray will be made to go in a completely random direction off of the surface. There are different ways to do this, but the method I'm using uses the normalized result of random unit vector added to the normal, with a small bump by epsilon to keep it above the actual surface that it hits. You can see below, the material starts to look like unglazed clay, terra cotta, or some kind of material like that.
 </p>
 
-<img src="images/dithered3/dither3_5.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="a cool fractal" width="768">
+<img src="images/sdf_path/sdf_path6.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="diffuse" width="768">
 
 <p>
-&nbsp; Many of the fractals I have found are variants of the Apollonian fractal, which is a sphere packing strategy that uses spheres of reducing radius. With minor tweaks, these infinite spaces of differently shaped pillars can be formed. 
+&nbsp; Specular materials require the computation of the reflected vector. This is done by reflecting the incoming vector about the surface normal at the hit location. My specular material averages this reflected vector with the same ray generation algorithm as the diffuse material, weighted by a sort of roughness parameter. You can see in some of the images on this page, the reflections are not perfectly specular (e.g. there is some blending of these two vectors), and in fact create their own bokeh as the rays diverge off of the surface.
 </p>
 
-<img src="images/dithered3/dither3_6.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="a cool fractal" width="768">
-<img src="images/dithered3/dither3_13.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="a cool fractal" width="768">
-<img src="images/dithered3/dither3_14.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="a cool fractal" width="768">
+<img src="images/sdf_path/sdf_path7.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="specular" width="768">
 
 <p>
-&nbsp; There are, however, many different types, some of which create some very exotic forms. I will have the compiled list finished soon, which hopefully will prove to be a valuable resource. I look forward to seeing how these things are used - they can see usage in a realtime raymarching context, but I have been sharing them back and forth with Nameless on discord, who has been using raymarching-style intersection in an offline pathtracing context, like the images below. Using different union and intersection operators can create some very interesting effects, and they have been working with MIS techniques using different lighting models, and methods for volumetrics, as well.
+&nbsp; Emissive materials are the only sources of light in the scene right now. The pathtracing algorithm is very flexible in this regard - I can make arbitrarily shaped lights by simply giving an SDF an emissive material, or use a simpler model like a point light. Once you get into more advanced topics like importance sampling, etc, this obviously becomes more complicated, as you cannot easily generate points on this light source. It creates some interesting results in this implementation, though. You can see them turned way down in the picture below, where the emissive materials are directly visible. Nearby bounces on the surrounding diffuse material have a higher chance to hit the emissive material (think: it takes up more of the horizon) which creates an effect very similar to the inverse square law. The energy of the ray is conserved between bounces, not scaled by distance. Much like global illumination, you can see that this effect is created with no explicit consideration of the inverse square law. 
 </p>
 
-<img src="images/dithered3/nameless3.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="a cool fractal" width="768">
-<img src="images/dithered3/nameless2.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="a cool fractal" width="768">
-<img src="images/dithered3/nameless1.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="a cool fractal" width="768">
+<img src="images/sdf_path/sdf_path8.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="emissive" width="768">
 
+<h2>Future Directions</h2>
+<p>
+&nbsp;
+</p>
 
 </div>
 <br>
-<p>Last updated 5/19/2021</p>
+<p>Last updated 7/12/2021</p>
 </body>
 </html>
