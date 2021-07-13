@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>GPU SDF Pathtracing - Refraction</title>
+<title>GPU SDF Pathtracing: Refraction</title>
 
 <style>
 body {
@@ -38,15 +38,104 @@ a:hover {
 
 <div style='width:768px;'>
 
-<h2>Dithered Raymarching, Part 3: Fractals</h2>
+<h2>GPU SDF Pathtracing: Refraction - WIP</h2>
 
+<img src="images/refract/refract0.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="refractive bubble" width="768">
+
+<p>
+&nbsp; This was my next step after getting pathtracing with basic materials done. Continuing on with an SDF based model for geometry, this part of the project introduces a separate distance estimator which represents the refractive materials, defined in the same space as the rest of the geometry. By having these as two separate entities, there are two distinct types of geometry intersections that can happen: normal and refractive (refractive has two types, but we will get there).
+</p>
+
+
+<h2>Vessica Picis</h2>
+<p>
+&nbsp; There's a classical shape from geometry which is the <a href="https://en.wikipedia.org/wiki/Vesica_piscis">intersection of two circles of the same radius</a>. I'm not sure what spurred my initial interest, but this inspired the method by which I formed the lens shape. Extending the idea of the vessica picis two three dimensions, I used the intersection of two sphere SDFs. In my implementation, the two spheres can have different radii, and are separated by some lens thickness. Their centers are separated by radius1 + radius2 - thickness. As you can see, the use of two distinct radii creates different curvature on either side of the lens - this will create different refractive behavior for viewer positions on either side. For the purposes of this discussion, this is the refractive object that I will be dealing with.
+</p>
+
+<img src="images/refract/vessica.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="vessica" width="768">
+
+
+<h2>Refraction</h2>
+<p>
+&nbsp; Refraction is a phenomena that occurs with light rays, by which the direction bends at interface changes. These interfaces exist between materials with different index of refraction (IOR) values. These types of materials are called 'dielectric'. IOR is a ratio of how quickly light can pass through this material, relative to the speed of light in a vacuum. By specifiying this quantity for the lens, and assuming a value of 1.0 for the surrounding 'air', we have now established a partitioning of the space. Independent of the rest of the scene geometry, there is 'inside the lens' and 'outside the lens'.
+</p>
+
+<img src="images/refract/refract1.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="basic refraction" width="768">
+
+<p>
+&nbsp; As light passes through these interfaces between dielectric materials, these bends will affect the direction of the ray as it continues farther into the scene. As you can see in the images above and below, this can create a magnification effect, as the rays have effectively diverged out from one another, spreading out and becoming less parallel. This plays interestingly with the DoF calculations, as well as creating some interesting visual distortion, as you can see here.
+</p>
+
+<img src="images/refract/refract2.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="basic refraction" width="768">
+
+<p>
+&nbsp; WIP
+</p>
 
 <p>
 &nbsp;
 </p>
 
-<img src="images/refract/refract0.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="global illumination effects" width="768">
+<p>
+&nbsp; 
+</p>
 
+<p>
+&nbsp; WIP
+</p>
+
+<p>
+&nbsp;
+</p>
+
+<p>
+&nbsp; 
+</p>
+
+<p>
+&nbsp; WIP
+</p>
+
+<h2>Implementation</h2>
+
+<p>
+&nbsp; WIP
+</p>
+
+<p>
+&nbsp; 
+</p>
+
+<p>
+&nbsp; 
+</p>
+
+
+<h2>A Limited Model for Nested Dielectrics</h2>
+<img src="images/refract/refract3.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="basic refraction" width="768">
+<img src="images/refract/refract4.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="basic refraction" width="768">
+
+
+<h2>Viewer Inside the Lens</h2>
+<img src="images/refract/refract5.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="basic refraction" width="768">
+<img src="images/refract/refract6.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="basic refraction" width="768">
+
+
+<h2>Objects Embedded in Lens</h2>
+<img src="images/refract/refract7.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="basic refraction" width="768">
+<img src="images/refract/refract8.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="basic refraction" width="768">
+<img src="images/refract/refract9.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="basic refraction" width="768">
+
+
+<h2>Wierd Stuff</h2>
+<img src="images/refract/refract10.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="basic refraction" width="768">
+<img src="images/refract/refract11.png" style="margin: 0px 0px 0px 0px; border: 2px solid #ba550b;" alt="basic refraction" width="768">
+
+
+<h2>Future Directions</h2>
+<p>
+&nbsp; One of the major things I want investigate from here is spectral rendering. This eschews the concept of using RGB tuples as your primary currency, and instead represents light as spectral distributions. In doing this, you can start to see a wavelength dependence in the behavior of rays interacting with materials. This manifests in things like chromatic aberration, and the rainbow colored dispersion through the prism on the cover of Pink Floyd's <i>The Dark Side of the Moon</i>.
+</p>
 
 </div>
 <br>
